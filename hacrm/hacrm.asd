@@ -2,8 +2,7 @@
 (defpackage #:hacrm-asd
   (:use
    :cl
-   :asdf
-   :cl-who))
+   :asdf))
 
 (in-package :hacrm-asd)
 
@@ -14,14 +13,40 @@
   :author ""
   :licence ""
   :description "hacrm"
-  :depends-on (:weblocks
-               :weblocks-twitter-bootstrap-application
-               :weblocks-cms)
-  :components ((:file "hacrm")
+  :depends-on (:lass
+               :local-time
+               :split-sequence
+               :cl-markdown
+               :weblocks
+               :weblocks-stores
+               :weblocks-ui
+               :cl-prevalence
+               ;;:weblocks-twitter-bootstrap-application
+               :ceramic
+               :swank
+               :find-port
+               ;; :weblocks-cms
+               )
+  :components ((:file hacrm)
                (:module conf
-                :components ((:file "stores"))
-                :depends-on ("hacrm"))
+                :components ((:file stores))
+                :depends-on (hacrm))
                (:module src
-                :components ((:file "init-session"))
-                :depends-on ("hacrm" conf))))
+                :components ((:file utils)
+                             (:module models
+                              :components ((:file contact)
+                                           (:file note))
+                              :depends-on (utils))
+                             (:module widgets
+                              :components ((:file notes)
+                                           (:file contact-details
+                                            :depends-on (notes))))
+
+                             (:file init-session
+                              :depends-on (models
+                                           widgets))
+
+                             (:file desktop))
+                :depends-on (hacrm
+                             conf))))
 

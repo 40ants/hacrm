@@ -1,5 +1,11 @@
 
-(("https://raw.github.com/html/weblocks-assets/master/weblocks-jquery/0.2.0/"
+(("https://raw.github.com/html/weblocks-assets/master/bootstrap-timepicker/0.2.3/"
+  . "bootstrap-timepicker-0.2.3")
+ ("https://raw.github.com/html/weblocks-assets/master/bootstrap-datepicker/1.2.0/"
+  . "bootstrap-datepicker-1.2.0")
+ ("https://raw.github.com/html/weblocks-assets/master/tinymce/4.0.4/"
+  . "tinymce-4.0.4")
+ ("https://raw.github.com/html/weblocks-assets/master/weblocks-jquery/0.2.0/"
   . "weblocks-jquery-0.2.0")
  ("https://raw.github.com/html/weblocks-assets/master/jquery-seq/0.0.3/"
   . "jquery-seq-0.0.3")
