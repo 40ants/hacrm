@@ -18,7 +18,9 @@
                :split-sequence
                :cl-markdown
                :weblocks
+               :weblocks-lass
                :weblocks-stores
+               :weblocks-prevalence
                :weblocks-ui
                :cl-prevalence
                ;;:weblocks-twitter-bootstrap-application
@@ -35,7 +37,8 @@
                 :components ((:file utils)
                              (:module models
                               :components ((:file contact)
-                                           (:file note))
+                                           (:file note)
+                                           (:file playground))
                               :depends-on (utils))
                              (:module widgets
                               :components ((:file notes)

@@ -31,8 +31,18 @@
   :js-backend :jquery
   )
 
-;; Top level start & stop scripts
 
+(defmethod weblocks.dependencies:get-dependencies ((app hacrm))
+  (append (list (weblocks.lass:make-dependency
+                  '(.page-wrapper
+                    :margin-left "100px"
+                    :margin-right "100px"
+                    :margin-top "50px"
+                    )))
+          (call-next-method)))
+
+
+;; Top level start & stop scripts
 
 (defvar hacrm-app nil
   "Инстанс приложения hacrm.")
