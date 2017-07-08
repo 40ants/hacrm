@@ -249,14 +249,124 @@
                 :value "Добавить"))))
 
 
+(defwidget input-box ()
+  ((callback :type function
+             :initarg :callback
+             :reader callback)))
+
+
+(defmethod weblocks.dependencies:get-dependencies ((widget input-box))
+  (append (list (weblocks.lass:make-dependency
+                  '(.input-box
+                    (form
+                     :margin 0)
+                    (input
+                     :margin 0
+                     :width "100%"
+                     :font-size "30px"
+                     :height "30px"
+                     :border 0
+                     :border-top "1px solid gray"
+                     :border-radius 0
+                     ))))
+          (call-next-method)))
+
+
+(defun make-input-box (callback)
+  (make-instance 'input-box
+                 :callback callback))
+
+
+(defmethod render-widget-body ((widget input-box)
+                               &rest rest)
+  (declare (ignorable rest))
+  
+  (with-html-form (:post (lambda (&rest args)
+                           (apply (callback widget)
+                                  args)))
+    (:input :type "text"
+            :name "query"
+            :autofocus t
+            :value "")))
+
+
+(defwidget main-window ()
+  ((input-box :type input-box
+              :initarg :input-box
+              :reader get-input-box)
+   (main-widget :type widget
+                :initarg :main-widget
+                :accessor main-widget)))
+
+
+(defmethod weblocks.dependencies:get-dependencies ((widget main-window))
+  (append (list (weblocks.lass:make-dependency
+                  '(.main-window
+                    :position "absolute"
+                    :left 0
+                    :right 0
+                    :top 0
+                    :bottom 0
+                    :display "flex"
+                    :flex-direction "column"
+                    (.main-window__working-area
+                     :flex 1 1 100%)
+                    (.main-window__input
+                     :flex-shrink 0)
+                    )))
+          (call-next-method)))
+
+
+(defgeneric process-query (widget query)
+  (:documentation "Processes given query and returns a given widget or a new one."))
+
+
+(defmethod process-query ((widget widget) query)
+  (cond ((string-equal query "all")
+         (make-contacts-list))
+        
+        ((cl-strings:starts-with query "/")
+         (hacrm.widgets.contact-details:make-contact-details2-widget
+          (car (weblocks-stores:find-persistent-objects
+                hacrm::*hacrm-store*
+                'hacrm.models.contact:contact))))
+        (t (make-widget (format nil "Unknown query \"~a\"" query)))))
+
+
+(defun make-main-window ()
+  (let (window)
+    (flet ((callback (&key query &allow-other-keys)
+             (log:debug "Callback called" query)
+             (let* ((current-widget (main-widget window))
+                    (widget (process-query current-widget query)))
+               (when (not (eql current-widget
+                               widget))
+                 (setf (main-widget window)
+                       widget)
+                 (mark-dirty window)))))
+    
+      (setf window
+            (make-instance 'main-window
+                           :input-box (make-input-box #'callback)
+                           :main-widget (make-widget "Enter the query"))))))
+
+
+(defmethod render-widget-body ((window main-window)
+                               &rest rest)
+  (declare (ignorable rest))
+  
+  (with-html
+    (:div :class "main-window__working-area"
+          (render-widget (main-widget window)))
+    (:div :class "main-window__input"
+          (render-widget (get-input-box window)))))
+
+
 (defun init-user-session (root)
   (let ((contacts-list (make-contacts-list)))
     (setf (widget-children root)
-          (list (lambda (&rest args)
-                  (declare (ignorable args))
-                  (with-html
-                    (:div :class "container"
-                          (:h1 :align "center" "Happy Hacking with HACRM!"))))
-                contacts-list
-                (make-custom-form contacts-list)))))
+          (list (make-main-window)
+                ;; contacts-list
+                ;; (make-custom-form contacts-list)
+                ))))
 

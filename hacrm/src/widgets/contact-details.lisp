@@ -2,9 +2,11 @@
   (:use #:cl
         #:cl-who
         #:weblocks
-        #:f-underscore)
+        #:f-underscore
+        #:hacrm.models.contact)
   (:export :make-contact-details-widget
-           :contact-details-contact))
+   :contact-details-contact
+   :make-contact-details2-widget))
 (in-package hacrm.widgets.contact-details)
 
 
@@ -47,3 +49,26 @@
           (render-widget (contact-details-notes widget)))
         (with-html
           (:p "Выберите какой-либо контакт")))))
+
+
+;; Second version
+
+(defwidget contact-details2 ()
+  ((contact :type 'contact
+            :initarg :contact
+            :reader get-contact)))
+
+
+(defun make-contact-details2-widget (contact)
+  (make-instance 'contact-details2
+                 :contact contact))
+
+
+(defmethod render-widget-body ((widget contact-details2) &rest args)
+  (declare (ignorable args))
+
+  (with-accessors ((contact get-contact))
+      widget
+    (with-html
+      (:h1 (esc (contact-name contact)))
+      (:p "No details"))))
