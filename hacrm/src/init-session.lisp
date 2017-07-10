@@ -165,7 +165,7 @@
             (loop for c in contacts
                   do (htm (:tr (:td (render-link (funcall (f_ (f_% (select-contact contact-list _)))
                                                           c)
-                                                 (hacrm.models.contact:contact-name c)))
+                                                 (hacrm.models.contact:name c)))
                                (:td :style "text-align: right"
                                     (render-link (funcall (f_ (f_% (remove-contact contact-list _)))
                                                           c)
@@ -176,15 +176,13 @@
   "TODO: удалить и использовать вместо этого виджет."
   (let ((contact (current-contact contact-list)))
     (with-html
-      (:h1 (esc (hacrm.models.contact:contact-name contact)))
+      (:h1 (esc (hacrm.models.contact:name contact)))
       (render-link (f_% (setf (current-contact contact-list)
                               nil)
                         (mark-dirty contact-list))
                    "Отмена"
                    :class "btn btn-default"))))
 
-
-(declaim (optimize (debug 3)))
 
 (defmethod render-widget-body ((contact-list contacts-list) &rest rest)
   "Returns HTML with contacts list."
@@ -302,35 +300,59 @@
 (defmethod weblocks.dependencies:get-dependencies ((widget main-window))
   (append (list (weblocks.lass:make-dependency
                   '(.main-window
-                    :position "absolute"
+                    :position absolute
                     :left 0
                     :right 0
                     :top 0
                     :bottom 0
-                    :display "flex"
-                    :flex-direction "column"
+                    :display flex
+                    :flex-direction column
                     (.main-window__working-area
-                     :flex 1 1 100%)
+                     :flex 1 1 100%
+                     :padding 10px)
                     (.main-window__input
                      :flex-shrink 0)
                     )))
           (call-next-method)))
 
 
-(defgeneric process-query (widget query)
-  (:documentation "Processes given query and returns a given widget or a new one."))
+(defun rewrite-query (query)
+  (if (find #\: query)
+      query
+      (format nil "name:~a or tag:~a" query query)))
 
 
-(defmethod process-query ((widget widget) query)
-  (cond ((string-equal query "all")
-         (make-contacts-list))
-        
-        ((cl-strings:starts-with query "/")
-         (hacrm.widgets.contact-details:make-contact-details2-widget
-          (car (weblocks-stores:find-persistent-objects
-                hacrm::*hacrm-store*
-                'hacrm.models.contact:contact))))
-        (t (make-widget (format nil "Unknown query \"~a\"" query)))))
+(defmethod hacrm.query:process-query ((widget widget)
+                                      token
+                                      query)
+  "If no handler processed the query, then we'll try to search a contact."
+  (declare (ignorable token))
+
+  (log:debug "Trying to search contact" query)
+  
+  (let* ((search-query (rewrite-query query))
+         (contacts (hacrm.search:search-contact search-query))
+         (contacts-count (length contacts)))
+    (log:debug "Search completed" contacts-count)
+    
+    (cond
+      ((eql contacts-count 0)
+       (make-widget "No contacts were found"))
+      ((eql contacts-count 1)
+       (hacrm.widgets.contact-details:make-contact-details2-widget
+        (car contacts)))
+      (t
+       (hacrm.widgets.contacts-list:make-contacts-list
+        contacts)))))
+
+
+(defmethod hacrm.query:process-query ((widget widget)
+                                      (token (eql :contacts))
+                                      query)
+  "Shows full contact list."
+  (declare (ignorable query))
+  (hacrm.widgets.contacts-list:make-contacts-list
+   (hacrm.models.contact:find-contacts)))
 
 
 (defun make-main-window ()
@@ -338,9 +360,10 @@
     (flet ((callback (&key query &allow-other-keys)
              (log:debug "Callback called" query)
              (let* ((current-widget (main-widget window))
-                    (widget (process-query current-widget query)))
-               (when (not (eql current-widget
-                               widget))
+                    (widget (hacrm.query:process-string-query current-widget query)))
+               (when (and widget
+                          (not (eql current-widget
+                                    widget)))
                  (setf (main-widget window)
                        widget)
                  (mark-dirty window)))))

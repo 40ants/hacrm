@@ -29,22 +29,29 @@
                :find-port
                ;; :weblocks-cms
                )
+  :serial t
   :components ((:file hacrm)
                (:module conf
                 :components ((:file stores))
                 :depends-on (hacrm))
                (:module src
                 :components ((:file utils)
+                             (:file query)
                              (:module models
                               :components ((:file contact)
                                            (:file note)
-                                           (:file playground))
+                                           (:file playground)
+                                           (:module facts
+                                            :components ((:file core)
+                                                         (:file twitter)
+                                                         (:file tag))))
                               :depends-on (utils))
+                             (:file search)
                              (:module widgets
                               :components ((:file notes)
                                            (:file contact-details
-                                            :depends-on (notes))))
-
+                                            :depends-on (notes))
+                                           (:file contacts-list)))
                              (:file init-session
                               :depends-on (models
                                            widgets))

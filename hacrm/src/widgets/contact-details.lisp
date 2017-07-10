@@ -69,6 +69,32 @@
 
   (with-accessors ((contact get-contact))
       widget
-    (with-html
-      (:h1 (esc (contact-name contact)))
-      (:p "No details"))))
+    (let ((tags (hacrm.models.facts.tag:get-contact-tags contact)))
+      (with-html
+        (:h1 (esc (name contact)))
+
+        (if tags
+            (with-html
+              (:p "Tags:")
+              (:ul (loop for tag in tags
+                         do (with-html (:li (esc (hacrm.models.facts.tag:name tag)))))))
+            (with-html
+              (:p "No details")))))))
+
+
+(defmethod hacrm.query:process-query ((widget contact-details2)
+                                      (token (eql :tag))
+                                      query)
+  (log:debug "Adding a tags from" query)
+  
+  (let* ((tokens (cl-strings:split query #\Space))
+         (tags (cdr tokens)))
+    (loop for tag in tags
+          do (log:debug "Creating a tag" tag)
+          do (hacrm.utils:store-object
+              (hacrm.models.facts.tag:make-tag-fact
+               (get-contact widget)
+               tag))))
+
+  (mark-dirty widget)
+  (values))

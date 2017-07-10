@@ -2,7 +2,8 @@
   (:use #:cl)
   (:export
    #:fact
-   #:deffact))
+   #:deffact
+   #:contact))
 (in-package hacrm.models.facts.core)
 
 
@@ -13,7 +14,7 @@
    (updated-at :initform (get-universal-time)
                :reader updated-at)
    (contact :initarg :contact
-            :reader fact-contact)))
+            :reader contact)))
 
 
 (defmacro deffact (name slots)
@@ -23,13 +24,13 @@
      
      (defmethod cl-prevalence::get-root-object ((system hacrm::hacrm-prevalence-system)
                                                 (name (eql ',name)))
-       (cl-prevalence::get-root-object system 'hacrm.models.playground::fact))
+       (cl-prevalence::get-root-object system 'fact))
 
 
      (defmethod (setf cl-prevalence::get-root-object) (value
                                                        (system hacrm::hacrm-prevalence-system)
                                                        (name (eql ',name)))
        (setf (cl-prevalence::get-root-object system
-                                             'hacrm.models.playground::fact)
+                                             'fact)
              value))))
 

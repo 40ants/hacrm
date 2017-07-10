@@ -2,8 +2,8 @@
   (:use #:cl)
   (:export #:contact
            #:make-contact
-           #:contact-name
-           #:contact-created
+           #:name
+           #:created
            #:find-contacts))
 (in-package hacrm.models.contact)
 
@@ -12,10 +12,10 @@
   ((id)
    (name :type string
          :initarg :name
-         :accessor contact-name)
+         :accessor name)
    (created :type integer
             :initform (get-universal-time)
-            :reader contact-created)))
+            :reader created)))
 
 
 (defun make-contact (name)
@@ -32,4 +32,4 @@
 
 (defmethod print-object ((contact contact) stream)
   (format stream "#<CONTACT ~S>"
-          (contact-name contact)))
+          (name contact)))
