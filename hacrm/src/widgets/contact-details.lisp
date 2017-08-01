@@ -6,11 +6,14 @@
         #:hacrm.models.contact)
   (:export :make-contact-details-widget
    :contact-details-contact
-   :make-contact-details2-widget))
+           :make-contact-details2-widget
+   :contact-details2
+           :get-contact
+           :render-facts))
 (in-package hacrm.widgets.contact-details)
 
 
-(defwidget contact-details ()
+(defwidget contact-details (hacrm.widgets.base:base)
   ((contact-list :initarg :contact-list
                  :reader contact-details-contact-list)
    (contact :initform nil
@@ -40,7 +43,7 @@
   (with-slots (contact-list contact) widget
     (if contact
         (with-html
-          (:h1 (esc (hacrm.models.contact:contact-name contact)))
+          (:h1 (esc (hacrm.models.contact:name contact)))
           (render-link (f_% (setf (hacrm::current-contact contact-list)
                                   nil)
                             (mark-dirty contact-list))
@@ -53,7 +56,7 @@
 
 ;; Second version
 
-(defwidget contact-details2 ()
+(defwidget contact-details2 (hacrm.widgets.base:base)
   ((contact :type 'contact
             :initarg :contact
             :reader get-contact)))
@@ -64,37 +67,17 @@
                  :contact contact))
 
 
+(defgeneric render-facts (fact-group contact)
+  (:documentation "Renders a closely related group of facts about a contact."))
+
+
 (defmethod render-widget-body ((widget contact-details2) &rest args)
   (declare (ignorable args))
 
   (with-accessors ((contact get-contact))
       widget
-    (let ((tags (hacrm.models.facts.tag:get-contact-tags contact)))
-      (with-html
-        (:h1 (esc (name contact)))
+    (with-html
+      (:h1 (esc (name contact)))
 
-        (if tags
-            (with-html
-              (:p "Tags:")
-              (:ul (loop for tag in tags
-                         do (with-html (:li (esc (hacrm.models.facts.tag:name tag)))))))
-            (with-html
-              (:p "No details")))))))
-
-
-(defmethod hacrm.query:process-query ((widget contact-details2)
-                                      (token (eql :tag))
-                                      query)
-  (log:debug "Adding a tags from" query)
-  
-  (let* ((tokens (cl-strings:split query #\Space))
-         (tags (cdr tokens)))
-    (loop for tag in tags
-          do (log:debug "Creating a tag" tag)
-          do (hacrm.utils:store-object
-              (hacrm.models.facts.tag:make-tag-fact
-               (get-contact widget)
-               tag))))
-
-  (mark-dirty widget)
-  (values))
+      (loop for fact-group in (hacrm.models.facts.core:fact-groups contact)
+            do (render-facts fact-group contact)))))

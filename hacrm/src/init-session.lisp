@@ -108,6 +108,7 @@
       (call-next-method)))
 
 
+;; TODO: remove because new widget was created
 (defwidget contacts-list ()
   ((current-contact :initform nil
                     :initarg :current-contact
@@ -247,148 +248,67 @@
                 :value "Добавить"))))
 
 
-(defwidget input-box ()
-  ((callback :type function
-             :initarg :callback
-             :reader callback)))
+;; (defun rewrite-query (text)
+;;   "Rewrites a text query, adding field prefixes if needed."
+;;   ;; TODO: implement
+;;   text)
 
 
-(defmethod weblocks.dependencies:get-dependencies ((widget input-box))
-  (append (list (weblocks.lass:make-dependency
-                  '(.input-box
-                    (form
-                     :margin 0)
-                    (input
-                     :margin 0
-                     :width "100%"
-                     :font-size "30px"
-                     :height "30px"
-                     :border 0
-                     :border-top "1px solid gray"
-                     :border-radius 0
-                     ))))
-          (call-next-method)))
+;; Убрать, потому что я сделал так чтобы вызывалась команда по-умолчанию
+;; (defmethod hacrm.commands:command ((widget widget)
+;;                                    token
+;;                                    query)
+;;   "If no handler processed the query, then we'll try to search a contact."
+;;   (declare (ignorable token))
 
-
-(defun make-input-box (callback)
-  (make-instance 'input-box
-                 :callback callback))
-
-
-(defmethod render-widget-body ((widget input-box)
-                               &rest rest)
-  (declare (ignorable rest))
+;;   (log:debug "Trying to search contact" query)
   
-  (with-html-form (:post (lambda (&rest args)
-                           (apply (callback widget)
-                                  args)))
-    (:input :type "text"
-            :name "query"
-            :autofocus t
-            :value "")))
-
-
-(defwidget main-window ()
-  ((input-box :type input-box
-              :initarg :input-box
-              :reader get-input-box)
-   (main-widget :type widget
-                :initarg :main-widget
-                :accessor main-widget)))
-
-
-(defmethod weblocks.dependencies:get-dependencies ((widget main-window))
-  (append (list (weblocks.lass:make-dependency
-                  '(.main-window
-                    :position absolute
-                    :left 0
-                    :right 0
-                    :top 0
-                    :bottom 0
-                    :display flex
-                    :flex-direction column
-                    (.main-window__working-area
-                     :flex 1 1 100%
-                     :padding 10px)
-                    (.main-window__input
-                     :flex-shrink 0)
-                    )))
-          (call-next-method)))
-
-
-(defun rewrite-query (query)
-  (if (find #\: query)
-      query
-      (format nil "name:~a or tag:~a" query query)))
-
-
-(defmethod hacrm.query:process-query ((widget widget)
-                                      token
-                                      query)
-  "If no handler processed the query, then we'll try to search a contact."
-  (declare (ignorable token))
-
-  (log:debug "Trying to search contact" query)
-  
-  (let* ((search-query (rewrite-query query))
-         (contacts (hacrm.search:search-contact search-query))
-         (contacts-count (length contacts)))
-    (log:debug "Search completed" contacts-count)
+;;   (let* ((search-query (rewrite-query query))
+;;          (contacts (hacrm.search:search-contact search-query))
+;;          (contacts-count (length contacts)))
+;;     (log:debug "Search completed" contacts-count)
     
-    (cond
-      ((eql contacts-count 0)
-       (make-widget "No contacts were found"))
-      ((eql contacts-count 1)
-       (hacrm.widgets.contact-details:make-contact-details2-widget
-        (car contacts)))
-      (t
-       (hacrm.widgets.contacts-list:make-contacts-list
-        contacts)))))
+;;     (cond
+;;       ((eql contacts-count 0)
+;;        (hacrm.conditions:change-main-widget
+;;         (make-widget "No contacts were found")))
+;;       ((eql contacts-count 1)
+;;        (hacrm.conditions:change-main-widget
+;;         (hacrm.widgets.contact-details:make-contact-details2-widget (car contacts))))
+;;       (t
+;;        (hacrm.conditions:change-main-widget
+;;         (hacrm.widgets.contacts-list:make-contacts-list
+;;          contacts))))))
 
 
-(defmethod hacrm.query:process-query ((widget widget)
-                                      (token (eql :contacts))
-                                      query)
+(defmethod hacrm.commands:command ((widget widget)
+                                   (token (eql :all))
+                                   query)
   "Shows full contact list."
   (declare (ignorable query))
-  (hacrm.widgets.contacts-list:make-contacts-list
-   (hacrm.models.contact:find-contacts)))
 
-
-(defun make-main-window ()
-  (let (window)
-    (flet ((callback (&key query &allow-other-keys)
-             (log:debug "Callback called" query)
-             (let* ((current-widget (main-widget window))
-                    (widget (hacrm.query:process-string-query current-widget query)))
-               (when (and widget
-                          (not (eql current-widget
-                                    widget)))
-                 (setf (main-widget window)
-                       widget)
-                 (mark-dirty window)))))
-    
-      (setf window
-            (make-instance 'main-window
-                           :input-box (make-input-box #'callback)
-                           :main-widget (make-widget "Enter the query"))))))
-
-
-(defmethod render-widget-body ((window main-window)
-                               &rest rest)
-  (declare (ignorable rest))
+  (log:debug "Opening all contacts")
   
-  (with-html
-    (:div :class "main-window__working-area"
-          (render-widget (main-widget window)))
-    (:div :class "main-window__input"
-          (render-widget (get-input-box window)))))
+  (flet ((on-contact-selection (contact)
+           (log:debug "Displaying contact" contact)
+           (hacrm.widgets.main:change-widget
+            widget
+            (hacrm.widgets.contact-details:make-contact-details2-widget
+             contact))))
+
+    ;; TODO: разобраться, почему не срабатывает смена основного виджета
+    (hacrm.widgets.main:change-widget
+     widget
+     (hacrm.widgets.contacts-list:make-contacts-list
+      (hacrm.models.contact:find-contacts)
+      :on-contact-click #'on-contact-selection))))
 
 
 (defun init-user-session (root)
-  (let ((contacts-list (make-contacts-list)))
+  (let ((main-window (hacrm.widgets.main:make-main-window)))
+    
     (setf (widget-children root)
-          (list (make-main-window)
+          (list main-window
                 ;; contacts-list
                 ;; (make-custom-form contacts-list)
                 ))))

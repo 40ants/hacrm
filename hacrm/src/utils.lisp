@@ -6,13 +6,19 @@
 ;;b           #:all-of
            #:format-time
            #:first-line
-           #:text->html))
+           #:text->html)
+  (:export
+   #:remove-object))
 (in-package #:hacrm.utils)
 
 
 (defun store-object (object)
   (weblocks-stores:persist-object hacrm::*hacrm-store*
                                   object))
+
+(defun remove-object (object)
+  (weblocks-stores:delete-persistent-object hacrm::*hacrm-store*
+                                            object))
 
 
 (defun format-time (universal-time)

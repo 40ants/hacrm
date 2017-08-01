@@ -14,6 +14,8 @@
   :licence ""
   :description "hacrm"
   :depends-on (:lass
+               :cl-strings
+               :montezuma
                :local-time
                :split-sequence
                :cl-markdown
@@ -36,7 +38,8 @@
                 :depends-on (hacrm))
                (:module src
                 :components ((:file utils)
-                             (:file query)
+                             (:file commands)
+                             (:file conditions)
                              (:module models
                               :components ((:file contact)
                                            (:file note)
@@ -46,15 +49,25 @@
                                                          (:file twitter)
                                                          (:file tag))))
                               :depends-on (utils))
-                             (:file search)
                              (:module widgets
-                              :components ((:file notes)
-                                           (:file contact-details
-                                            :depends-on (notes))
-                                           (:file contacts-list)))
+                              :components ((:file base)
+                                           (:file notes)
+                                           (:file contact-details)
+                                           (:file contacts-list)
+                                           (:file help)
+                                           (:file input-box)
+                                           (:file main)))
+                             (:file search)
                              (:file init-session
                               :depends-on (models
                                            widgets))
+                             (:module plugins
+                              :components ((:module tags
+                                            :components ((:file plugin)
+                                                         (:file fact)
+                                                         (:file commands)
+                                                         (:file render)
+                                                         (:file migrations)))))
 
                              (:file desktop))
                 :depends-on (hacrm

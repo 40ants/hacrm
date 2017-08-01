@@ -66,3 +66,16 @@
 
 (defmethod playground::print-obj :after ((obj bar))
   (format t "After BAR METHODs~%"))
+
+
+;;; Попробуем сделать макро с параметрами, как указано в Google Styleguide
+
+(defmacro with-foo ((&key some)  &body body)
+  "doc"
+  `(progn (format t "~&FOO~%")
+          ,@body)
+  )
+
+
+(with-foo ()
+  (format t "~&BAR~%"))

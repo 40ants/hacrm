@@ -12,7 +12,8 @@
    #:%widget
    #:start-hacrm
    #:stop-hacrm
-   #:backup))
+   #:backup
+   #:base))
 
 (in-package :hacrm)
 

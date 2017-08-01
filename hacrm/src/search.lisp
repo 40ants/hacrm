@@ -3,7 +3,8 @@
         #:hacrm.models.contact)
   (:export
    #:index-contacts
-   #:search-contact))
+   #:search-contact
+   #:index-facts))
 (in-package hacrm.search)
 
 
@@ -15,13 +16,16 @@
   "")
 
 
+(defgeneric index-facts (fact-group contact search-document)
+  (:documentation "Adds fields to a search document for each fact of given type."))
+
+
 (defun index-contacts ()
   (setf *index*
         (make-instance 'montezuma:index))
 
   (flet ((transform-to-document (contact)
-           (let ((doc (make-instance 'montezuma:document))
-                 (tags (hacrm.models.facts.tag:get-contact-tags contact)))
+           (let ((doc (make-instance 'montezuma:document)))
              (montezuma:add-field doc (montezuma:make-field
                                        "id"
                                        (format nil "~a"
@@ -32,13 +36,9 @@
                                        "name"
                                        (name contact)))
 
-             ;; TODO: make this hookable, so new types of information
-             ;; won't require to change this code.
-             (loop for tag in tags
-                   do (montezuma:add-field doc (montezuma:make-field
-                                                "tag"
-                                                (hacrm.models.facts.tag:name tag))))
-
+             (loop for fact-group in (hacrm.models.facts.core:fact-groups contact)
+                   do (index-facts fact-group contact doc))
+             
              doc)))
     
     (loop for contact in (weblocks-stores:find-persistent-objects
@@ -50,6 +50,11 @@
 
 
 (defun search-contact (query)
+  (unless *index*
+    (index-contacts))
+
+  (log:debug "Running" query)
+  
   (let (results)
     (montezuma:search-each *index*
                            query
@@ -85,3 +90,37 @@
      (montezuma:add-field doc (montezuma:make-field
                                "tag"
                                "django")))))
+
+
+(defun rewrite-query (query)
+  ;; For some reason, montezuma makes case insensitive search only
+  ;; if query is in the lowercase.
+  ;; But we want it alway be case insensitive.
+  (let ((query (string-downcase query)))
+    (if (find #\: query)
+        query
+        (format nil "name:~a* or tag:~a" query query))))
+
+
+(defmethod hacrm.commands:command ((widget hacrm.widgets.base:base)
+                    (command (eql :search))
+                    query)
+  "If no handler processed the query, then we'll try to search a contact."
+
+  (log:debug "Trying to search contact" query)
+  
+  (let* ((search-query (rewrite-query query))
+         (contacts (hacrm.search:search-contact search-query))
+         (contacts-count (length contacts)))
+    (log:debug "Search completed" contacts-count)
+    
+    (cond
+      ((eql contacts-count 1)
+       (hacrm.widgets.main:change-widget
+        widget
+        (hacrm.widgets.contact-details:make-contact-details2-widget (car contacts))))
+      (t
+       (hacrm.widgets.main:change-widget
+        widget
+        (hacrm.widgets.contacts-list:make-contacts-list
+         contacts))))))
