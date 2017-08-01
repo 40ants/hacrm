@@ -67,6 +67,7 @@
                                                          (:file fact)
                                                          (:file commands)
                                                          (:file render)
+                                                         (:file search)
                                                          (:file migrations)))))
 
                              (:file desktop))
