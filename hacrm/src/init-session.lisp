@@ -1,21 +1,8 @@
 (in-package hacrm)
 
 
-(defwidget list-dependencies ()
-  ())
-
-
-(defmethod render-widget-body ((widget list-dependencies) &rest args)
-  (declare (ignorable args))
-  (with-html
-    (:ul :class "page-dependencies"
-         (loop :for item :in (append (webapp-application-dependencies)
-                                     weblocks::*page-dependencies*)
-               :do (htm
-                    (:li (esc (format nil "dep: ~s" item))))
-               )
-         )))
-
+;; (defwidget list-dependencies ()
+;;   ())
 
 
 ;; (defmethod render-widget-body ((widget list-dependencies) &rest args)
@@ -26,21 +13,8 @@
 ;;                                      weblocks::*page-dependencies*)
 ;;                :do (htm
 ;;                     (:li (esc (format nil "dep: ~s" item))))
-;;                ))))
-
-
-(defwidget github-projects ()
-  ((username :type string)))
-
-
-(defmethod render-widget-body ((widget github-projects) &rest args)
-  (declare (ignorable args))
-  
-  (with-html
-    (:table :class "table"
-     (:tr
-      (:td "Hello")
-      (:td "World2!")))))
+;;                )
+;;          )))
 
 
 (defun get-debug-style ()
@@ -109,207 +83,148 @@
 
 
 ;; TODO: remove because new widget was created
-(defwidget contacts-list ()
-  ((current-contact :initform nil
-                    :initarg :current-contact
-                    :accessor current-contact)
-   (details-widget :initform nil
-                   :reader details-widget)))
+;; (defwidget contacts-list ()
+;;   ((current-contact :initform nil
+;;                     :initarg :current-contact
+;;                     :accessor current-contact)
+;;    (details-widget :initform nil
+;;                    :reader details-widget)))
 
 
-(defmethod (setf current-contact) :after (new-current-contact (contacts-list contacts-list))
-  (log:info "New contact was selected" new-current-contact)
-  (setf (hacrm.widgets.contact-details:contact-details-contact
-         (details-widget contacts-list))
-        new-current-contact))
+;; (defmethod (setf current-contact) :after (new-current-contact (contacts-list contacts-list))
+;;   (log:info "New contact was selected" new-current-contact)
+;;   (setf (hacrm.widgets.contact-details:contact-details-contact
+;;          (details-widget contacts-list))
+;;         new-current-contact))
 
 
-(defmethod initialize-instance :after ((contacts-list contacts-list) &rest args)
-  "Создадим для списка контактов виджет, отображающий детали текущего контакта."
-  (declare (ignorable args))
-  (setf (slot-value contacts-list 'details-widget)
-        (hacrm.widgets.contact-details:make-contact-details-widget
-         contacts-list
-         (current-contact contacts-list))))
+;; (defmethod initialize-instance :after ((contacts-list contacts-list) &rest args)
+;;   "Создадим для списка контактов виджет, отображающий детали текущего контакта."
+;;   (declare (ignorable args))
+;;   (setf (slot-value contacts-list 'details-widget)
+;;         (hacrm.widgets.contact-details:make-contact-details-widget
+;;          contacts-list
+;;          (current-contact contacts-list))))
 
 
-(defun make-contacts-list ()
-  "Создаёт виджет со списком контактов"
-  (make-instance 'contacts-list))
+;; (defun make-contacts-list ()
+;;   "Создаёт виджет со списком контактов"
+;;   (make-instance 'contacts-list))
 
 
-(defun remove-contact (contact-list contact)
-  (log:debug "Removing" contact)
+;; (defun remove-contact (contact-list contact)
+;;   (log:debug "Removing" contact)
   
-  (weblocks-stores:delete-persistent-object
-   *hacrm-store*
-   contact)
+;;   (weblocks-stores:delete-persistent-object
+;;    *hacrm-store*
+;;    contact)
   
-  (mark-dirty contact-list))
+;;   (mark-dirty contact-list))
 
 
-(defun select-contact (contact-list contact)
-  (log:debug "Selecting" contact)
+;; (defun select-contact (contact-list contact)
+;;   (log:debug "Selecting" contact)
 
-  (setf (current-contact contact-list)
-        contact)
-  ;; (mark-dirty contact-list)
-  )
-
-
-(defun render-contacts (contact-list contacts)
-  (with-html
-    (:h1 "Контакты")
-    (:table :class "table"
-            (:tr (:th "Имя")
-                 (:th :style "text-align: right" "Действие"))
-            (loop for c in contacts
-                  do (htm (:tr (:td (render-link (funcall (f_ (f_% (select-contact contact-list _)))
-                                                          c)
-                                                 (hacrm.models.contact:name c)))
-                               (:td :style "text-align: right"
-                                    (render-link (funcall (f_ (f_% (remove-contact contact-list _)))
-                                                          c)
-                                                 "Удалить"
-                                                 :class "btn btn-danger btn-mini"))))))))
-
-(defun render-contact-details (contact-list)
-  "TODO: удалить и использовать вместо этого виджет."
-  (let ((contact (current-contact contact-list)))
-    (with-html
-      (:h1 (esc (hacrm.models.contact:name contact)))
-      (render-link (f_% (setf (current-contact contact-list)
-                              nil)
-                        (mark-dirty contact-list))
-                   "Отмена"
-                   :class "btn btn-default"))))
+;;   (setf (current-contact contact-list)
+;;         contact)
+;;   ;; (mark-dirty contact-list)
+;;   )
 
 
-(defmethod render-widget-body ((contact-list contacts-list) &rest rest)
-  "Returns HTML with contacts list."
+;; (defun render-contacts (contact-list contacts)
+;;   (with-html
+;;     (:h1 "Контакты")
+;;     (:table :class "table"
+;;             (:tr (:th "Имя")
+;;                  (:th :style "text-align: right" "Действие"))
+;;             (loop for c in contacts
+;;                   do (htm (:tr (:td (render-link (funcall (f_ (f_% (select-contact contact-list _)))
+;;                                                           c)
+;;                                                  (hacrm.models.contact:name c)))
+;;                                (:td :style "text-align: right"
+;;                                     (render-link (funcall (f_ (f_% (remove-contact contact-list _)))
+;;                                                           c)
+;;                                                  "Удалить"
+;;                                                  :class "btn btn-danger btn-mini"))))))))
+
+;; (defun render-contact-details (contact-list)
+;;   "TODO: удалить и использовать вместо этого виджет."
+;;   (let ((contact (current-contact contact-list)))
+;;     (with-html
+;;       (:h1 (esc (hacrm.models.contact:name contact)))
+;;       (render-link (f_% (setf (current-contact contact-list)
+;;                               nil)
+;;                         (mark-dirty contact-list))
+;;                    "Отмена"
+;;                    :class "btn btn-default"))))
+
+
+;; (defmethod render-widget-body ((contact-list contacts-list) &rest rest)
+;;   "Returns HTML with contacts list."
   
-  (declare (ignorable rest))
-  (let ((directory (slot-value *hacrm-store* 'directory)))
-    (log:info "Reading contacts from" directory))
+;;   (declare (ignorable rest))
+;;   (let ((directory (slot-value *hacrm-store* 'directory)))
+;;     (log:info "Reading contacts from" directory))
   
-  (let ((contacts (hacrm.models.contact:find-contacts)))
-    (if contacts
-        (with-html
-          (:table :class "vbox"
-                  :style "width: 100%"
-                  (:tr :valign "top"
-                   (:td :style "width: 30%; padding-right: 30px;"
-                        (render-contacts contact-list contacts))
-                   (:td
-                        :style ""
-                        (render-widget (details-widget contact-list))
-                        ;; (hacrm.widgets.notes:render-contact-notes (current-contact contact-list))
-                        ))))
-        (with-html
-          (:p "Пока нет ни одного контакта. Добавь хотя бы один.")))))
+;;   (let ((contacts (hacrm.models.contact:find-contacts)))
+;;     (if contacts
+;;         (with-html
+;;           (:table :class "vbox"
+;;                   :style "width: 100%"
+;;                   (:tr :valign "top"
+;;                    (:td :style "width: 30%; padding-right: 30px;"
+;;                         (render-contacts contact-list contacts))
+;;                    (:td
+;;                         :style ""
+;;                         (render-widget (details-widget contact-list))
+;;                         ;; (hacrm.widgets.notes:render-contact-notes (current-contact contact-list))
+;;                         ))))
+;;         (with-html
+;;           (:p "Пока нет ни одного контакта. Добавь хотя бы один.")))))
 
 
-(defwidget custom-form ()
-  ())
+;; (defwidget custom-form ()
+;;   ())
 
 
-(defun make-custom-form (contacts-list)
-  (make-instance 'custom-form
-                 :propagate-dirty (list contacts-list)))
+;; (defun make-custom-form (contacts-list)
+;;   (make-instance 'custom-form
+;;                  :propagate-dirty (list contacts-list)))
 
 
-(defun add-new-contact (form &rest args)
-  (let* ((name (getf args :name))
-         (contact (hacrm.models.contact:make-contact name)))
+;; (defun add-new-contact (form &rest args)
+;;   (let* ((name (getf args :name))
+;;          (contact (hacrm.models.contact:make-contact name)))
     
-    (log:debug "Adding new contact" args)
+;;     (log:debug "Adding new contact" args)
 
-    (weblocks-stores:persist-object *hacrm-store*
-                                    contact)
-    (mark-dirty form)))
+;;     (weblocks-stores:persist-object *hacrm-store*
+;;                                     contact)
+;;     (mark-dirty form)))
 
 
-(defmethod render-widget-body ((form custom-form) &rest rest)
-  (declare (ignorable rest))
+;; (defmethod render-widget-body ((form custom-form) &rest rest)
+;;   (declare (ignorable rest))
 
-  (with-html-form (:post (lambda (&rest args)
-                           (apply #'add-new-contact
-                                  form
-                                  args)))
-    (:h1 "Добавить новый контакт")
+;;   (with-html-form (:post (lambda (&rest args)
+;;                            (apply #'add-new-contact
+;;                                   form
+;;                                   args)))
+;;     (:h1 "Добавить новый контакт")
     
-    (:p (:label :for "name"
-                "Имя")
-        (:input :type "text"
-                :name "name"
-                :value ""))
-    (:p (:input :type "submit"
-                :class "btn btn-primary"
-                :value "Добавить"))))
-
-
-;; (defun rewrite-query (text)
-;;   "Rewrites a text query, adding field prefixes if needed."
-;;   ;; TODO: implement
-;;   text)
-
-
-;; Убрать, потому что я сделал так чтобы вызывалась команда по-умолчанию
-;; (defmethod hacrm.commands:command ((widget widget)
-;;                                    token
-;;                                    query)
-;;   "If no handler processed the query, then we'll try to search a contact."
-;;   (declare (ignorable token))
-
-;;   (log:debug "Trying to search contact" query)
-  
-;;   (let* ((search-query (rewrite-query query))
-;;          (contacts (hacrm.search:search-contact search-query))
-;;          (contacts-count (length contacts)))
-;;     (log:debug "Search completed" contacts-count)
-    
-;;     (cond
-;;       ((eql contacts-count 0)
-;;        (hacrm.conditions:change-main-widget
-;;         (make-widget "No contacts were found")))
-;;       ((eql contacts-count 1)
-;;        (hacrm.conditions:change-main-widget
-;;         (hacrm.widgets.contact-details:make-contact-details2-widget (car contacts))))
-;;       (t
-;;        (hacrm.conditions:change-main-widget
-;;         (hacrm.widgets.contacts-list:make-contacts-list
-;;          contacts))))))
-
-
-(defmethod hacrm.commands:command ((widget widget)
-                                   (token (eql :all))
-                                   query)
-  "Shows full contact list."
-  (declare (ignorable query))
-
-  (log:debug "Opening all contacts")
-  
-  (flet ((on-contact-selection (contact)
-           (log:debug "Displaying contact" contact)
-           (hacrm.widgets.main:change-widget
-            widget
-            (hacrm.widgets.contact-details:make-contact-details2-widget
-             contact))))
-
-    ;; TODO: разобраться, почему не срабатывает смена основного виджета
-    (hacrm.widgets.main:change-widget
-     widget
-     (hacrm.widgets.contacts-list:make-contacts-list
-      (hacrm.models.contact:find-contacts)
-      :on-contact-click #'on-contact-selection))))
+;;     (:p (:label :for "name"
+;;                 "Имя")
+;;         (:input :type "text"
+;;                 :name "name"
+;;                 :value ""))
+;;     (:p (:input :type "submit"
+;;                 :class "btn btn-primary"
+;;                 :value "Добавить"))))
 
 
 (defun init-user-session (root)
   (let ((main-window (hacrm.widgets.main:make-main-window)))
     
     (setf (widget-children root)
-          (list main-window
-                ;; contacts-list
-                ;; (make-custom-form contacts-list)
-                ))))
+          (list main-window))))
 
