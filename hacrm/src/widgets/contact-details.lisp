@@ -19,8 +19,8 @@
    (contact :initform nil
             :initarg :contact
             :accessor contact-details-contact)
-   (notes :initform (hacrm.widgets.notes:make-notes-widget)
-          :reader contact-details-notes)))
+   (feed :initform (hacrm.widgets.feed:make-feed-widget)
+         :reader contact-feed-widget)))
 
 
 (defmethod (setf contact-details-contact) :after (contact (widget contact-details))
@@ -59,7 +59,9 @@
 (defwidget contact-details2 (hacrm.widgets.base:base)
   ((contact :type 'contact
             :initarg :contact
-            :reader get-contact)))
+            :reader get-contact)
+   (feed :initform (hacrm.widgets.feed:make-feed-widget)
+         :reader contact-feed-widget)))
 
 
 (defun make-contact-details2-widget (contact)
@@ -77,7 +79,22 @@
   (with-accessors ((contact get-contact))
       widget
     (with-html
-      (:h1 (esc (name contact)))
+      (:table :class "contact"
+              (:tr (:td :class "contact__details"
+                        (:h1 (esc (name contact)))
 
-      (loop for fact-group in (hacrm.models.facts.core:fact-groups contact)
-            do (render-facts fact-group contact)))))
+                        (dolist (fact-group (hacrm.models.facts.core:fact-groups contact))
+                          (render-facts fact-group contact)))
+                   (:td :class "contact__feed"
+                        (render-widget (contact-feed-widget widget))))))))
+
+
+(defmethod weblocks.dependencies:get-dependencies  ((widget contact-details2))
+  (list (weblocks.lass:make-dependency
+         '(.contact-details2
+           (table :width 100%
+            (td :vertical-align top)
+            (.contact__details :width 30%
+                               :border-right "1px solid gray")
+            (.contact__feed :width 70%
+                            :padding-left 10px))))))

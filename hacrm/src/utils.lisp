@@ -8,7 +8,8 @@
            #:first-line
            #:text->html)
   (:export
-   #:remove-object))
+   #:remove-object
+   #:find-object))
 (in-package #:hacrm.utils)
 
 
@@ -20,6 +21,9 @@
   (weblocks-stores:delete-persistent-object hacrm::*hacrm-store*
                                             object))
 
+(defun find-object (class-name)
+  (weblocks-stores:find-persistent-objects hacrm::*hacrm-store* 
+                                           class-name))
 
 (defun format-time (universal-time)
   "Возвращает строку в формате YYYY-MM-DD hh:mm"

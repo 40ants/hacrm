@@ -47,7 +47,8 @@
                                            (:module facts
                                             :components ((:file core)
                                                          (:file twitter)
-                                                         (:file tag))))
+                                                         (:file tag)))
+                                           (:file feed))
                               :depends-on (utils))
                              (:module widgets
                               :components ((:file base)
@@ -68,7 +69,10 @@
                                                          (:file commands)
                                                          (:file render)
                                                          (:file search)
-                                                         (:file migrations)))))
+                                                         (:file migrations)))
+                                           (:module notes
+                                            :components ((:file plugin)
+                                                         (:file commands)))))
 
                              (:file desktop))
                 :depends-on (hacrm
