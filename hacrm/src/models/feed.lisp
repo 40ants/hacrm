@@ -41,7 +41,10 @@ of other types."
      (defmethod weblocks-stores:find-persistent-objects :around
          ((store hacrm::hacrm-prevalence-system)
           (class-name (eql ',name)) 
-          &key (filter nil) order-by range slot
+          &key (filter nil)
+            order-by
+            range
+            slot
             (value nil value-given-p)
             (test #'equal))
        "A wrapper to filter feed items by they actual type."

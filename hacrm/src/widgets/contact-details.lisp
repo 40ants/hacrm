@@ -60,8 +60,15 @@
   ((contact :type 'contact
             :initarg :contact
             :reader get-contact)
-   (feed :initform (hacrm.widgets.feed:make-feed-widget)
+   (feed :initform nil
          :reader contact-feed-widget)))
+
+
+(defmethod initialize-instance ((details-widget contact-details2)
+                                &key contact)
+  (setf (slot-value details-widget 'feed)
+        (hacrm.widgets.feed:make-feed-widget contact))
+  (call-next-method))
 
 
 (defun make-contact-details2-widget (contact)

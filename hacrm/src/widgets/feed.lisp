@@ -14,8 +14,8 @@
             :reader contact)))
 
 
-(defun make-feed-widget ()
-  (make-instance 'feed))
+(defun make-feed-widget (contact)
+  (make-instance 'feed :contact contact))
 
 
 (defgeneric render-feed-item (item)
@@ -27,8 +27,9 @@ Each type of feed items should define a this method."))
 (defmethod render-widget-body ((widget feed) &rest args)
   (declare (ignorable args))
   
-  (let* (;;(contact (contact widget))
-         (items (hacrm.utils:find-object 'hacrm.models.feed:feed-item)))
+  (let* ((contact (contact widget))
+         (relations (hacrm.models.relation:find-relation-from-object contact :type :activity))
+         (items (mapcar #'hacrm.models.relation:right relations)))
     
     (with-html
       (:h1 "Активность")
