@@ -43,6 +43,7 @@
                              (:module models
                               :components ((:file contact)
                                            (:file note)
+                                           (:file relation)
                                            (:file playground)
                                            (:module facts
                                             :components ((:file core)
@@ -53,6 +54,7 @@
                              (:module widgets
                               :components ((:file base)
                                            (:file notes)
+                                           (:file feed)
                                            (:file contact-details)
                                            (:file contacts-list)
                                            (:file help)
@@ -62,6 +64,7 @@
                              (:file init-session
                               :depends-on (models
                                            widgets))
+                             (:file toplevel-commands)
                              (:module plugins
                               :components ((:module tags
                                             :components ((:file plugin)
@@ -72,6 +75,8 @@
                                                          (:file migrations)))
                                            (:module notes
                                             :components ((:file plugin)
+                                                         (:file models)
+                                                         (:file render)
                                                          (:file commands)))))
 
                              (:file desktop))
