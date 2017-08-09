@@ -1,40 +1,50 @@
 (defpackage #:hacrm.widgets.feed
   (:use #:cl
         #:weblocks
-        #:cl-who)
+        #:cl-who
+        #:f-underscore)
   (:export
    #:make-feed-widget
-   #:render-feed-item))
+   #:make-feed-item-widget))
 (in-package hacrm.widgets.feed)
 
 
 (defwidget feed ()
   ((contact :initform nil
             :initarg :contact
-            :reader contact)))
+            :reader contact)
+   (items :initform nil
+          :initarg :items
+          :documentation "A list of widgets, representing feed items to display."
+          :reader items)))
+
+
+(defgeneric make-feed-item-widget (object parent-widget)
+  (:documentation "This method should return a widget to represent given object in an activity feed."))
 
 
 (defun make-feed-widget (contact)
-  (make-instance 'feed :contact contact))
+  (let* ((relations (hacrm.models.relation:find-relation-from-object contact :type :activity))
+         (objects (mapcar #'hacrm.models.relation:right relations))
+         (feed-widget (make-instance 'feed :contact contact)))
+    
+    (let ((items (mapcar (f_ (make-feed-item-widget _ feed-widget))
+                         objects)))
+      (setf (slot-value feed-widget 'items)
+            items))
 
-
-(defgeneric render-feed-item (item)
-  (:documentation "Renders a single feed item in the activity stream.
-
-Each type of feed items should define a this method."))
+    feed-widget))
 
 
 (defmethod render-widget-body ((widget feed) &rest args)
   (declare (ignorable args))
   
-  (let* ((contact (contact widget))
-         (relations (hacrm.models.relation:find-relation-from-object contact :type :activity))
-         (items (mapcar #'hacrm.models.relation:right relations)))
+  (let ((items (items widget)))
     
     (with-html
       (:h1 "Активность")
-      (:ul (dolist (item items)
-             (render-feed-item item))))))
+      (dolist (item items)
+        (render-widget item)))))
 
 
 (defmethod weblocks.dependencies:get-dependencies  ((widget feed))

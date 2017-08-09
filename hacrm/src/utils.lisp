@@ -9,7 +9,8 @@
            #:text->html)
   (:export
    #:remove-object
-   #:find-object))
+   #:find-object
+   #:render-markup))
 (in-package #:hacrm.utils)
 
 
@@ -51,3 +52,10 @@
                             )
     (declare (ignorable document))
     html))
+
+
+(defun render-markup (text)
+  "Transforms a text in cl-markup into a HTML and returns a new string."
+  (let ((3bmd-auto-links:*auto-links* t))
+    (with-output-to-string (s)
+      (3bmd:parse-string-and-print-to-stream text s))))

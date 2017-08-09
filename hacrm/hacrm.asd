@@ -29,6 +29,7 @@
                :ceramic
                :swank
                :find-port
+               :cl-markdown
                ;; :weblocks-cms
                )
   :serial t
@@ -37,7 +38,8 @@
                 :components ((:file stores))
                 :depends-on (hacrm))
                (:module src
-                :components ((:file utils)
+                :components ((:file auto-links)
+                             (:file utils)
                              (:file commands)
                              (:file conditions)
                              (:module models
@@ -76,7 +78,7 @@
                                            (:module notes
                                             :components ((:file plugin)
                                                          (:file models)
-                                                         (:file render)
+                                                         (:file widget)
                                                          (:file commands)))))
 
                              (:file desktop))

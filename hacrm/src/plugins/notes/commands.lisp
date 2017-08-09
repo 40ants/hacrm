@@ -6,7 +6,7 @@
                                    rest-text)
   (declare (ignorable keyword))
 
-  (log:debug "Adding a note for the contact")
+  (log:info "Adding a note for the contact")
   
   (let* ((contact (hacrm.widgets.contact-details:get-contact widget))
          (note (make-note rest-text))
