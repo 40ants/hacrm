@@ -29,7 +29,7 @@
                :ceramic
                :swank
                :find-port
-               :cl-markdown
+               :3bmd
                ;; :weblocks-cms
                )
   :serial t

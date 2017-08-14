@@ -13,7 +13,10 @@
          (relation (hacrm.models.relation:make-relation
                     :activity contact note)))
     (hacrm.utils:store-object note)
-    (hacrm.utils:store-object relation))
+    (hacrm.utils:store-object relation)
 
-  (hacrm.widgets.main:reset-user-input widget)
-  (mark-dirty widget))
+    (hacrm.widgets.main:reset-user-input widget)
+    (mark-dirty widget)
+    
+    (weblocks.hooks:eval-hooks :feed-item-created note)
+    (values)))

@@ -66,8 +66,20 @@
 
 (defmethod initialize-instance ((details-widget contact-details2)
                                 &key contact)
-  (setf (slot-value details-widget 'feed)
-        (hacrm.widgets.feed:make-feed-widget contact))
+  (flet ((update-feed-widget ()
+           (setf (slot-value details-widget 'feed)
+                 (hacrm.widgets.feed:make-feed-widget contact))
+           (mark-dirty details-widget)))
+    
+    ;; Create initial version of the feed widget
+    (update-feed-widget)
+    (weblocks.hooks:add-session-hook
+     :feed-item-created
+     (lambda (item)
+       (declare (ignorable item))
+       ;; TODO: add check if added item is related to the contact
+       (update-feed-widget))))
+  
   (call-next-method))
 
 
