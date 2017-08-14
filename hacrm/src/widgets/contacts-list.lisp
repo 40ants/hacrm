@@ -13,12 +13,36 @@
 (in-package hacrm.widgets.contacts-list)
 
 
+(defwidget contact-card (hacrm.widgets.base:base)
+  ((contact :type 'contact
+            :initarg :contact
+            :reader contact)
+   (fact-groups :initarg :fact-groups
+                :reader fact-groups)
+   (on-click :type function
+             :initarg :on-click
+             :reader on-click)))
+
+
 (defwidget contacts-list (hacrm.widgets.base:base)
   ((contacts :initarg :contacts
-             :reader contacts)
-   (on-contact-click :type function
-                     :initarg :on-contact-click
-                     :reader on-contact-click)))
+             :reader contacts)))
+
+
+(defun make-contact-card (contact on-click)
+  (let* ((fact-groups (hacrm.models.facts.core:fact-groups
+                       contact))
+         (fact-group-widgets
+           (mapcar
+            (f_ (hacrm.widgets.facts:make-facts-group-widget
+                 _
+                 contact))
+            fact-groups)))
+    
+    (make-instance 'contact-card
+                   :contact contact
+                   :on-click on-click
+                   :fact-groups fact-group-widgets)))
 
 
 (defun make-contacts-list (contacts &key on-contact-click)
@@ -26,45 +50,43 @@
            (log:info "No action was passed to process selection of the"
                      contact)))
     
-    (make-instance 'contacts-list
-                   :contacts contacts
-                   :on-contact-click (or on-contact-click
-                                         #'default-click-processor))))
+    (make-instance
+     'contacts-list
+     :contacts (mapcar
+                (f_ (make-contact-card
+                     _
+                     (or on-contact-click
+                         #'default-click-processor)
+                     ))
+                contacts))))
 
 
-(defgeneric render-facts (fact-group contact)
-  (:documentation "Renders a closely related group of facts about a contact.
-It is like concats-details:render-facts, but for a list view, so
-some types of contacts may be hidden."))
-
-
-(defun render (contact on-click)
+(defmethod render-widget-body ((widget contact-card) &rest rest)
   "Internal helper to render single contact in the contact's list."
-  (with-html
-    (:div :class "contact-list__contact"
-          (:h1 (render-link on-click
-                            (name contact)))
-          (loop for fact-group in (hacrm.models.facts.core:fact-groups contact)
-                do (render-facts fact-group contact)))))
-
-
-(defmethod render-widget-body ((widget contacts-list) &rest args)
-  (declare (ignore args))
+  (declare (ignorable rest))
   
-  (let ((contacts (contacts widget))
-        (on-click (on-contact-click widget)))
+  (let ((contact (contact widget))
+        (fact-group-widgets (fact-groups widget))
+        (on-click-callback (on-click widget)))
+
+    (with-html
+      (:div :class "contact-list__contact"
+            (:h1 (render-link (f_% (funcall on-click-callback
+                                            contact))
+                              (name contact)))
+
+            (mapcar #'render-widget fact-group-widgets)))))
+
+
+(defmethod render-widget-body ((widget contacts-list) &rest rest)
+  (declare (ignorable rest))
+  
+  (let ((contacts (contacts widget)))
 
     (if contacts
-        (flet ((make-click-processor (contact)
-                 (f_%
-                   (log:debug "Clicked" contact)
-                   (funcall on-click contact))))
-      
-          ;; To not close over loop variable,
-          ;; we use intermediate function generator make-click-processor.
-          (loop for contact in contacts
-                do (render contact (make-click-processor contact))))
+        (mapcar #'render-widget
+                contacts)
         
-        ;; No conctacts
+        ;; No contacts
         (with-html
           (:p "No contacts")))))

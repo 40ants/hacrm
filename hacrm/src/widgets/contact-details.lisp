@@ -13,55 +13,14 @@
 (in-package hacrm.widgets.contact-details)
 
 
-(defwidget contact-details (hacrm.widgets.base:base)
-  ((contact-list :initarg :contact-list
-                 :reader contact-details-contact-list)
-   (contact :initform nil
-            :initarg :contact
-            :accessor contact-details-contact)
-   (feed :initform (hacrm.widgets.feed:make-feed-widget)
-         :reader contact-feed-widget)))
-
-
-(defmethod (setf contact-details-contact) :after (contact (widget contact-details))
-  "Устанавливает новый контакт."
-  (setf (hacrm.widgets.notes:notes-contact
-         (contact-details-notes widget))
-        contact)
-  (mark-dirty widget))
-
-
-(defun make-contact-details-widget (contact-list &optional current-contact)
-  (make-instance 'contact-details
-                 :contact-list contact-list
-                 :contact current-contact))
-
-
-(defmethod render-widget-body ((widget contact-details) &rest args)
-  (declare (ignorable args))
-  
-  (with-slots (contact-list contact) widget
-    (if contact
-        (with-html
-          (:h1 (esc (hacrm.models.contact:name contact)))
-          (render-link (f_% (setf (hacrm::current-contact contact-list)
-                                  nil)
-                            (mark-dirty contact-list))
-                       "Отмена"
-                       :class "btn btn-default")
-          (render-widget (contact-details-notes widget)))
-        (with-html
-          (:p "Выберите какой-либо контакт")))))
-
-
-;; Second version
-
 (defwidget contact-details2 (hacrm.widgets.base:base)
   ((contact :type 'contact
             :initarg :contact
             :reader get-contact)
    (feed :initform nil
-         :reader contact-feed-widget)))
+         :reader contact-feed-widget)
+   (fact-groups :initform nil
+                :reader fact-groups)))
 
 
 (defmethod initialize-instance ((details-widget contact-details2)
@@ -79,6 +38,15 @@
        (declare (ignorable item))
        ;; TODO: add check if added item is related to the contact
        (update-feed-widget))))
+
+  ;; create widgets to render fact groups
+  (let* ((fact-groups (hacrm.models.facts.core:fact-groups contact))
+         (fact-group-widgets (mapcar (f_ (hacrm.widgets.facts:make-facts-group-widget
+                                          _
+                                          contact))
+                                     fact-groups)))
+    (setf (slot-value details-widget 'fact-groups)
+          fact-group-widgets))
   
   (call-next-method))
 
@@ -86,10 +54,6 @@
 (defun make-contact-details2-widget (contact)
   (make-instance 'contact-details2
                  :contact contact))
-
-
-(defgeneric render-facts (fact-group contact)
-  (:documentation "Renders a closely related group of facts about a contact."))
 
 
 (defmethod render-widget-body ((widget contact-details2) &rest args)
@@ -102,8 +66,9 @@
               (:tr (:td :class "contact__details"
                         (:h1 (esc (name contact)))
 
-                        (dolist (fact-group (hacrm.models.facts.core:fact-groups contact))
-                          (render-facts fact-group contact)))
+                        (dolist (fact-group-widget (fact-groups widget))
+                          (render-widget fact-group-widget)))
+                   
                    (:td :class "contact__feed"
                         (render-widget (contact-feed-widget widget))))))))
 
