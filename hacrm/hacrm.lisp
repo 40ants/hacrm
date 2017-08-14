@@ -35,11 +35,26 @@
 
 (defmethod weblocks.dependencies:get-dependencies ((app hacrm))
   (append (list (weblocks.lass:make-dependency
-                  '(.page-wrapper
-                    :margin-left "100px"
-                    :margin-right "100px"
-                    :margin-top "50px"
-                    )))
+                 '(body
+                   :position absolute
+                   :height 100%
+                   :min-height 100%
+                   :width 100%
+                   :margin 0
+                   :padding 0
+
+                   ;; Common "reset" rules
+                   (*
+                    :box-sizing "border-box"
+                    :margin 0
+                    :padding 0
+                    :border 0
+                    ;; to make element's height calculation easier, will use
+                    ;; 20px as a default font-size
+                    :font-size 20px
+                    :line-height 30px
+                    :font-family helvetica
+                    ))))
           (call-next-method)))
 
 

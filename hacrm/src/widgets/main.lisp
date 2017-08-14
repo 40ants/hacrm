@@ -23,20 +23,21 @@
 (defmethod weblocks.dependencies:get-dependencies ((widget main-window))
   ;; http://css-live.ru/articles/vizualnoe-rukovodstvo-po-svojstvam-flexbox-iz-css3.html
   (append (list (weblocks.lass:make-dependency
-                  '(.main-window
-                    :position absolute
-                    :left 0
-                    :right 0
-                    :top 0
-                    :bottom 0
-                    :display flex
-                    :flex-direction column
-                    (.main-window__working-area
-                     :flex 1 1 100%
-                     :padding 10px)
-                    (.main-window__input
-                     :flex-shrink 0)
-                    )))
+                 '(.main-window
+                   :position absolute
+                   :width 100%
+                   :height 100%
+                   :display flex
+                   :flex-direction column
+                   
+                   (.main-window__working-area
+                    :flex 1 1 100%
+                    :overflow auto
+                    :padding 10px)
+                   
+                   (.main-window__input
+                    :flex-shrink 0)
+                   )))
           (call-next-method)))
 
 
