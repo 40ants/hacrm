@@ -12,12 +12,9 @@
 (add-hook 'slime-repl-mode-hook
           (lambda ()
             (slime-eval '(cl:progn
-                          (cl:pushnew "./hacrm/" asdf:*central-registry*)
+                          (cl:pushnew "./" asdf:*central-registry*)
                           (cl:declaim (cl:optimize (cl:debug 3)))
-                          (ql:quickload 'hacrm)))
-            ;; (slime-eval '(cl:progn
-            ;;               (hacrm.web:start-server)))
-            ))
+                          (ql:quickload 'hacrm)))))
 
 (slime)
 

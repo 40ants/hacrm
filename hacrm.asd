@@ -55,6 +55,7 @@
                               :depends-on (utils))
                              (:module widgets
                               :components ((:file base)
+                                           (:file facts)
                                            (:file notes)
                                            (:file feed)
                                            (:file contact-details)
@@ -72,7 +73,7 @@
                                             :components ((:file plugin)
                                                          (:file fact)
                                                          (:file commands)
-                                                         (:file render)
+                                                         (:file widgets)
                                                          (:file search)
                                                          (:file migrations)))
                                            (:module notes
