@@ -54,7 +54,10 @@
                     :font-size 20px
                     :line-height 30px
                     :font-family helvetica
-                    ))))
+                    )
+                   (a
+                    ;; special color for links
+                    :color "#0071d8"))))
           (call-next-method)))
 
 
