@@ -28,25 +28,38 @@
   (flet ((update-feed-widget ()
            (setf (slot-value details-widget 'feed)
                  (hacrm.widgets.feed:make-feed-widget contact))
-           (mark-dirty details-widget)))
+           (mark-dirty details-widget))
+
+         (update-fact-widgets ()
+           "Creates widgets to render fact groups for the contact."
+           (let* ((fact-groups (hacrm.models.facts.core:fact-groups contact))
+                  (fact-group-widgets (mapcar (f_ (hacrm.widgets.facts:make-facts-group-widget
+                                                   _
+                                                   contact))
+                                              fact-groups)))
+             (setf (slot-value details-widget 'fact-groups)
+                   fact-group-widgets))))
     
     ;; Create initial version of the feed widget
     (update-feed-widget)
+    ;; Create widgets to render facts
+    (update-fact-widgets)
+
+    ;; Now we'll add hooks to update this widgets when something changed
     (weblocks.hooks:add-session-hook
      :feed-item-created
      (lambda (item)
        (declare (ignorable item))
        ;; TODO: add check if added item is related to the contact
-       (update-feed-widget))))
+       (update-feed-widget)))
 
-  ;; create widgets to render fact groups
-  (let* ((fact-groups (hacrm.models.facts.core:fact-groups contact))
-         (fact-group-widgets (mapcar (f_ (hacrm.widgets.facts:make-facts-group-widget
-                                          _
-                                          contact))
-                                     fact-groups)))
-    (setf (slot-value details-widget 'fact-groups)
-          fact-group-widgets))
+    (weblocks.hooks:add-session-hook
+     :fact-created
+     (lambda (object fact)
+       (declare (ignorable object fact))
+       ;; TODO: add check if added item is related to the contact
+       (update-fact-widgets))))
+
   
   (call-next-method))
 

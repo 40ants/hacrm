@@ -1,7 +1,9 @@
 (defpackage #:hacrm.t.utils
   (:use #:cl
         #:prove
-        #:hamcrest.prove))
+        #:hamcrest.prove)
+  (:export
+   #:with-empty-db))
 (in-package hacrm.t.utils)
 
 

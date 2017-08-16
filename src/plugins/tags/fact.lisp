@@ -16,6 +16,10 @@
     (format stream "~a" (name fact))))
 
 
+(defmethod fact-group ((fact tag))
+  :tags)
+
+
 (defun make-tag-fact (contact tag-name)
   (make-instance 'tag
                  :contact contact

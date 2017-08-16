@@ -1,14 +1,14 @@
-(defpackage #:hacrm.models.facts.tag
-  (:use #:cl
-        #:cl-who
-        #:hacrm.models.facts.core
-        #:f-underscore)
-  (:export
-   #:make-tag-fact
-   #:name
-   #:tag
-   #:get-contact-tags))
-(in-package hacrm.models.facts.tag)
+;; (defpackage #:hacrm.models.facts.tag
+;;   (:use #:cl
+;;         #:cl-who
+;;         #:hacrm.models.facts.core
+;;         #:f-underscore)
+;;   (:export
+;;    #:make-tag-fact
+;;    #:name
+;;    #:tag
+;;    #:get-contact-tags))
+;; (in-package hacrm.models.facts.tag)
 
 
 ;; (deffact tag

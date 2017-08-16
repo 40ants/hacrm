@@ -3,7 +3,7 @@
         #:hacrm.models.contact)
   (:export
    #:index-contacts
-   #:search-contact
+   #:search-contacts
    #:index-facts))
 (in-package hacrm.search)
 
@@ -17,7 +17,12 @@
 
 
 (defgeneric index-facts (fact-group contact search-document)
-  (:documentation "Adds fields to a search document for each fact of given type."))
+  (:documentation "Adds fields to a search document for each fact of given type.
+
+If you want the facts added by your plugin were searchable, define this method.")
+
+  (:method (fact-group contact search-document)
+    (declare (ignorable fact-group contact search-document))))
 
 
 (defun index-contacts ()
@@ -49,28 +54,39 @@
               (transform-to-document contact)))))
 
 
-(defun search-contact (query)
+(defun rewrite-query (query)
+  ;; For some reason, montezuma makes case insensitive search only
+  ;; if query is in the lowercase.
+  ;; But we want it alway be case insensitive.
+  (let ((query (string-downcase query)))
+    (if (find #\: query)
+        query
+        (format nil "name:~a* or tag:~a" query query))))
+
+
+(defun search-contacts (query)
   (unless *index*
     (index-contacts))
 
-  (log:debug "Running" query)
-  
-  (let (results)
-    (montezuma:search-each *index*
-                           query
-                           (lambda (doc score)
-                             (declare (ignorable score))
-                             (push doc results)))
-    (flet ((to-contact (doc-index)
-             (let* ((doc (montezuma:get-document *index* doc-index))
-                    (contact-id (cl-strings:parse-number
-                                 (montezuma:document-value doc "id")))
-                    (cnt (weblocks-stores:find-persistent-object-by-id
-                          hacrm::*hacrm-store*
-                          'hacrm.models.contact:contact
-                          contact-id)))
-               cnt)))
-      (mapcar #'to-contact results))))
+  (let ((query (rewrite-query query)))
+    (log:debug "Running" query)
+   
+    (let (results)
+      (montezuma:search-each *index*
+                             query
+                             (lambda (doc score)
+                               (declare (ignorable score))
+                               (push doc results)))
+      (flet ((to-contact (doc-index)
+               (let* ((doc (montezuma:get-document *index* doc-index))
+                      (contact-id (cl-strings:parse-number
+                                   (montezuma:document-value doc "id")))
+                      (cnt (weblocks-stores:find-persistent-object-by-id
+                            hacrm::*hacrm-store*
+                            'hacrm.models.contact:contact
+                            contact-id)))
+                 cnt)))
+        (mapcar #'to-contact results)))))
 
 
 (defun index-experimental ()
@@ -92,16 +108,6 @@
                                "django")))))
 
 
-(defun rewrite-query (query)
-  ;; For some reason, montezuma makes case insensitive search only
-  ;; if query is in the lowercase.
-  ;; But we want it alway be case insensitive.
-  (let ((query (string-downcase query)))
-    (if (find #\: query)
-        query
-        (format nil "name:~a* or tag:~a" query query))))
-
-
 (defmethod hacrm.commands:command ((widget hacrm.widgets.base:base)
                     (command (eql :search))
                     query)
@@ -109,8 +115,7 @@
 
   (log:debug "Trying to search contact" query)
   
-  (let* ((search-query (rewrite-query query))
-         (contacts (hacrm.search:search-contact search-query))
+  (let* ((contacts (hacrm.search:search-contacts query))
          (contacts-count (length contacts)))
     (log:debug "Search completed" contacts-count)
     

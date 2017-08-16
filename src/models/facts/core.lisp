@@ -5,7 +5,9 @@
    #:fact
    #:deffact
    #:contact
-   #:fact-groups))
+   #:fact-groups
+   #:find-contact-facts
+   #:fact-group))
 (in-package hacrm.models.facts.core)
 
 
@@ -62,9 +64,27 @@
          (apply #'call-next-method params)))))
 
 
+(defgeneric fact-group (fact)
+  (:documentation "This method should be defined for each `fact' subtype and return a keyword.
+
+This keyword is used to group together similar facts like contacts or links to websites."))
+
+
+(defun find-contact-facts (contact)
+  (hacrm.utils:find-object
+   'fact
+   :filter (f_ (equal (weblocks-stores:object-id (contact _))
+                      (weblocks-stores:object-id contact)))))
+
 
 (defun fact-groups (contact)
   "Returns a list of keywords, denoting a groups of facts known about the contact."
-  (declare (ignorable contact))
-  ;; TODO: make this list taken from a database
-  (list :tags))
+  (let* ((facts (find-contact-facts contact))
+         groups)
+    (loop for fact in facts
+          for group = (fact-group fact)
+          do (pushnew group groups))
+
+    groups))
+
+
