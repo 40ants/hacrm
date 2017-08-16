@@ -44,3 +44,12 @@
         (:span (esc (hacrm.plugins.birthdays::date
                      (birthday widget)))))))
 
+
+
+(defun foo ()
+  "BLAH"
+  (values))
+
+
+(defmacro blah ()
+  "Some docs")

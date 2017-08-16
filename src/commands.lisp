@@ -1,9 +1,11 @@
 (defpackage #:hacrm.commands
-  (:use #:cl)
+  (:use #:cl
+        #:f-underscore)
   (:export
    #:command
    #:process-query
-   #:default-command))
+   #:default-command
+   #:help))
 (in-package hacrm.commands)
 
 
@@ -66,3 +68,37 @@ and then generic function hacrm.command:command is called."
                  (default-command widget)
                  text)))))
 
+
+
+(defun get-command-description (method)
+  (destructuring-bind (widget-class command text)
+      (closer-mop:method-specializers method)
+    (declare (ignorable widget-class text))
+    
+    (let ((command-string (typecase command
+                            (closer-mop:eql-specializer (string-downcase (closer-mop:eql-specializer-object command)))
+                            (t nil))))
+      (when command-string
+        (list command-string
+              (or (documentation method t)
+                  "No documentaion."))))))
+
+
+(defun applicablep (method widget)
+  "Checks if given method-function is applicable to the widget."
+  (destructuring-bind (command-widget-class command text)
+      (closer-mop:method-specializers method)
+    (declare (ignorable command text))
+
+    (typep widget command-widget-class)))
+
+
+(defun help (widget)
+  "Returns a list with tuples where first element is string with command's name and second – command's description."
+  (let* ((all-commands (closer-mop:generic-function-methods #'hacrm.commands:command))
+         (filtered-commands (remove-if-not (f_ (applicablep _ widget))
+                                           all-commands)))
+    (sort (mapcar #'get-command-description
+                  filtered-commands)
+          #'string-lessp
+          :key #'first)))

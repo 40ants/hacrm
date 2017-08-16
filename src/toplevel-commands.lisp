@@ -42,3 +42,15 @@
       :on-contact-click #'on-contact-selection))))
 
 
+
+(defmethod hacrm.commands:command ((widget hacrm.widgets.base:base)
+                                   (token (eql :help))
+                                   query)
+  "Shows a list of available commands."
+  (declare (ignorable query))
+
+  (log:debug "Opening help for a widget")
+  
+  (hacrm.widgets.main:change-widget
+   widget
+   (hacrm.widgets.help:make-help-widget widget)))
