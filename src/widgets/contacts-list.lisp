@@ -9,7 +9,8 @@
    #:make-contacts-list
    #:contacts-list
    #:contacts
-   #:render-facts))
+   #:render-facts
+   #:show-fact-group-in-contact-list-p))
 (in-package hacrm.widgets.contacts-list)
 
 
@@ -29,9 +30,24 @@
              :reader contacts)))
 
 
+(defgeneric show-fact-group-in-contact-list-p (fact-group)
+  (:documentation "Accepts a keyword denoting a fact group returns nil or t.
+
+If nil is returned, then this kind of facts does not rendered in contact list
+mode.
+
+By default, nil is returned. If you really need to render the facts
+in contact list mode, redefine this method.")
+  (:method (fact-group)
+    (declare (ignorable fact-group))
+    nil))
+
+
 (defun make-contact-card (contact on-click)
-  (let* ((fact-groups (hacrm.models.facts.core:fact-groups
+  (let* ((all-fact-groups (hacrm.models.facts.core:fact-groups
                        contact))
+         (fact-groups (remove-if-not #'show-fact-group-in-contact-list-p
+                                     all-fact-groups))
          (fact-group-widgets
            (mapcar
             (f_ (hacrm.widgets.facts:make-facts-group-widget

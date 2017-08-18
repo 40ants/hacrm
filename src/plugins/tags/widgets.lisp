@@ -22,6 +22,10 @@
                  :object object))
 
 
+(defmethod hacrm.widgets.contacts-list:show-fact-group-in-contact-list-p ((fact-group (eql :tags)))
+  t)
+
+
 (defmethod hacrm.widgets.facts:fact-group-weight ((widget tags))
   "Tags should be on the top, right under the name."
   (declare (ignorable widget))
