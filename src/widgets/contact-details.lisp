@@ -36,9 +36,15 @@
                   (fact-group-widgets (mapcar (f_ (hacrm.widgets.facts:make-facts-group-widget
                                                    _
                                                    contact))
-                                              fact-groups)))
+                                              fact-groups))
+                  ;; Now we reorder widgets according to their weights.
+                  ;; To change ordering, define fact-group-weight method
+                  ;; for your widget.
+                  (sorted-widgets (sort fact-group-widgets
+                                        #'<
+                                        :key #'hacrm.widgets.facts:fact-group-weight)))
              (setf (slot-value details-widget 'fact-groups)
-                   fact-group-widgets))))
+                   sorted-widgets))))
     
     ;; Create initial version of the feed widget
     (update-feed-widget)

@@ -22,6 +22,12 @@
                  :object object))
 
 
+(defmethod hacrm.widgets.facts:fact-group-weight ((widget tags))
+  "Tags should be on the top, right under the name."
+  (declare (ignorable widget))
+  0)
+
+
 (defmethod render-widget-body ((widget tags) &rest rest)
   (declare (ignorable rest))
 

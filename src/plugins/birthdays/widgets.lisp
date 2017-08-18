@@ -34,6 +34,12 @@
                  :contact contact))
 
 
+(defmethod hacrm.widgets.facts:fact-group-weight ((widget birthday))
+  "Birthday is important and should go right after tags."
+  (declare (ignorable widget))
+  1)
+
+
 (defmethod render-widget-body ((widget birthday)
                                &rest args)
   (declare (ignorable args))
@@ -44,3 +50,11 @@
               (birthday widget))))))
 
 
+
+(defmethod weblocks.dependencies:get-dependencies ((widget birthday))
+  (list (weblocks.lass:make-dependency
+         '(.birthday
+           (h1 :font-size 20px
+               :line-height 30px
+               :margin-top 10px
+               :margin-bottom 5px)))))

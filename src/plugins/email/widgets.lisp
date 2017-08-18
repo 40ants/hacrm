@@ -30,6 +30,21 @@
       (:h1 "Emails")
       (:ul
        (dolist (email emails)
-         (htm (:li (esc (hacrm.plugins.email:address email)))))))))
+         (htm (:li (:a :href (concatenate 'string
+                                          "mailto:"
+                                          (hacrm.plugins.email:address email))
+                       (esc (hacrm.plugins.email:address email))))))))))
 
 
+
+(defmethod weblocks.dependencies:get-dependencies ((widget emails))
+  (list (weblocks.lass:make-dependency
+         '(.emails
+           (h1 :font-size 20px
+               :line-height 30px
+               :margin-top 20px
+               :margin-bottom 5px)
+           (ul :list-style none
+               :padding 0
+               :margin 0
+            (li :line-height 30px))))))
