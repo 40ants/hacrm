@@ -54,7 +54,7 @@ It consider any text a form, by adding an implicit braces around it.
 If first item of a list is a symbol, then it is converted to a keyword
 and then generic function hacrm.command:command is called."
   (let* ((first-token (first (cl-strings:split text #\Space)))
-         (rest-text (subseq text (min (length first-token)
+         (rest-text (subseq text (min (length text)
                                       (+ (length first-token)
                                          1))))
          (keyword (intern (string-upcase first-token)
