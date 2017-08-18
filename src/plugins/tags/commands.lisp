@@ -6,8 +6,7 @@
                                    query)
   (log:debug "Adding a tags from" query)
   
-  (let* ((tokens (cl-strings:split query #\Space))
-         (tags (cdr tokens)))
+  (let ((tags (cl-strings:split query #\Space)))
     (loop for tag in tags
           do (log:debug "Creating a tag" tag)
           do (hacrm.utils:store-object
@@ -26,8 +25,7 @@
                                    query)
   (log:debug "Removing tags from" query)
   
-  (let* ((tokens (cl-strings:split query #\Space))
-         (tags-to-remove (cdr tokens))
+  (let* ((tags-to-remove (cl-strings:split query #\Space))
          (contact (hacrm.widgets.contact-details:get-contact widget))
          (contact-tags (get-contact-tags contact)))
     
