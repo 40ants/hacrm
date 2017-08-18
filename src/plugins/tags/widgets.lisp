@@ -2,6 +2,7 @@
   (:use #:cl
         #:weblocks
         #:cl-who
+        #:f-underscore
         #:hacrm.plugins.tags))
 
 (in-package hacrm.plugins.tags.widgets)
@@ -26,9 +27,12 @@
 
   (let* ((contact (object widget))
          (tags (get-contact-tags contact))
-         (tag-names (mapcar #'name tags))
-         (tags-string (cl-strings:join tag-names :separator ", ")))
+         (tag-names (sort (mapcar #'name tags)
+                          #'string-lessp))
+         (tag-names-with-hash (mapcar (f_ (concatenate 'string
+                                                       "#"
+                                                       _))
+                                      tag-names))
+         (tags-string (cl-strings:join tag-names-with-hash :separator ", ")))
     (weblocks:with-html
-      (:p (:span (esc (concatenate 'string
-                                   "#"
-                                   tags-string)))))))
+      (:p (:span (esc tags-string))))))
