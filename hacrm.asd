@@ -80,6 +80,12 @@
                                             :components ((:file plugin)
                                                          (:file models)
                                                          (:file widget)
+                                                         (:file commands)))
+
+                                           (:module birthdays
+                                            :components ((:file plugin)
+                                                         (:file facts)
+                                                         (:file widgets)
                                                          (:file commands)))))
 
                              (:file desktop))

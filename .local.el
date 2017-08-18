@@ -16,6 +16,17 @@
                           (cl:declaim (cl:optimize (cl:debug 3)))
                           (ql:quickload 'hacrm)))))
 
+(add-hook 'lisp-mode-hook
+          (lambda ()
+            (hs-minor-mode 1)
+            (hs-hide-all)
+            
+            (local-set-key (kbd "C-c <up>") 'hs-hide-block)
+            (local-set-key (kbd "C-c C-x <up>") 'hs-hide-all)
+            (local-set-key (kbd "C-c <left>") 'bm-previous)
+            (local-set-key (kbd "C-c <down>") 'hs-show-block)
+            (local-set-key (kbd "C-c <right>") 'bm-next)))
+
 (slime)
 
 (load "~/.roswell/lisp/quicklisp/log4slime-setup.el")

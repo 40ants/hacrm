@@ -1,5 +1,4 @@
 (in-package asdf)
-
 (defpackage #:hacrm.plugins.birthdays.widgets
   (:use #:cl
         #:cl-who
@@ -45,11 +44,3 @@
                      (birthday widget)))))))
 
 
-
-(defun foo ()
-  "BLAH"
-  (values))
-
-
-(defmacro blah ()
-  "Some docs")
