@@ -43,8 +43,8 @@
   (first
    (hacrm.utils:find-object
     'birthday
-    :filter (f_ (equal (contact _)
-                       contact)))))
+    :filter (f_ (equal (weblocks-stores:object-id (contact _))
+                       (weblocks-stores:object-id contact))))))
 
 
 (defun set-birthday (contact date)
