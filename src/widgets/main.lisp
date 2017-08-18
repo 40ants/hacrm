@@ -42,7 +42,7 @@
 
 
 (defun make-main-window ()
-  (let* ((help-widget (hacrm.widgets.help:make-help-widget))
+  (let* ((help-widget (hacrm.widgets.help:make-help-widget nil))
          (app-window (make-instance 'main-window
                                 :main-widget help-widget))
          (input-box (hacrm.widgets.input-box:make-input-box app-window))

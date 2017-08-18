@@ -6,7 +6,7 @@
 (in-package hacrm.plugins.birthdays.widgets)
 
 
-(defwidget birthday-widget ()
+(defwidget birthday ()
   ((contact :initarg :contact
             :reader contact)
    (birthday :initarg :birthday
@@ -14,7 +14,7 @@
              :reader birthday)))
 
 
-(defmethod initialize-instance ((widget birthday-widget) &rest args)
+(defmethod initialize-instance ((widget birthday) &rest args)
   (declare (ignorable args))
 
   (call-next-method)
@@ -30,17 +30,17 @@
                                                         contact)
   (declare (ignorable group))
 
-  (make-instance 'birthday-widget
+  (make-instance 'birthday
                  :contact contact))
 
 
-(defmethod render-widget-body ((widget birthday-widget)
+(defmethod render-widget-body ((widget birthday)
                                &rest args)
   (declare (ignorable args))
 
   (with-html
-    (:p (:label "Birthday:")
-        (:span (esc (hacrm.plugins.birthdays::date
-                     (birthday widget)))))))
+    (:h1 "Birthday")
+    (:p (esc (hacrm.plugins.birthdays::date
+              (birthday widget))))))
 
 
