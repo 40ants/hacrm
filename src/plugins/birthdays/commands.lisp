@@ -1,7 +1,7 @@
 (in-package hacrm.plugins.birthdays)
 
 
-(defmethod hacrm.commands:command ((widget hacrm.widgets.contact-details:contact-details2)
+(defmethod hacrm.commands:command ((widget hacrm.widgets.contact-details:contact-details)
                                    (keyword (eql :birthday))
                                    date)
   "Sets a birthday. Accepts one argument like 1980-03-15"

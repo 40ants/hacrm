@@ -1,7 +1,7 @@
 (in-package hacrm.plugins.tags)
 
 
-(defmethod hacrm.commands:command ((widget hacrm.widgets.contact-details:contact-details2)
+(defmethod hacrm.commands:command ((widget hacrm.widgets.contact-details:contact-details)
                                    (keyword (eql :tag))
                                    query)
   (log:debug "Adding a tags from" query)
@@ -20,7 +20,7 @@
   (values))
 
 
-(defmethod hacrm.commands:command ((widget hacrm.widgets.contact-details:contact-details2)
+(defmethod hacrm.commands:command ((widget hacrm.widgets.contact-details:contact-details)
                                    (keyword (eql :untag))
                                    query)
   (log:debug "Removing tags from" query)

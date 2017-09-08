@@ -123,7 +123,7 @@ If you want the facts added by your plugin were searchable, define this method."
       ((eql contacts-count 1)
        (hacrm.widgets.main:change-widget
         widget
-        (hacrm.widgets.contact-details:make-contact-details2-widget (car contacts))))
+        (hacrm.widgets.contact-details:make-contact-details-widget (car contacts))))
       (t
        (hacrm.widgets.main:change-widget
         widget

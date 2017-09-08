@@ -16,7 +16,7 @@
     
     (hacrm.widgets.main:change-widget
         widget
-        (hacrm.widgets.contact-details:make-contact-details2-widget contact))))
+        (hacrm.widgets.contact-details:make-contact-details-widget contact))))
 
 
 (defmethod hacrm.commands:command ((widget hacrm.widgets.base:base)
@@ -31,7 +31,7 @@
            (log:debug "Displaying contact" contact)
            (hacrm.widgets.main:change-widget
             widget
-            (hacrm.widgets.contact-details:make-contact-details2-widget
+            (hacrm.widgets.contact-details:make-contact-details-widget
              contact))))
 
     ;; TODO: разобраться, почему не срабатывает смена основного виджета

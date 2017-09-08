@@ -1,7 +1,7 @@
 (in-package hacrm.plugins.email)
 
 
-(defmethod hacrm.commands:command ((widget hacrm.widgets.contact-details:contact-details2)
+(defmethod hacrm.commands:command ((widget hacrm.widgets.contact-details:contact-details)
                                    (keyword (eql :add-email))
                                    address)
   "Add an email to the contact."
@@ -20,7 +20,7 @@
       (values))))
 
 
-(defmethod hacrm.commands:command ((widget hacrm.widgets.contact-details:contact-details2)
+(defmethod hacrm.commands:command ((widget hacrm.widgets.contact-details:contact-details)
                                    (keyword (eql :remove-email))
                                    address)
   "Remove email from the contact."

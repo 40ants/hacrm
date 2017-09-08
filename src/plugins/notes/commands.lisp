@@ -1,7 +1,7 @@
 (in-package hacrm.plugins.notes)
 
 
-(defmethod hacrm.commands:command ((widget hacrm.widgets.contact-details:contact-details2)
+(defmethod hacrm.commands:command ((widget hacrm.widgets.contact-details:contact-details)
                                    (keyword (eql :note))
                                    rest-text)
   (declare (ignorable keyword))

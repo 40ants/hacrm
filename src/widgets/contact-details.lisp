@@ -4,16 +4,16 @@
         #:weblocks
         #:f-underscore
         #:hacrm.models.contact)
-  (:export :make-contact-details-widget
-   :contact-details-contact
-           :make-contact-details2-widget
-   :contact-details2
-           :get-contact
-           :render-facts))
+  (:export #:make-contact-details-widget
+           #:contact-details-contact
+           #:make-contact-details-widget
+           #:contact-details
+           #:get-contact
+           #:render-facts))
 (in-package hacrm.widgets.contact-details)
 
 
-(defwidget contact-details2 (hacrm.widgets.base:base)
+(defwidget contact-details (hacrm.widgets.base:base)
   ((contact :type 'contact
             :initarg :contact
             :reader get-contact)
@@ -23,7 +23,7 @@
                 :reader fact-groups)))
 
 
-(defmethod initialize-instance ((details-widget contact-details2)
+(defmethod initialize-instance ((details-widget contact-details)
                                 &key contact)
   (flet ((update-feed-widget ()
            (setf (slot-value details-widget 'feed)
@@ -70,12 +70,12 @@
   (call-next-method))
 
 
-(defun make-contact-details2-widget (contact)
-  (make-instance 'contact-details2
+(defun make-contact-details-widget (contact)
+  (make-instance 'contact-details
                  :contact contact))
 
 
-(defmethod render-widget-body ((widget contact-details2) &rest args)
+(defmethod render-widget-body ((widget contact-details) &rest args)
   (declare (ignorable args))
 
   (with-accessors ((contact get-contact))
@@ -92,9 +92,9 @@
                         (render-widget (contact-feed-widget widget))))))))
 
 
-(defmethod weblocks.dependencies:get-dependencies  ((widget contact-details2))
+(defmethod weblocks.dependencies:get-dependencies  ((widget contact-details))
   (list (weblocks.lass:make-dependency
-         '(.contact-details2
+         '(.contact-details
            (table :width 100%
             (td :vertical-align top)
             (.contact__details :width 30%

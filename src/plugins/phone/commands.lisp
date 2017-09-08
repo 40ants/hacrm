@@ -1,7 +1,7 @@
 (in-package hacrm.plugins.phone)
 
 
-(defmethod hacrm.commands:command ((widget hacrm.widgets.contact-details:contact-details2)
+(defmethod hacrm.commands:command ((widget hacrm.widgets.contact-details:contact-details)
                                    (keyword (eql :add-phone))
                                    number)
   "Add an phone to the contact."
@@ -20,7 +20,7 @@
       (values))))
 
 
-(defmethod hacrm.commands:command ((widget hacrm.widgets.contact-details:contact-details2)
+(defmethod hacrm.commands:command ((widget hacrm.widgets.contact-details:contact-details)
                                    (keyword (eql :remove-phone))
                                    number)
   "Remove phone from the contact."
