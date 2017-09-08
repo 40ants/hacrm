@@ -86,6 +86,16 @@
                                             :components ((:file plugin)
                                                          (:file facts)
                                                          (:file widgets)
+                                                         (:file commands)))
+                                           (:module email
+                                            :components ((:file plugin)
+                                                         (:file facts)
+                                                         (:file widgets)
+                                                         (:file commands)))
+                                           (:module phone
+                                            :components ((:file plugin)
+                                                         (:file facts)
+                                                         (:file widgets)
                                                          (:file commands)))))
 
                              (:file desktop))

@@ -2,8 +2,8 @@
 
 (deffact phone
     ((number :type string
-            :initarg :number
-             :reader) number))
+             :initarg :number
+             :reader number)))
 
 
 (defmethod print-object ((object phone) stream)
