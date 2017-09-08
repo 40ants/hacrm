@@ -7,12 +7,17 @@
   (log:debug "Adding a tags from" query)
   
   (let ((tags (cl-strings:split query #\Space)))
-    (loop for tag in tags
-          do (log:debug "Creating a tag" tag)
-          do (hacrm.utils:store-object
-              (hacrm.plugins.tags:make-tag-fact
-               (hacrm.widgets.contact-details:get-contact widget)
-               tag))))
+    (dolist (tag tags)
+      (log:debug "Creating a tag" tag)
+      
+      (let* ((contact (hacrm.widgets.contact-details:get-contact widget))
+             (fact (hacrm.plugins.tags:make-tag-fact
+                    contact
+                    tag)))
+        (hacrm.utils:store-object fact)
+        (weblocks.hooks:eval-hooks :fact-created
+                                   contact
+                                   fact))))
 
   (weblocks:mark-dirty widget)
   (hacrm.widgets.main:reset-user-input widget)
@@ -29,14 +34,15 @@
          (contact (hacrm.widgets.contact-details:get-contact widget))
          (contact-tags (get-contact-tags contact)))
     
-    (loop for tag in tags-to-remove
-          do (let ((tag-object (find tag
-                                     contact-tags
-                                     :test #'string=
-                                     :key #'name)))
-               (when tag-object
-                 (log:debug "Removing" tag)
-                 (hacrm.utils:remove-object tag-object)))))
+    (dolist (tag tags-to-remove)
+      (let ((tag-object (find tag
+                              contact-tags
+                              :test #'string=
+                              :key #'name)))
+        (when tag-object
+          (log:debug "Removing" tag)
+          (hacrm.utils:remove-object tag-object)
+          (weblocks.hooks:eval-hooks :fact-removed contact tag-object)))))
 
   (weblocks:mark-dirty widget)
   (hacrm.widgets.main:reset-user-input widget)

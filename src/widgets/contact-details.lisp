@@ -32,6 +32,8 @@
 
          (update-fact-widgets ()
            "Creates widgets to render fact groups for the contact."
+           (log:debug "Updating fact widgets.")
+           
            (let* ((fact-groups (hacrm.models.facts.core:fact-groups contact))
                   (fact-group-widgets (mapcar (f_ (hacrm.widgets.facts:make-facts-group-widget
                                                    _
@@ -61,6 +63,13 @@
 
     (weblocks.hooks:add-session-hook
      :fact-created
+     (lambda (object fact)
+       (declare (ignorable object fact))
+       ;; TODO: add check if added item is related to the contact
+       (update-fact-widgets)))
+
+    (weblocks.hooks:add-session-hook
+     :fact-removed
      (lambda (object fact)
        (declare (ignorable object fact))
        ;; TODO: add check if added item is related to the contact
