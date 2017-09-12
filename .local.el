@@ -11,10 +11,9 @@
 
 (add-hook 'slime-repl-mode-hook
           (lambda ()
-            (slime-eval '(cl:progn
-                          (cl:pushnew "./" asdf:*central-registry*)
-                          (cl:declaim (cl:optimize (cl:debug 3)))
-                          (ql:quickload 'hacrm)))))
+            (slime-eval '(ql:quickload 'hacrm)))
+          ;; append
+          t)
 
 (add-hook 'lisp-mode-hook
           (lambda ()
@@ -25,9 +24,12 @@
             (local-set-key (kbd "C-c C-x <up>") 'hs-hide-all)
             (local-set-key (kbd "C-c <left>") 'bm-previous)
             (local-set-key (kbd "C-c <down>") 'hs-show-block)
-            (local-set-key (kbd "C-c <right>") 'bm-next)))
+            (local-set-key (kbd "C-c <right>") 'bm-next))
+          ;; append
+          t)
 
 (slime)
 
-(load "~/.roswell/lisp/quicklisp/log4slime-setup.el")
-(global-log4slime-mode 1)
+;; (load "~/.roswell/lisp/quicklisp/log4slime-setup.el")
+;; (global-log4slime-mode 1)
+
