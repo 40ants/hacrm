@@ -14,9 +14,9 @@
 
       (hacrm.widgets.main:reset-user-input widget)
       (weblocks:mark-dirty widget)
-      (weblocks.hooks:eval-hooks :fact-created
-                                 contact
-                                 email-fact)
+      (weblocks.hooks:call-hook :fact-created
+                                contact
+                                email-fact)
       (values))))
 
 
@@ -35,8 +35,6 @@
         (weblocks:mark-dirty widget)
         
         (dolist (fact removed-facts)
-          (weblocks.hooks:eval-hooks :fact-removed
-                                     contact
-                                     fact))
+          (weblocks.hooks:call-hook :fact-removed contact fact))
         (values)))))
 

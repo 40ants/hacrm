@@ -14,8 +14,6 @@
 
       (hacrm.widgets.main:reset-user-input widget)
       (weblocks:mark-dirty widget)
-      (weblocks.hooks:eval-hooks :fact-created
-                                 contact
-                                 birthday)
+      (weblocks.hooks:call-hook :fact-created contact birthday)
       (values))))
 

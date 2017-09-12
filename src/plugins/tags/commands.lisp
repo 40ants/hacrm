@@ -15,9 +15,7 @@
                     contact
                     tag)))
         (hacrm.utils:store-object fact)
-        (weblocks.hooks:eval-hooks :fact-created
-                                   contact
-                                   fact))))
+        (weblocks.hooks:call-hook :fact-created contact fact))))
 
   (weblocks:mark-dirty widget)
   (hacrm.widgets.main:reset-user-input widget)
@@ -42,7 +40,7 @@
         (when tag-object
           (log:debug "Removing" tag)
           (hacrm.utils:remove-object tag-object)
-          (weblocks.hooks:eval-hooks :fact-removed contact tag-object)))))
+          (weblocks.hooks:call-hook :fact-removed contact tag-object)))))
 
   (weblocks:mark-dirty widget)
   (hacrm.widgets.main:reset-user-input widget)

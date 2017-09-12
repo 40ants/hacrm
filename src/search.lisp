@@ -109,8 +109,8 @@ If you want the facts added by your plugin were searchable, define this method."
 
 
 (defmethod hacrm.commands:command ((widget hacrm.widgets.base:base)
-                    (command (eql :search))
-                    query)
+                                   (command (eql :search))
+                                   query)
   "If no handler processed the query, then we'll try to search a contact."
 
   (log:debug "Trying to search contact" query)
@@ -125,7 +125,14 @@ If you want the facts added by your plugin were searchable, define this method."
         widget
         (hacrm.widgets.contact-details:make-contact-details-widget (car contacts))))
       (t
-       (hacrm.widgets.main:change-widget
-        widget
-        (hacrm.widgets.contacts-list:make-contacts-list
-         contacts))))))
+       (flet ((on-contact-selection (contact)
+                (log:debug "Displaying contact" contact)
+                (hacrm.widgets.main:change-widget
+                 widget
+                 (hacrm.widgets.contact-details:make-contact-details-widget
+                  contact))))
+         (hacrm.widgets.main:change-widget
+          widget
+          (hacrm.widgets.contacts-list:make-contacts-list
+           contacts
+           :on-contact-click #'on-contact-selection)))))))

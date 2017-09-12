@@ -55,25 +55,28 @@
 
     ;; Now we'll add hooks to update this widgets when something changed
     (weblocks.hooks:add-session-hook
-     :feed-item-created
-     (lambda (item)
-       (declare (ignorable item))
-       ;; TODO: add check if added item is related to the contact
-       (update-feed-widget)))
+        :feed-item-created
+        handle-new-feed-item (item)
+      
+      (declare (ignorable item))
+      ;; TODO: add check if added item is related to the contact
+      (update-feed-widget))
 
     (weblocks.hooks:add-session-hook
-     :fact-created
-     (lambda (object fact)
-       (declare (ignorable object fact))
-       ;; TODO: add check if added item is related to the contact
-       (update-fact-widgets)))
+        :fact-created
+        handle-new-fact (object fact)
+      
+      (declare (ignorable object fact))
+      ;; TODO: add check if added item is related to the contact
+      (update-fact-widgets))
 
     (weblocks.hooks:add-session-hook
-     :fact-removed
-     (lambda (object fact)
-       (declare (ignorable object fact))
+        :fact-removed
+        handle-removed-fact (object fact)
+      
+      (declare (ignorable object fact))
        ;; TODO: add check if added item is related to the contact
-       (update-fact-widgets))))
+      (update-fact-widgets)))
 
   
   (call-next-method))

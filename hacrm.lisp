@@ -17,6 +17,7 @@
 
 (in-package :hacrm)
 
+(declaim (optimize (debug 3) (speed 1)))
 
 ;; A macro that generates a class or this webapp
 
