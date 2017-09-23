@@ -92,7 +92,6 @@ arguments."
   ;;       (start-webapp 'weblocks-cms:weblocks-cms))
 
   (weblocks-stores:open-stores)
-  
   (list hacrm-app admin-app))
 
 
@@ -102,6 +101,7 @@ arguments."
   ;;  (stop-webapp 'weblocks-cms:weblocks-cms))
   (ignore-errors
    (stop-webapp 'hacrm))
+
   (weblocks.server:stop-weblocks)
 
   ;; TODO: make this happen using hooks

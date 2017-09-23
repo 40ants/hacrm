@@ -5,6 +5,8 @@
         #:f-underscore)
   (:import-from #:cl-who
                 #:esc)
+  (:import-from #:weblocks.ui.form
+                #:render-link)
   (:export
    #:make-contacts-list
    #:contacts-list

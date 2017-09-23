@@ -31,6 +31,7 @@
                :find-port
                :3bmd
                ;; :weblocks-cms
+               :weblocks-websocket
                )
   :serial t
   :components ((:file hacrm)
