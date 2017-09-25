@@ -5,6 +5,8 @@
         #:f-underscore)
   (:import-from #:cl-who
                 #:esc)
+  (:import-from #:parenscript
+                #:@)
   (:import-from #:weblocks.ui.form
                 #:render-link)
   (:export
@@ -24,7 +26,10 @@
                 :reader fact-groups)
    (on-click :type function
              :initarg :on-click
-             :reader on-click)))
+             :reader on-click)
+   (number :type integer
+           :initarg :number
+           :reader number)))
 
 
 (defwidget contacts-list (hacrm.widgets.base:base)
@@ -45,7 +50,7 @@ in contact list mode, redefine this method.")
     nil))
 
 
-(defun make-contact-card (contact on-click)
+(defun make-contact-card (contact on-click number)
   (let* ((all-fact-groups (hacrm.models.facts.core:fact-groups
                        contact))
          (fact-groups (remove-if-not #'show-fact-group-in-contact-list-p
@@ -60,6 +65,7 @@ in contact list mode, redefine this method.")
     (make-instance 'contact-card
                    :contact contact
                    :on-click on-click
+                   :number number
                    :fact-groups fact-group-widgets)))
 
 
@@ -70,13 +76,13 @@ in contact list mode, redefine this method.")
     
     (make-instance
      'contacts-list
-     :contacts (mapcar
-                (f_ (make-contact-card
-                     _
-                     (or on-contact-click
-                         #'default-click-processor)
-                     ))
-                contacts))))
+     :contacts (loop for contact in contacts
+                     for number upfrom 1
+                     collect (make-contact-card
+                              contact
+                              (or on-contact-click
+                                  #'default-click-processor)
+                              number)))))
 
 
 (defmethod render-widget-body ((widget contact-card) &rest rest)
@@ -89,9 +95,14 @@ in contact list mode, redefine this method.")
 
     (with-html
       (:div :class "contact-list__contact"
+            :id (format nil
+                        "contact-~a"
+                        (number widget))
             (:h1 (render-link (f_% (funcall on-click-callback
                                             contact))
-                              (name contact)))
+                              (name contact))
+                 (:span :class "contact-list__contact-number"
+                        (esc (princ-to-string (number widget)))))
 
             (mapcar #'render-widget fact-group-widgets)))))
 
@@ -108,3 +119,50 @@ in contact list mode, redefine this method.")
         ;; No contacts
         (with-html
           (:p "No contacts")))))
+
+
+(defmethod weblocks.dependencies:get-dependencies  ((widget contacts-list))
+  (list (weblocks.parenscript:make-dependency
+          (let ((numbers-are-visible nil))
+
+            ;; With this code we give user ability to press Alt+1, Alt+2,...
+            ;; to select one of first 10 contacts in the list.
+            (setf (@ document onkeydown)
+                  (lambda (e)
+                    (let ((code (@ e "keyCode"))
+                          (numbers (j-query ".contact-list__contact-number")))
+                      ((@ console log) "Key down with code:" code)
+                    
+                      (cond
+                        ((= code 18)
+                         ((@ numbers show))
+                         (setf numbers-are-visible t))
+                        ((and (>= 57 code 48))
+                         ;; If user presed 0, then we'l consider it a 10.
+                         (when (= code 48)
+                           (setf code (+ code 10)))
+                         
+                         (let ((contact-number (- code 48)))
+                           ((@ console log)
+                            "Selecting contact" contact-number)
+                           ;; jQuery("#contact-0 a").click()
+                           ((@ (j-query (+ "#contact-" contact-number " a"))
+                               click))))))))
+
+            (setf (@ document onkeyup)
+                  (lambda (e)
+                    (let ((code (@ e "keyCode"))
+                          (numbers (j-query ".contact-list__contact-number")))
+                      ((@ console log) "Key up with code:" code)
+                      
+                      (cond
+                        ((= code 18)
+                         ((@ numbers hide))
+                         (setf numbers-are-visible nil)))))))
+          )
+        (weblocks.lass:make-dependency
+          '(.contact-list__contact-number
+            :display none
+            :position relative
+            :top -0.5em
+            :color gray))))
