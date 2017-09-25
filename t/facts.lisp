@@ -5,9 +5,10 @@
         #:prove
         #:hamcrest.prove
         #:hacrm.t.utils
-        #:hacrm.models.contact
         #:hacrm.models.facts.core)
-  (:import-from #:hacrm.models.facts.core))
+  
+  (:import-from #:hacrm.models.contact
+                #:make-contact))
 (in-package hacrm.t.facts)
 
 

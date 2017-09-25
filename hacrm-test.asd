@@ -13,5 +13,6 @@
   :components ((:module t
                 :components ((:file utils)
                              (:file facts)
+                             (:file contacts)
                              (:module plugins
                               :components ((:file birthdays)))))))

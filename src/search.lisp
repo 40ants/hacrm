@@ -37,9 +37,10 @@ If you want the facts added by your plugin were searchable, define this method."
                                                (slot-value contact
                                                            'hacrm.models.contact::id))
                                        :index nil))
-             (montezuma:add-field doc (montezuma:make-field
-                                       "name"
-                                       (name contact)))
+             (dolist (name (hacrm.models.contact:get-name-synonyms contact))
+               (montezuma:add-field doc (montezuma:make-field
+                                         "name"
+                                         name)))
 
              (loop for fact-group in (hacrm.models.facts.core:fact-groups contact)
                    do (index-facts fact-group contact doc))
