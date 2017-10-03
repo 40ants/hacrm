@@ -32,6 +32,10 @@
                :3bmd
                ;; :weblocks-cms
                :weblocks-websocket
+               :mel-base   ;; from email plugin
+               :ubiquitous ;; from email plugin
+               :sanitize   ;; from email plugin
+               :cl-rfc2047 ;; from email plugin
                )
   :serial t
   :components ((:file hacrm)
@@ -92,7 +96,9 @@
                                             :components ((:file plugin)
                                                          (:file facts)
                                                          (:file widgets)
-                                                         (:file commands)))
+                                                         (:file commands)
+                                                         (:file multiparts)
+                                                         (:file imap)))
                                            (:module phone
                                             :components ((:file plugin)
                                                          (:file facts)

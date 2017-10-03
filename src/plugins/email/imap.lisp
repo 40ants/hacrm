@@ -1,0 +1,81 @@
+(defpackage #:hacrm.plugins.email.imap
+  (:use #:cl))
+(in-package hacrm.plugins.email.imap)
+
+
+;; Пока устанавливаем параметры таким образом:
+
+(setf (ubiquitous:value :hacrm.plugins.email :accounts)
+      '((:host "imap.yandex.ru" :username "art@allmychanges.com" :password "****")))
+
+
+(defun read-headers (message)
+  (let ((stream (mel.public:message-header-stream message)))
+    (unwind-protect
+         (mel.mime:read-rfc2822-header stream)
+      (close stream))))
+
+
+(defun parse-from-address (text)
+  (let* ((decoded-text (cl-rfc2047:decode* text))
+         (address (mel.mime:parse-rfc2822-address decoded-text))
+         (name (sf.mel:eml-address->name address))
+         (email (sf.mel:eml-address->email address)))
+    (list :name name :email email)))
+
+
+(defun trim-newlines-and-spaces (text)
+  (string-trim '(#\Newline #\Return #\Space) text))
+
+
+(defun normalize-newlines (text)
+  (cl-strings:replace-all text
+                          (coerce '(#\Return #\Newline) 'string)
+                          (string #\Newline)))
+
+
+(defun get-usable-text (message)
+  (let* ((parts (mel.mime:parts message))
+         (html-parts (remove-if-not #'sf.mel:part-body-html? parts))
+         (text-parts (remove-if-not #'sf.mel:part-body-text? parts))
+         (text (cond
+                 (html-parts (sf.mel:part-body-html (first html-parts)))
+                 (text-parts (sf.mel:part-body-text (first text-parts)))
+                 (t nil))))
+    (when text
+      (normalize-newlines
+       (trim-newlines-and-spaces
+        (sanitize:clean text sanitize:+basic+))))))
+
+
+(defun process-message (message)
+  "Returns a list with two items:
+
+1) Email author's name and email like (:name \"Some Author\" :email \"author@example.com\")
+2) Sanitized message body."
+  
+  (let* ((text (get-usable-text message))
+         (headers (read-headers message))
+         (from (alexandria:assoc-value headers :from)))
+    
+    (list (parse-from-address from)
+          text)))
+
+
+(defun process-messages-from (&key host port username password)
+  (let* ((imap (apply
+                #'mel.folders.imap:make-imaps-folder
+                :host host
+                :username username
+                :password password
+                (when port
+                  (list :port port))))
+         
+         (messages (mel.public:messages imap)))
+    (mapcar #'process-message messages)))
+
+
+(defun process-messages ()
+  (let ((accounts (ubiquitous:value :hacrm.plugins.email :accounts)))
+    (loop for account in accounts
+          collect (apply #'process-messages-from account))))
