@@ -48,7 +48,7 @@
         (sanitize:clean text sanitize:+basic+))))))
 
 
-(defun process-message (message)
+(defun fetch-message (message)
   "Returns a list with two items:
 
 1) Email author's name and email like (:name \"Some Author\" :email \"author@example.com\")
@@ -62,7 +62,7 @@
           text)))
 
 
-(defun process-messages-from (&key host port username password)
+(defun fetch-messages-from (&key host port username password)
   (let* ((imap (apply
                 #'mel.folders.imap:make-imaps-folder
                 :host host
@@ -72,10 +72,20 @@
                   (list :port port))))
          
          (messages (mel.public:messages imap)))
-    (mapcar #'process-message messages)))
+    (mapcar #'fetch-message messages)))
+
+
+(defun create-contact-and-feed-item (contact text)
+  (let ((email (getf contact :email))
+        (name (getf contact :name))))
+  )
 
 
 (defun process-messages ()
-  (let ((accounts (ubiquitous:value :hacrm.plugins.email :accounts)))
-    (loop for account in accounts
-          collect (apply #'process-messages-from account))))
+  "This function fetches new emails, creates contacts and feed items."
+  (let* ((accounts (ubiquitous:value :hacrm.plugins.email :accounts))
+         (messages
+           (loop for account in accounts
+                 append (apply #'fetch-messages-from account))))
+    (loop for message in messages
+          do (apply #'create-contact-and-feed-item message))))

@@ -1,0 +1,11 @@
+("quicklisp" .
+ (:class qlot.source.ql:source-ql-all
+  :initargs (:project-name "quicklisp" :%version "2017-08-30")
+  :version "2017-08-30"))
+("websocket-driver" .
+ (:class qlot.source.github:source-github
+  :initargs (:project-name "websocket-driver" :repos "fukamachi/websocket-driver" :ref "a3046b11dfb9803ac3bff7734dd017390c2b54bb" :branch nil :tag nil)
+  :version "github-a3046b11dfb9803ac3bff7734dd017390c2b54bb"
+  :repos "fukamachi/websocket-driver"
+  :url "https://github.com/fukamachi/websocket-driver/archive/a3046b11dfb9803ac3bff7734dd017390c2b54bb.tar.gz"
+  :ref "a3046b11dfb9803ac3bff7734dd017390c2b54bb"))

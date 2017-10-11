@@ -166,7 +166,7 @@
 ;;   (let ((directory (slot-value *hacrm-store* 'directory)))
 ;;     (log:info "Reading contacts from" directory))
   
-;;   (let ((contacts (hacrm.models.contact:find-contacts)))
+;;   (let ((contacts (hacrm.models.contact:all-contacts)))
 ;;     (if contacts
 ;;         (with-html
 ;;           (:table :class "vbox"
@@ -198,8 +198,6 @@
     
 ;;     (log:debug "Adding new contact" args)
 
-;;     (weblocks-stores:persist-object *hacrm-store*
-;;                                     contact)
 ;;     (mark-dirty form)))
 
 

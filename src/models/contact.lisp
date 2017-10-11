@@ -4,8 +4,9 @@
            #:make-contact
            #:name
            #:created
-           #:find-contacts
-           #:get-name-synonyms))
+           #:find-contacts-by
+           #:get-name-synonyms
+           #:all-contacts))
 (in-package hacrm.models.contact)
 
 
@@ -21,14 +22,23 @@
 
 (defun make-contact (name)
   "Создать карточку с контактом."
-  (make-instance 'contact
-                 :name name))
+  (let ((contact (make-instance 'contact
+                                :name name)))
+    (hacrm.utils:store-object contact)
+    contact))
 
 
-(defun find-contacts ()
+(defun all-contacts ()
   (weblocks-stores:find-persistent-objects
    hacrm::*hacrm-store*
    'contact))
+
+
+(defgeneric find-contacts-by (keyword value)
+  (:documentation "Searches contacts by different facts, for example, by email, or twitter nickname.
+
+Plugins should define methods for this generic, if they want to give ability to search
+contacts by some associated data."))
 
 
 (defmethod print-object ((contact contact) stream)

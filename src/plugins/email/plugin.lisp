@@ -6,4 +6,7 @@
    #:get-emails
    #:add-email
    #:remove-email
-   #:address))
+   #:address
+   #:already-exists
+   #:email
+   #:other-contact))

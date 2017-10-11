@@ -15,4 +15,5 @@
                              (:file facts)
                              (:file contacts)
                              (:module plugins
-                              :components ((:file birthdays)))))))
+                              :components ((:file birthdays)
+                                           (:file email)))))))

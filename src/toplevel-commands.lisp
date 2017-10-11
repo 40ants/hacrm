@@ -12,7 +12,6 @@
 
   (log:debug "Adding new contact" name)
   (let ((contact (hacrm.models.contact:make-contact name)))
-    (hacrm.utils:store-object contact)
     
     (hacrm.widgets.main:change-widget
         widget
@@ -38,7 +37,7 @@
     (hacrm.widgets.main:change-widget
      widget
      (hacrm.widgets.contacts-list:make-contacts-list
-      (hacrm.models.contact:find-contacts)
+      (hacrm.models.contact:all-contacts)
       :on-contact-click #'on-contact-selection))))
 
 
