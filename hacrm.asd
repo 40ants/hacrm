@@ -21,7 +21,7 @@
                :cl-markdown
                :weblocks
                :weblocks-lass
-               :weblocks-stores
+;;               :weblocks-stores
                :weblocks-prevalence
                :weblocks-ui
                :cl-prevalence

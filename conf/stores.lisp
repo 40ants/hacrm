@@ -16,14 +16,14 @@
 (defclass hacrm-prevalence-system (cl-prevalence:guarded-prevalence-system)
   ())
 
-(asdf:defsystem weblocks-hacrm-prevalence
-  :name "weblocks-hacrm-prevalence"
-  :version "0.0.1"
-  :maintainer ""
-  :author ""
-  :licence ""
-  :description "Fake system to make weblocks-stores happy"
-  :depends-on ())
+;; (asdf:defsystem weblocks-hacrm-prevalence
+;;   :name "weblocks-hacrm-prevalence"
+;;   :version "0.0.1"
+;;   :maintainer ""
+;;   :author ""
+;;   :licence ""
+;;   :description "Fake system to make weblocks-stores happy"
+;;   :depends-on ())
 
 
 (defmethod weblocks-stores:open-store ((store-type (eql :hacrm-prevalence)) &rest args)
