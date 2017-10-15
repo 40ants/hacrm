@@ -26,17 +26,34 @@
 ;;   :depends-on ())
 
 
-(defmethod weblocks-stores:open-store ((store-type (eql :hacrm-prevalence)) &rest args)
-  (let* ((store (apply #'make-instance 'hacrm-prevalence-system :directory (car args) (cdr args)))
+;; (defmethod weblocks-stores:open-store ((store-type (eql :hacrm-prevalence)) &rest args)
+;;   (let* ((store (apply #'make-instance 'hacrm-prevalence-system :directory (car args) (cdr args)))
+;;          (lock-name (format nil "Prevalence lock for store ~S" store))
+;;          (lock (bordeaux-threads:make-lock lock-name)))
+;;     (setf (gethash store weblocks-prevalence::*locks*) lock)
+;;     (setf (weblocks-prevalence::get-guard store)
+;;           (lambda (thunk)
+;;             (bordeaux-threads:with-lock-held (lock)
+;;               (funcall thunk))))
+;;     (setf weblocks-stores:*default-store* store)))
+
+
+;; (weblocks-stores:defstore *hacrm-store* :hacrm-prevalence *default-db-path*)
+
+
+(defun open-store (path &rest args)
+  (let* ((store (apply #'make-instance 'hacrm-prevalence-system :directory path args))
          (lock-name (format nil "Prevalence lock for store ~S" store))
          (lock (bordeaux-threads:make-lock lock-name)))
     (setf (gethash store weblocks-prevalence::*locks*) lock)
-    (setf (weblocks-prevalence::get-guard store)
+    (setf (cl-prevalence:get-guard store)
           (lambda (thunk)
             (bordeaux-threads:with-lock-held (lock)
               (funcall thunk))))
-    (setf weblocks-stores:*default-store* store)))
+
+    store))
 
 
-(weblocks-stores:defstore *hacrm-store* :hacrm-prevalence *default-db-path*)
+(defvar *hacrm-store* (open-store *default-db-path*)
+  "Main database for all items operated by CRM.")
 
