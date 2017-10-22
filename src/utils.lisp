@@ -16,16 +16,16 @@
 
 (defun store-object (object)
   (error "Need to reimplement")
-  (weblocks-stores:persist-object hacrm::*hacrm-store*
+  (weblocks-stores:persist-object hacrm::*store*
                                   object))
 
 (defun remove-object (object)
   (error "Need to-reimplement using transactions")
-  (weblocks-stores:delete-persistent-object hacrm::*hacrm-store*
+  (weblocks-stores:delete-persistent-object hacrm::*store*
                                             object))
 
 (defun find-object (root-object-name &key filter)
-  (let ((objects (cl-prevalence:get-root-object hacrm::*hacrm-store*
+  (let ((objects (cl-prevalence:get-root-object hacrm::*store*
                                                 root-object-name)))
     (if filter
         (remove-if-not filter objects)

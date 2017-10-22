@@ -33,7 +33,7 @@
 (defun save-note (note)
   (error "Removed")
   ;; (weblocks-stores:persist-object
-  ;;  hacrm::*hacrm-store*
+  ;;  hacrm::*store*
   ;;  note)
   )
 
@@ -41,7 +41,7 @@
 (defun find-notes (contact &key (order-by '(created . :desc)))
   (error "Removed")
   ;; (weblocks-stores:find-persistent-objects
-  ;;  hacrm::*hacrm-store*
+  ;;  hacrm::*store*
   ;;  'note
   ;;  :filter (f_ (equal (note-contact _)
   ;;                     contact))
@@ -58,7 +58,7 @@
 (defmacro for-each (var-name &body body)
   `(error "For-each was removed")
   ;; (loop for ,var-name in (weblocks-stores:find-persistent-objects
-  ;;                          hacrm::*hacrm-store*
+  ;;                          hacrm::*store*
   ;;                          'hacrm.models.note:note)
   ;;        do ,@body)
   )

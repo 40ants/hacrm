@@ -56,11 +56,11 @@
 
 (defun save-object (obj)
   (weblocks-stores:persist-object
-   hacrm::*hacrm-store*
+   hacrm::*store*
    obj))
 
 
 (defun find-facts ()
   (weblocks-stores:find-persistent-objects
-   hacrm::*hacrm-store*
+   hacrm::*store*
    'fact))

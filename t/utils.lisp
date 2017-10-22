@@ -25,7 +25,7 @@
                                "/")))
      (uiop:with-temporary-file (:pathname name :prefix prefix)
        (let* ((db-directory (uiop:pathname-directory-pathname name))
-              (hacrm::*hacrm-store* (hacrm::open-store db-directory))
+              (hacrm::*store* (hacrm::open-store db-directory))
               (hacrm::*transaction-log-length* 0)
               (hacrm::*log-transactions* t)
               (hacrm::*transactions* nil))

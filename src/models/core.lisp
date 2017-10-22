@@ -22,10 +22,10 @@
 (defun get-next-id ()
   "Each object should have a unique id.
    This function updates an id counter in the database and return a new value."
-  (unless hacrm::*hacrm-store*
-    (error "Please, setup hacrm::*hacrm-store* first."))
+  (unless hacrm::*store*
+    (error "Please, setup hacrm::*store* first."))
   (cl-prevalence:execute-transaction
-   (tx-increment-max-id hacrm::*hacrm-store*)))
+   (tx-increment-max-id hacrm::*store*)))
 
 
 (defclass base ()
@@ -51,7 +51,7 @@ id for the object."
 Additional variable \"store\" will be bound to the current cl-prevalence
 store during execution of the \"body\".
 
-Also, a helper defined to call the transaction on hacrm::*hacrm-store*."
+Also, a helper defined to call the transaction on hacrm::*store*."
   
   (alexandria:with-gensyms (prevalence-system)
     `(progn (defun ,name (,prevalence-system ,@args)
@@ -62,4 +62,4 @@ Also, a helper defined to call the transaction on hacrm::*hacrm-store*."
           
             (defun ,(alexandria:symbolicate "EXECUTE-" name) (,@args)
               (cl-prevalence:execute-transaction
-               (,name hacrm::*hacrm-store* ,@args))))))
+               (,name hacrm::*store* ,@args))))))

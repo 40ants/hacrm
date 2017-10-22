@@ -116,7 +116,7 @@
 ;;   (log:debug "Removing" contact)
   
 ;;   (weblocks-stores:delete-persistent-object
-;;    *hacrm-store*
+;;    *store*
 ;;    contact)
   
 ;;   (mark-dirty contact-list))
@@ -163,7 +163,7 @@
 ;;   "Returns HTML with contacts list."
   
 ;;   (declare (ignorable rest))
-;;   (let ((directory (slot-value *hacrm-store* 'directory)))
+;;   (let ((directory (slot-value *store* 'directory)))
 ;;     (log:info "Reading contacts from" directory))
   
 ;;   (let ((contacts (hacrm.models.contact:all-contacts)))

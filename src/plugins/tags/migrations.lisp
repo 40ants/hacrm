@@ -7,16 +7,16 @@
 
 ;; (defun remove-old-tags ()
 ;;   (let ((old-tags (weblocks-stores:find-persistent-objects
-;;                    hacrm::*hacrm-store*
+;;                    hacrm::*store*
 ;;                    'hacrm.models.facts.tag:tag)))
 ;;     (dolist (tag old-tags)
-;;       (weblocks-stores:delete-persistent-object hacrm::*hacrm-store*
+;;       (weblocks-stores:delete-persistent-object hacrm::*store*
 ;;                                                 tag))))
 
 
 ;; (defun rename-object-class ()
 ;;   (let ((old-tags (weblocks-stores:find-persistent-objects
-;;                    hacrm::*hacrm-store*
+;;                    hacrm::*store*
 ;;                    'hacrm.models.facts.tag:tag)))
 ;;     (dolist (old-tag old-tags)
 ;;       (hacrm.utils:store-object
@@ -27,16 +27,16 @@
 
 ;; (defun remove-old-tags ()
 ;;   (let ((old-tags (weblocks-stores:find-persistent-objects
-;;                    hacrm::*hacrm-store*
+;;                    hacrm::*store*
 ;;                    'hacrm.plugins.tags::new-tag)))
 ;;     (dolist (tag old-tags)
-;;       (weblocks-stores:delete-persistent-object hacrm::*hacrm-store*
+;;       (weblocks-stores:delete-persistent-object hacrm::*store*
 ;;                                                 tag))))
 
 
 ;; (defun rename-object-class ()
 ;;   (let ((old-tags (weblocks-stores:find-persistent-objects
-;;                    hacrm::*hacrm-store*
+;;                    hacrm::*store*
 ;;                    'hacrm.plugins.tags::new-tag)))
 ;;     (dolist (old-tag old-tags)
 ;;       (hacrm.utils:store-object
@@ -48,4 +48,4 @@
 (defun move-tags-to-plugin-package ()
   (rename-object-class)
   (remove-old-tags)
-  (cl-prevalence:snapshot hacrm::*hacrm-store*))
+  (cl-prevalence:snapshot hacrm::*store*))

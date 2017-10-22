@@ -30,7 +30,7 @@
 
 ;; (defun get-contact-tags (contact)
 ;;   (weblocks-stores:find-persistent-objects
-;;    hacrm::*hacrm-store*
+;;    hacrm::*store*
 ;;    'hacrm.models.facts.tag:tag
 
 ;;    :filter (f_ (and ;(typep _ 'hacrm.models.facts.tag:tag)

@@ -90,7 +90,7 @@ This keyword is used to group together similar facts like contacts or links to w
 
 
 (defun all-facts ()
-  (cl-prevalence:get-root-object hacrm::*hacrm-store* :facts))
+  (cl-prevalence:get-root-object hacrm::*store* :facts))
 
 
 (defun fix-facts-contacts ()

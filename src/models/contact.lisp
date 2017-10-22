@@ -39,7 +39,7 @@
 
 
 (defun all-contacts ()
-  (cl-prevalence:get-root-object hacrm::*hacrm-store* :contacts))
+  (cl-prevalence:get-root-object hacrm::*store* :contacts))
 
 
 (defgeneric find-contacts-by (keyword value)
