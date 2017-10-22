@@ -60,4 +60,4 @@
                     'already-exists)/)))
 
 
-(prove:finalize)
+(finalize)

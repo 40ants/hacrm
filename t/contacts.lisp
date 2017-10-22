@@ -2,6 +2,8 @@
   (:use #:cl
         #:prove
         #:hamcrest.prove)
+  (:import-from #:hacrm.models.core
+                #:get-object-id)
   (:import-from #:hacrm.models.contact
                 #:make-contact
                 #:get-name-synonyms
@@ -12,28 +14,37 @@
 (in-package hacrm.t.contacts)
 
 
-(plan 3)
+(plan 2)
 
-(with-empty-db
- (subtest "get-name-synonyms"
-   (let* ((contact (make-contact "саша шульгин"))
-          (result (get-name-synonyms contact)))
-     (assert-that result
-                  (contains "саша шульгин"
-                            "александр шульгин"
-                            "шурик шульгин"
-                            "шура шульгин")))))
+(subtest "get-name-synonyms"
+  (with-empty-db
+    (let* ((contact (make-contact "саша шульгин"))
+           (result (get-name-synonyms contact)))
+      (assert-that result
+                   (contains "саша шульгин"
+                             "александр шульгин"
+                             "шурик шульгин"
+                             "шура шульгин")))))
 
-(with-empty-db
- (subtest "make-contact saves data to database"
-   (let* ((contact (make-contact "саша шульгин"))
-          (result (all-contacts)))
-     (subtest "make-contact should return created object"
-       (assert-that contact
-                    (has-slots 'name "саша шульгин")))
-     (subtest "Database should contain one contact with given name."
-       (assert-that result
-                    (contains (has-slots 'name "саша шульгин")))))))
+(subtest "make-contact saves data to database and assigns it a sequential id"
+  (with-empty-db
+    (let* ((contact (make-contact "саша шульгин"))
+           (result (all-contacts)))
+      (subtest "make-contact should return created object"
+        (assert-that contact
+                     (has-slots 'name "саша шульгин"))
+        (is (get-object-id contact)
+            1
+            "Contact has id=1"))
+    
+      (subtest "Database should contain one contact with given name."
+        (assert-that result
+                     (contains (has-slots 'name "саша шульгин"))))
 
+      (subtest "Next contact should have incremented id"
+        (let ((contact (make-contact "next contact")))
+          (is (get-object-id contact)
+              2
+              "Next contact's id is 2"))))))
 
 (prove:finalize)

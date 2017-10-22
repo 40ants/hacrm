@@ -48,7 +48,8 @@
                              (:file commands)
                              (:file conditions)
                              (:module models
-                              :components ((:file contact)
+                              :components ((:file core)
+                                           (:file contact)
                                            (:file note)
                                            (:file relation)
                                            (:file playground)

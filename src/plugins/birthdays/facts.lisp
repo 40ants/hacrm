@@ -22,7 +22,11 @@
          :reader date)))
 
 
-(defun make-birthday-fact (contact date)
+(defun clean-date (date)
+  "Prepares a date and checks it's format.
+
+Should be applied to the user input before storing it into the database."
+  
   (check-type date string)
 
   (let ((date (cl-strings:clean date)))
@@ -34,17 +38,33 @@
         (error 'invalid-date-format
                :date date)))
 
-    (make-instance 'birthday
-                   :date date
-                   :contact contact)))
+    date))
 
 
 (defun get-birthday (contact)
   (first
    (hacrm.utils:find-object
-    'birthday
-    :filter (f_ (equal (weblocks-stores:object-id (contact _))
-                       (weblocks-stores:object-id contact))))))
+    :facts
+    :filter (f_ (and (typep _ 'birthday)
+                     (equal (contact _)
+                            contact))))))
+
+
+(hacrm.models.core:define-transaction tx-set-birthday (contact-id date)
+  (let* ((date (clean-date date))
+         (contact (hacrm.models.contact:find-contact-by-id contact-id))
+         (birthday (get-birthday contact)))
+    (cond
+      (birthday
+       (setf (slot-value birthday 'date)
+             date))
+      (t (setf birthday (make-object 'birthday
+                                     :date date
+                                     :contact contact))
+         (push birthday
+               (hacrm.models.core:get-root-object :facts))))
+
+    birthday))
 
 
 (defun set-birthday (contact date)
@@ -52,11 +72,5 @@
 
 Returns a new `birthday' fact."
 
-  (let ((current (get-birthday contact)))
-    (when current
-      (hacrm.utils:remove-object current)))
-  
-  (hacrm.utils:store-object
-   (make-birthday-fact
-    contact
-    date)))
+  (execute-tx-set-birthday (hacrm.models.core:get-object-id contact)
+                           date))

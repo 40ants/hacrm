@@ -1,18 +1,23 @@
 (defpackage  #:hacrm.models.contact
   (:use #:cl)
+  (:import-from #:hacrm.models.core
+                #:define-transaction
+                #:make-object
+                #:get-root-object)
   (:export #:contact
            #:make-contact
            #:name
            #:created
            #:find-contacts-by
            #:get-name-synonyms
-           #:all-contacts))
+           #:all-contacts
+           #:find-contacts-by-id
+           #:find-contact-by-id))
 (in-package hacrm.models.contact)
 
 
-(defclass contact ()
-  ((id)
-   (name :type string
+(defclass contact (hacrm.models.core:base)
+  ((name :type string
          :initarg :name
          :accessor name)
    (created :type integer
@@ -20,18 +25,21 @@
             :reader created)))
 
 
-(defun make-contact (name)
-  "Создать карточку с контактом."
-  (let ((contact (make-instance 'contact
-                                :name name)))
-    (hacrm.utils:store-object contact)
+(define-transaction tx-make-contact (name)
+  (let ((contact (make-object 'contact
+                              :name name)))
+    (push contact
+          (get-root-object :contacts))
     contact))
 
 
+(defun make-contact (name)
+  "Создать карточку с контактом."
+  (execute-tx-make-contact name))
+
+
 (defun all-contacts ()
-  (weblocks-stores:find-persistent-objects
-   hacrm::*hacrm-store*
-   'contact))
+  (cl-prevalence:get-root-object hacrm::*hacrm-store* :contacts))
 
 
 (defgeneric find-contacts-by (keyword value)
@@ -39,6 +47,14 @@
 
 Plugins should define methods for this generic, if they want to give ability to search
 contacts by some associated data."))
+
+
+(defun find-contact-by-id (value)
+  (dolist (contact (all-contacts))
+    (when (eql (hacrm.models.core:get-object-id contact)
+               value)
+      (return-from find-contact-by-id
+        contact))))
 
 
 (defmethod print-object ((contact contact) stream)
@@ -50,6 +66,7 @@ contacts by some associated data."))
   '(("саша" "александр" "шурик" "шура")
     ("алексей" "лёша" "леша" "алекс")
     ("юра" "юрий" "юрик")
+    ("дима" "дмитрий" "димон" "димка")
     ("петя" "пётр" "петр")))
 
 

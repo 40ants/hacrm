@@ -13,9 +13,8 @@
 (in-package hacrm.models.relation)
 
 
-(defclass relation ()
-  ((id)
-   (left :initarg :left
+(defclass relation (hacrm.models.core:base)
+  ((left :initarg :left
          :reader left)
    (right :initarg :right
           :reader right)
@@ -38,10 +37,10 @@
   "Returns relations where given object is in the `left' part,
 optionally filtering by relation's type."
   (hacrm.utils:find-object
-   'relation
+   :relations
    :filter (lambda (relation)
-             (and (eql (weblocks-stores:object-id (left relation))
-                       (weblocks-stores:object-id obj))
+             (and (equal (left relation)
+                         obj)
                   (or (null type)
                       (eql type
                            (type relation)))))))

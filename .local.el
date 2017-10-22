@@ -11,7 +11,12 @@
 
 (add-hook 'slime-repl-mode-hook
           (lambda ()
-            (slime-eval '(ql:quickload 'hacrm)))
+            (slime-eval '(ql:quickload '(hacrm prove)))
+            (slime-eval '(cl:setf prove:*enable-colors* nil
+                                  prove:*debug-on-error* t))
+            ;; (slime-eval '(ql:quickload :hacrm-test))
+            )
+          
           ;; append
           t)
 
@@ -29,6 +34,7 @@
           t)
 
 (slime)
+
 
 ;; (load "~/.roswell/lisp/quicklisp/log4slime-setup.el")
 ;; (global-log4slime-mode 1)

@@ -1,5 +1,6 @@
 (defpackage #:hacrm.plugins.email
   (:use #:cl
+        #:hacrm.models.core
         #:hacrm.models.facts.core
         #:f-underscore)
   (:export

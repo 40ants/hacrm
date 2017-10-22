@@ -91,7 +91,8 @@ arguments."
   ;; (setf admin-app
   ;;       (start-webapp 'weblocks-cms:weblocks-cms))
 
-  (weblocks-stores:open-stores)
+  ;;(weblocks-stores:open-stores)
+  (setf *hacrm-store* (open-store *default-db-path*))
   (list hacrm-app admin-app))
 
 
@@ -105,7 +106,9 @@ arguments."
   (weblocks.server:stop-weblocks)
 
   ;; TODO: make this happen using hooks
-  (weblocks-stores:close-stores))
+  ;; (weblocks-stores:close-stores)
+  (cl-prevalence:snapshot *hacrm-store*)
+  (setf *hacrm-store* nil))
 
 
 ;; (defun reset-hunchentoot-routes ()
@@ -125,10 +128,8 @@ arguments."
 
 
 (defun switch-to-db (path)
-  (weblocks-stores:close-store *hacrm-store*)
-  (setf (cl-prevalence::get-directory *hacrm-store*)
-        path)
-  (weblocks-stores:open-store *hacrm-store*))
+  (close-store *hacrm-store*)
+  (setf *hacrm-store* (open-store path)))
 
 
 (defun dev-db ()

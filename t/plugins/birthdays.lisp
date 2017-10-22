@@ -7,14 +7,17 @@
 (in-package hacrm.t.plugins.birthdays)
 
 
+(plan 2)
+
 (with-empty-db
   (subtest "It should be impossible to create a fact with wrong date."
-    (is-error (make-birthday-fact nil "2017-20-14")
-              'invalid-date-format)
+    (let ((contact (hacrm.models.contact:make-contact "Vasily")))
+      (is-error (set-birthday contact "2017-20-14")
+                'invalid-date-format)
 
-    (is (date (make-birthday-fact nil "2017-08-17"))
-        "2017-08-17"
-        "If date is correct, returned object should contain original string in `date' slot.")))
+      (is (date (set-birthday contact "2017-08-17"))
+          "2017-08-17"
+          "If date is correct, returned object should contain original string in `date' slot."))))
 
 
 (with-empty-db
@@ -41,3 +44,5 @@
       (set-birthday contact "  2001-01-02")
       (is (date (get-birthday contact))
           "2001-01-02"))))
+
+(finalize)

@@ -15,18 +15,21 @@
 
 
 (defun store-object (object)
+  (error "Need to reimplement")
   (weblocks-stores:persist-object hacrm::*hacrm-store*
                                   object))
 
 (defun remove-object (object)
+  (error "Need to-reimplement using transactions")
   (weblocks-stores:delete-persistent-object hacrm::*hacrm-store*
                                             object))
 
-(defun find-object (class-name &key filter)
-  (weblocks-stores:find-persistent-objects
-   hacrm::*hacrm-store* 
-   class-name
-   :filter filter))
+(defun find-object (root-object-name &key filter)
+  (let ((objects (cl-prevalence:get-root-object hacrm::*hacrm-store*
+                                                root-object-name)))
+    (if filter
+        (remove-if-not filter objects)
+        objects)))
 
 (defun format-time (universal-time)
   "Возвращает строку в формате YYYY-MM-DD hh:mm"

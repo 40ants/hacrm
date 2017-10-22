@@ -7,15 +7,11 @@
   (log:debug "Adding a tags from" query)
   
   (let ((tags (cl-strings:split query #\Space)))
-    (dolist (tag tags)
+    (dolist (tag-name tags)
       (log:debug "Creating a tag" tag)
       
-      (let* ((contact (hacrm.widgets.contact-details:get-contact widget))
-             (fact (hacrm.plugins.tags:make-tag-fact
-                    contact
-                    tag)))
-        (hacrm.utils:store-object fact)
-        (weblocks.hooks:call-hook :fact-created contact fact))))
+      (let* ((contact (hacrm.widgets.contact-details:get-contact widget)))
+        (hacrm.plugins.tags:tag-contact contact tag-name))))
 
   (weblocks:mark-dirty widget)
   (hacrm.widgets.main:reset-user-input widget)

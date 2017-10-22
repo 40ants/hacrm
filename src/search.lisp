@@ -11,6 +11,10 @@
 (defvar *index* nil
   "Search index for contacts")
 
+(defvar *next-document-id* 0)
+
+(defvar *doc-by-id* (make-hash-table))
+
 
 (defvar *experimental-index* nil
   "")
@@ -25,18 +29,28 @@ If you want the facts added by your plugin were searchable, define this method."
     (declare (ignorable fact-group contact search-document))))
 
 
+(defclass hacrm-document (montezuma:document)
+  ((object :initarg :object
+           :reader get-object)))
+
+
 (defun index-contacts ()
   (setf *index*
         (make-instance 'montezuma:index))
 
   (flet ((transform-to-document (contact)
-           (let ((doc (make-instance 'montezuma:document)))
+           (let ((doc (make-instance 'hacrm-document
+                                     :object contact)))
              (montezuma:add-field doc (montezuma:make-field
                                        "id"
-                                       (format nil "~a"
-                                               (slot-value contact
-                                                           'hacrm.models.contact::id))
+                                       (format nil "~a" *next-document-id*)
                                        :index nil))
+             ;; Now we'll put a reference to the indexed contact
+             ;; to the table where we can get it by generated id:
+             (setf (gethash *next-document-id* *doc-by-id*)
+                   contact)
+             (incf *next-document-id*)
+             
              (dolist (name (hacrm.models.contact:get-name-synonyms contact))
                (montezuma:add-field doc (montezuma:make-field
                                          "name"
@@ -47,9 +61,7 @@ If you want the facts added by your plugin were searchable, define this method."
              
              doc)))
     
-    (loop for contact in (weblocks-stores:find-persistent-objects
-                          hacrm::*hacrm-store*
-                          'contact)
+    (loop for contact in (hacrm.models.contact:all-contacts)
           do (montezuma:add-document-to-index
               *index*
               (transform-to-document contact)))))
@@ -82,10 +94,7 @@ If you want the facts added by your plugin were searchable, define this method."
                (let* ((doc (montezuma:get-document *index* doc-index))
                       (contact-id (cl-strings:parse-number
                                    (montezuma:document-value doc "id")))
-                      (cnt (weblocks-stores:find-persistent-object-by-id
-                            hacrm::*hacrm-store*
-                            'hacrm.models.contact:contact
-                            contact-id)))
+                      (cnt (gethash contact-id *doc-by-id*)))
                  cnt)))
         (mapcar #'to-contact results)))))
 

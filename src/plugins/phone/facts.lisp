@@ -27,9 +27,11 @@
 (defun get-phones (contact)
   "Returns all phone bound to the contact."
   (hacrm.utils:find-object
-   'phone
-   :filter (f_ (equal (weblocks-stores:object-id (contact _))
-                      (weblocks-stores:object-id contact)))))
+   :facts
+   :filter (f_ (and
+                (typep _ 'phone)
+                (equal (contact _)
+                       contact)))))
 
 
 (defun add-phone (contact phone-number)

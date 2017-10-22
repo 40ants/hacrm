@@ -19,18 +19,28 @@
 (defmethod fact-group ((fact tag))
   :tags)
 
+(define-transaction tx-tag-contact (contact-id tag-name)
+  (let* ((contact (first (hacrm.models.contact:find-contacts-by :id contact-id)))
+         (tag (make-object 'tag
+                           :contact contact
+                           :name tag-name)))
+    (push tag (get-root-object :facts))
+    
+    tag))
 
-(defun make-tag-fact (contact tag-name)
-  (make-instance 'tag
-                 :contact contact
-                 :name tag-name))
+
+(defun tag-contact (contact tag-name &optional foo)
+  (let ((tag (execute-tx-tag-contact (get-object-id contact)
+                                     tag-name)))
+    (weblocks.hooks:call-hook :fact-created contact tag)
+    
+    tag))
 
 
 (defun get-contact-tags (contact)
-  (weblocks-stores:find-persistent-objects
-   hacrm::*hacrm-store*
-   'tag
-
-   :filter (f_ (eql (weblocks-stores:object-id (contact _))
-                    (weblocks-stores:object-id contact)))))
+  (hacrm.utils:find-object
+   :facts
+   :filter (f_ (and (typep _ 'tag)
+                    (eql (contact _)
+                         contact)))))
 

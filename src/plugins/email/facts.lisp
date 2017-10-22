@@ -23,60 +23,68 @@
                   :reader other-contact)))
 
 
-(defun make-email-fact (contact email-address)
-  (check-type email-address string)
-
-  ;; First, check if this email address already bound to some
-  ;; contact
-
-  (make-instance 'email
-                 :address email-address
-                 :contact contact))
-
-
 (defun get-emails (contact)
-  "Returns all email bound to the contact."
+  "Returns all emails bound to the contact."
   (hacrm.utils:find-object
-   'email
-   :filter (f_ (equal (weblocks-stores:object-id (contact _))
-                      (weblocks-stores:object-id contact)))))
+   :facts
+   :filter (f_ (and (typep _ 'email)
+                    (equal (contact _)
+                           contact)))))
 
+
+(hacrm.models.core:define-transaction tx-add-email (contact-id email-address)
+  (check-type email-address string)
+  (check-type contact-id integer)
+  
+  (let ((contact (hacrm.models.contact:find-contact-by-id contact-id)))
+    (push
+     (make-object 'email
+                  :address email-address
+                  :contact contact)
+     (hacrm.models.core:get-root-object :facts))))
 
 
 (defun add-email (contact email-address)
   (let ((exists (hacrm.models.contact:find-contacts-by :email email-address)))
     (when exists
       (error 'already-exists))
-    
-    (hacrm.utils:store-object
-     (make-email-fact contact email-address))))
+
+    (execute-tx-add-email (hacrm.models.core:get-object-id contact)
+                          email-address)))
 
 
-(defun remove-email (contact email-to-remove)
+(hacrm.models.core:define-transaction tx-remove-email (contact-id email-to-remove)
+  (check-type contact-id integer)
   (check-type email-to-remove string)
-  
-  (let ((emails (get-emails contact))
-        removed)
+
+  (let* ((contact (hacrm.models.contact:find-contact-by-id contact-id))
+         (emails (get-emails contact))
+         removed)
+    
+    ;; Not optimal, but is ok for prototype
     (dolist (email emails)
       (when (string-equal (address email)
                           email-to-remove)
         (log:debug "Removing email from contact" email contact)
-        (hacrm.utils:remove-object email)
         (push email removed)))
+
+    (setf (hacrm.models.core:get-root-object :facts)
+          (remove-if (f_ (member _ removed :test #'eql))
+                     (hacrm.models.core:get-root-object :facts)))
 
     removed))
 
 
+(defun remove-email (contact email-to-remove)
+  (execute-tx-remove-email (hacrm.models.core:get-object-id contact)
+                           email-to-remove))
+
+
 (defmethod hacrm.models.contact:find-contacts-by ((keyword (eql :email)) value)
-  (let* ((facts (hacrm.utils:find-object 'email
+  (let* ((facts (hacrm.utils:find-object :facts
                                          :filter
-                                         (f_ (string-equal (address _)
-                                                           value))))
-         (contact-id (when facts
-                       (weblocks-stores:object-id (contact
-                                                   (first facts)))))
-         (all-contacts (hacrm.models.contact:all-contacts)))
-    (hacrm.utils:find-object
-     'hacrm.models.contact:contact
-     :filter (f_ (equal (weblocks-stores:object-id _)
-                        contact-id)))))
+                                         (f_ (and (typep _ 'email)
+                                                  (string-equal (address _)
+                                                                value))))))
+    (loop for fact in facts
+          collect (contact fact))))

@@ -12,8 +12,13 @@
 (in-package hacrm.t.facts)
 
 
-(with-empty-db
-  (subtest "If there is no facts about contact, then there is no groups."
+(plan 1)
+
+(subtest "If there is no facts about contact, then there is no groups."
+  (with-empty-db
     (let ((contact (make-contact "Petya")))
       (is (fact-groups contact)
           nil))))
+
+
+(finalize)
