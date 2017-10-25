@@ -34,20 +34,36 @@
                        contact)))))
 
 
-(defun add-phone (contact phone-number)
-  (hacrm.utils:store-object
-   (make-phone-fact contact phone-number)))
+(define-transaction tx-add-phone (contact-id number)
+  (check-type contact-id integer)
+  (check-type number string)
+  (let* ((contact (hacrm.models.contact:find-contact-by-id contact-id))
+         (phone (make-instance 'phone
+                               :contact contact
+                               :number number)))
+    (push phone (get-root-object :facts))
+
+    phone))
 
 
-(defun remove-phone (contact phone-to-remove)
-  (check-type phone-to-remove string)
-  
-  (let ((phones (get-phones contact))
-        removed)
-    (dolist (phone phones)
-      (when (string-equal (number phone)
-                          phone-to-remove)
-        (hacrm.utils:remove-object phone)
-        (push phone removed)))
+(defun add-phone (contact number)
+  (check-type contact hacrm.models.contact:contact)
+  (check-type number string)
+  (execute-tx-add-phone (get-object-id contact)
+                        number))
 
-    removed))
+
+(define-transaction tx-remove-phone (contact-id number)
+  (check-type contact-id integer)
+  (check-type number string)
+
+  (remove-facts contact-id
+    (string-equal (number fact)
+                  number)))
+
+
+(defun remove-phone (contact number)
+  (check-type contact hacrm.models.contact:contact)
+  (check-type number string)
+  (execute-tx-remove-phone (get-object-id contact)
+                           number))

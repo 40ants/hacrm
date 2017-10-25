@@ -38,28 +38,9 @@
 
 
 (hacrm.models.core:define-transaction tx-untag-contact (contact-id tag-name)
-  ;; First, we need to find a contact by id
-  ;; Default let does not guarantee an order of execution
-  ;; for binding clauses. That is why you need to replace it
-  ;; with let*, if one binding depends on other
-  ;; Now there is no warning after compilation.
-  ;; By the way, I'm hitting C-c C-c each time, when I need
-  ;; to compile a function.
-  ;; Now it is loaded into the lisp image and we ready to check it with a
-  ;; test.
-  (let* ((contact (hacrm.models.contact:find-contact-by-id contact-id))
-         ;; Tags are the facts which stored in a facts collection
-         (all-facts (get-root-object :facts))
-         ;; Now we need to filter-out facts, related to the contact and
-         ;; having the given name
-         (filtered-facts (remove-if (f_ (and (eql (contact _)
-                                                  contact)
-                                             (string-equal (name _)
-                                                           tag-name)))
-                                    all-facts)))
-    ;; Now, filtered facts should be saved back to the collection
-    (setf (get-root-object :facts)
-          filtered-facts)))
+  (remove-facts contact-id
+    (string-equal (name fact)
+                  tag-name)))
 
 
 (defun untag-contact (contact tag-name)

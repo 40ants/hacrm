@@ -8,7 +8,8 @@
    #:fact-groups
    #:find-contact-facts
    #:fact-group
-   #:all-facts))
+   #:all-facts
+   #:remove-facts))
 (in-package hacrm.models.facts.core)
 
 
@@ -121,3 +122,34 @@ This keyword is used to group together similar facts like contacts or links to w
             and do
               (setf (slot-value fact 'contact)
                     real-contact))))
+
+
+(defmacro remove-facts (contact-id &body rules)
+  "Removes a fact or facts bound to a contact with given id.
+
+A rules is an expression, evaluated to check if the fact should be removed.
+For example:
+
+\(remove-facts contact-id \(string-equal \(number fact\)
+                                       phone-number\)\)
+
+Will remove all phone numbers where number is equal to given.
+
+Variables 'contact' and 'fact' are bound to a contact identified by contact-id,
+and to checked fact during rules evaluation.
+"
+  (alexandria:with-gensyms (all-facts filtered-facts)
+    `(let* ((contact (hacrm.models.contact:find-contact-by-id ,contact-id))
+            ;; Tags are the facts which stored in a facts collection
+            (,all-facts (hacrm.models.core:get-root-object :facts))
+            ;; Now we need to filter-out facts, related to the contact and
+            ;; having the given name
+            (,filtered-facts (remove-if (lambda (fact)
+                                         (and (eql (contact fact)
+                                                   contact)
+                                              ,@rules))
+                                       ,all-facts)))
+       ;; Now, filtered facts should be saved back to the collection
+       (setf (hacrm.models.core:get-root-object :facts)
+             ,filtered-facts))))
+

@@ -40,6 +40,8 @@
       ;; to ensure that tag does not removed by name from
       ;; all contacts instead from one given to the untag-contact
       (tag-contact contact1 "foo")
+      (tag-contact contact1 "bar")
+      
       (tag-contact contact2 "foo")
 
       ;; Now we need to untag the first contact
@@ -50,9 +52,11 @@
       ;; I'm hittint M-. on the function's name
       (untag-contact contact1 "foo")
 
-      (subtest "Checking tags on our first contact, they should be empty"
-        (is (get-contact-tags contact1)
-            nil))
+      (subtest "Checking tags on our first contact, they should contain only bar, because foo tag was removed"
+        (assert-that (get-contact-tags contact1)
+                     (contains (has-slots
+                                'hacrm.plugins.tags:name
+                                "bar"))))
 
       (subtest "But second contact should have one tag"
         (assert-that (get-contact-tags contact2)
