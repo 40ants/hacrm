@@ -50,8 +50,8 @@
                              (:module models
                               :components ((:file core)
                                            (:file contact)
-                                           (:file note)
-                                           (:file relation)
+                                           ;; (:file note)
+                                           ;; (:file relation)
                                            (:file playground)
                                            (:module facts
                                             :components ((:file core)
@@ -109,4 +109,5 @@
                              (:file desktop))
                 :depends-on (hacrm
                              conf))))
+
 

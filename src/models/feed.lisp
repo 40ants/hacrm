@@ -5,7 +5,8 @@
    #:def-feed-item
    #:feed-item
    #:created-at
-   #:updated-at))
+   #:updated-at
+   #:related-to-object-p))
 (in-package hacrm.models.feed)
 
 
@@ -66,3 +67,16 @@ of other types."
      ;;     (apply #'call-next-method params)))
      ))
 
+
+(defgeneric related-to-object-p (feed-item object)
+  (:documentation "Should return true, if given feed item is related to the given object.
+
+For example, this could check if an email was sent to or by a contact. Or if a feed-item
+is a note about the contact.
+
+Default implementation returns nil.")
+
+  (:method (feed-item object)
+    "Default implementation returns nil, saying that feed item is unrelated."
+    (declare (ignorable feed-item object))
+    nil))

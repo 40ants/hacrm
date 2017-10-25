@@ -26,8 +26,8 @@
 
 (defun add-new-note (widget contact &key text &allow-other-keys)
   (log:debug "Adding new note for" contact "with" text)
-  (hacrm.models.note:save-note 
-   (hacrm.models.note:make-note contact text))
+  ;; (hacrm.models.note:save-note 
+  ;;  (hacrm.models.note:make-note contact text))
   (mark-dirty widget))
 
 
@@ -51,19 +51,21 @@
 
 
 (defun render (note)
-  (with-accessors ((created hacrm.models.note:note-created)
-                   (text hacrm.models.note:note-text)) note
-    (with-html (:li (:p "Дата: " (esc (hacrm.utils:format-time
-                                       created)))
-                    (:p (str (hacrm.utils:text->html
-                              text)))))))
+  ;; (with-accessors ((created hacrm.models.note:note-created)
+  ;;                  (text hacrm.models.note:note-text)) note
+  ;;   (with-html (:li (:p "Дата: " (esc (hacrm.utils:format-time
+  ;;                                      created)))
+  ;;                   (:p (str (hacrm.utils:text->html
+  ;;                             text))))))
+  )
 
 
 (defmethod render-widget-body ((widget notes) &rest args)
   (declare (ignorable args))
   
   (let* ((contact (notes-contact widget))
-         (notes (hacrm.models.note:find-notes contact)))
+         (notes ;; (hacrm.models.note:find-notes contact)
+                ))
     (when contact
       (render-new-note-form widget contact))
     

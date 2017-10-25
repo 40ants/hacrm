@@ -12,4 +12,5 @@
    #:contact
    #:tag
    #:get-contact-tags
-   #:tag-contact))
+   #:tag-contact
+   #:untag-contact))

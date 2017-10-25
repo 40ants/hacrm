@@ -16,4 +16,6 @@
                              (:file contacts)
                              (:module plugins
                               :components ((:file birthdays)
+                                           (:file tags)
+                                           (:file notes)
                                            (:file email)))))))

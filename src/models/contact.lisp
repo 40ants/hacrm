@@ -11,7 +11,6 @@
            #:find-contacts-by
            #:get-name-synonyms
            #:all-contacts
-           #:find-contacts-by-id
            #:find-contact-by-id))
 (in-package hacrm.models.contact)
 

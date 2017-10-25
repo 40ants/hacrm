@@ -24,10 +24,14 @@
 
 
 (defun make-feed-widget (contact)
-  (let* ((relations (hacrm.models.relation:find-relation-from-object contact :type :activity))
-         (objects (mapcar #'hacrm.models.relation:right relations))
+  (let* ((all-feed-items (hacrm.models.core:get-root-object :feed-items))
+         (items-for-the-contact
+           (remove-if-not (f_ (hacrm.models.feed:related-to-object-p
+                               _
+                               contact))
+                          all-feed-items))
          ;; feed items are sorted from recent to oldest
-         (sorted-objects (sort objects
+         (sorted-objects (sort items-for-the-contact
                                #'>
                                :key #'hacrm.models.feed:created-at))
          (feed-widget (make-instance 'feed :contact contact)))

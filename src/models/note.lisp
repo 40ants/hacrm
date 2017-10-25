@@ -62,3 +62,25 @@
   ;;                          'hacrm.models.note:note)
   ;;        do ,@body)
   )
+
+
+(defun migrate-old-notes ()
+  "Временная функция чтобы трансформировать данные перенеся данные на плагин"
+  
+  (let* ((old-notes (hacrm.models.core:get-root-object :notes))
+         (contacts (hacrm.models.core:get-root-object :contacts))
+         (contacts-by-name (make-hash-table :test 'equal)))
+
+    ;; Заполним словарик с контактами
+    (loop for contact in contacts
+          do (setf (gethash (hacrm.models.contact:name contact)
+                            contacts-by-name)
+                   contact))
+
+    (loop for note in old-notes
+          collect (let* ((note-text (note-text note))
+                         (contact-name (hacrm.models.contact:name (note-contact note)))
+                         (contact (gethash (cl-strings:clean contact-name)
+                                           contacts-by-name)))
+
+                    (hacrm.plugins.notes:add-note contact note-text))))) 

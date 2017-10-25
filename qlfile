@@ -1,4 +1,4 @@
-ql :all 2017-08-30
+ql :all :latest
 
 github websocket-driver fukamachi/websocket-driver :ref a3046b11dfb9803ac3bff7734dd017390c2b54bb
 github weblocks-websocket 40ants/weblocks-websocket :ref v0.1.1
