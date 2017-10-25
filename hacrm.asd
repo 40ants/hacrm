@@ -1,4 +1,3 @@
-;;;; -*- Mode: Lisp; Syntax: ANSI-Common-Lisp; Base: 10 -*-
 (defpackage #:hacrm-asd
   (:use
    :cl
@@ -77,7 +76,7 @@
                              (:module plugins
                               :components ((:module tags
                                             :components ((:file plugin)
-                                                         (:file fact)
+                                                         (:file models)
                                                          (:file commands)
                                                          (:file widgets)
                                                          (:file search)
@@ -90,19 +89,19 @@
 
                                            (:module birthdays
                                             :components ((:file plugin)
-                                                         (:file facts)
+                                                         (:file models)
                                                          (:file widgets)
                                                          (:file commands)))
                                            (:module email
                                             :components ((:file plugin)
-                                                         (:file facts)
+                                                         (:file models)
                                                          (:file widgets)
                                                          (:file commands)
                                                          (:file multiparts)
                                                          (:file imap)))
                                            (:module phone
                                             :components ((:file plugin)
-                                                         (:file facts)
+                                                         (:file models)
                                                          (:file widgets)
                                                          (:file commands)))))
 

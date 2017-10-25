@@ -18,4 +18,5 @@
                               :components ((:file birthdays)
                                            (:file tags)
                                            (:file notes)
+                                           (:file phones)
                                            (:file email)))))))
