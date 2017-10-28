@@ -38,22 +38,17 @@
 
 
 (hacrm.models.core:define-transaction tx-untag-contact (contact-id tag-name)
-  (remove-facts contact-id
+  (remove-facts (contact-id :type 'tag)
     (string-equal (name fact)
                   tag-name)))
 
 
 (defun untag-contact (contact tag-name)
-  ;; Ups, there is commented implementation,
-  ;; copypasted from tag-contact :)
+  (let ((removed-tags (execute-tx-untag-contact (get-object-id contact)
+                                                tag-name)))
 
-  ;; We need to call a cl-prevalence's transaction here
-  ;; let's define it before untag-contact
-
-  ;; Of cause, i forgot to call a transaction from the function!!!
-
-  (execute-tx-untag-contact (get-object-id contact)
-                            tag-name))
+    (dolist (tag removed-tags)
+      (weblocks.hooks:call-hook :fact-removed contact tag))))
 
 
 (defun get-contact-tags (contact)

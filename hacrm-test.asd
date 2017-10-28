@@ -8,7 +8,8 @@
 
 (defsystem hacrm-test
   :depends-on (:hacrm
-               :hamcrest-prove)
+               :hamcrest-prove
+               :weblocks-testutils)
   :serial t
   :components ((:module t
                 :components ((:file utils)

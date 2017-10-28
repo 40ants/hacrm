@@ -16,14 +16,6 @@
   :phones)
 
 
-(defun make-phone-fact (contact phone-number)
-  (check-type phone-number string)
-
-  (make-instance 'phone
-                 :number phone-number
-                 :contact contact))
-
-
 (defun get-phones (contact)
   "Returns all phone bound to the contact."
   (hacrm.utils:find-object
@@ -57,7 +49,7 @@
   (check-type contact-id integer)
   (check-type number string)
 
-  (remove-facts contact-id
+  (remove-facts (contact-id :type 'phone)
     (string-equal (number fact)
                   number)))
 

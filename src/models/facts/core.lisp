@@ -124,32 +124,50 @@ This keyword is used to group together similar facts like contacts or links to w
                     real-contact))))
 
 
-(defmacro remove-facts (contact-id &body rules)
+(defmacro remove-facts ((contact-id &key type) &body rules)
   "Removes a fact or facts bound to a contact with given id.
 
 A rules is an expression, evaluated to check if the fact should be removed.
 For example:
 
-\(remove-facts contact-id \(string-equal \(number fact\)
-                                       phone-number\)\)
+\(remove-facts \(contact-id :type 'tag\)
+     \(string-equal \(number fact\)
+                     phone-number\)\)
 
 Will remove all phone numbers where number is equal to given.
 
 Variables 'contact' and 'fact' are bound to a contact identified by contact-id,
 and to checked fact during rules evaluation.
+
+Returns a list of removed facts.
 "
-  (alexandria:with-gensyms (all-facts filtered-facts)
+  (alexandria:with-gensyms (all-facts filtered-facts removed-facts)
     `(let* ((contact (hacrm.models.contact:find-contact-by-id ,contact-id))
             ;; Tags are the facts which stored in a facts collection
             (,all-facts (hacrm.models.core:get-root-object :facts))
             ;; Now we need to filter-out facts, related to the contact and
             ;; having the given name
-            (,filtered-facts (remove-if (lambda (fact)
-                                         (and (eql (contact fact)
-                                                   contact)
-                                              ,@rules))
-                                       ,all-facts)))
+            ,filtered-facts
+            ,removed-facts)
+       
+       (dolist (fact ,all-facts)
+         ;; TODO: it is possible to move
+         ;; this rules construction to the macro level
+         ;; to optimize performance
+         (if (and (eql (contact fact)
+                       contact)
+                  (or (null ,type)
+                      (typep fact ,type))
+                  ,@rules)
+             (push fact ,removed-facts)
+             (push fact ,filtered-facts)))
        ;; Now, filtered facts should be saved back to the collection
        (setf (hacrm.models.core:get-root-object :facts)
-             ,filtered-facts))))
+             (nreverse ,filtered-facts))
+
+       ;; Return removed facts
+       (nreverse ,removed-facts))))
+
+;;(weblocks.hooks:call-hook :fact-removed contact tag-object)
+
 

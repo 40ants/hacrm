@@ -25,18 +25,10 @@
   (log:debug "Removing tags from" query)
   
   (let* ((tags-to-remove (cl-strings:split query #\Space))
-         (contact (hacrm.widgets.contact-details:get-contact widget))
-         (contact-tags (get-contact-tags contact)))
+         (contact (hacrm.widgets.contact-details:get-contact widget)))
     
     (dolist (tag tags-to-remove)
-      (let ((tag-object (find tag
-                              contact-tags
-                              :test #'string=
-                              :key #'name)))
-        (when tag-object
-          (log:debug "Removing" tag)
-          (hacrm.utils:remove-object tag-object)
-          (weblocks.hooks:call-hook :fact-removed contact tag-object)))))
+      (untag-contact contact tag)))
 
   (weblocks:mark-dirty widget)
   (hacrm.widgets.main:reset-user-input widget)

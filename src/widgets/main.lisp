@@ -61,7 +61,7 @@
 (defmethod render-widget-body ((window main-window)
                                &rest rest)
   (declare (ignorable rest))
-  (log:error "Rendering main window")
+  (log:info "Rendering main window")
   
   (with-html
     (:div :class "main-window__working-area"
