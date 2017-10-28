@@ -9,13 +9,13 @@
 (in-package hacrm.widgets.input-box)
 
 
-(defwidget counter-box (weblocks.websocket:websocket-widget)
+(defwidget counter-box ()
   ((counter :initform nil
             :accessor counter
             :affects-dirty-status-p t)))
 
 
-(defwidget input-box (weblocks.websocket:websocket-widget hacrm.widgets.base:base)
+(defwidget input-box (hacrm.widgets.base:base)
   ((counter :initform (make-instance 'counter-box)
             :reader counter)))
 
@@ -63,10 +63,11 @@
                  (setf (counter widget)
                        0)
 
-                 (weblocks.websocket:in-thread ("Update counter")
-                   (sleep 3)
-                   (log:info "Updating counter")
-                   (incf (counter widget))))
+                 ;; (weblocks.websocket:in-thread ("Update counter")
+                 ;;   (sleep 3)
+                 ;;   (log:info "Updating counter")
+                 ;;   (incf (counter widget)))
+                 )
                "Start counter")))))
 
 
