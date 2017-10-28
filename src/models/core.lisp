@@ -58,24 +58,17 @@ Also, a helper defined to call the transaction on hacrm::*store*."
   (alexandria:with-gensyms (prevalence-system)
     `(eval-when (:compile-toplevel :load-toplevel :execute)
        (defun ,name (,prevalence-system ,@args)
-              (declare (ignorable ,prevalence-system))
+         (declare (ignorable ,prevalence-system))
 
-              ;; When cl-prevalence restores data from transaction log
-              ;; our store can be still a nil and transaction expecting
-              ;; it to be a prevalence store, will fail.
+         ;; When cl-prevalence restores data from transaction log
+         ;; our store can be still a nil and transaction expecting
+         ;; it to be a prevalence store, will fail.
          (let ((hacrm::*store* ,prevalence-system))
-           ,@body)
-         
-              ;; (macrolet  ((get-root-object (name)
-              ;;               `(cl-prevalence:get-root-object ,',prevalence-system
-              ;;                                               ,name)))
-              ;;   ,@body)
-;;              ,@body
-              )
+           ,@body))
           
-            (defun ,(alexandria:symbolicate "EXECUTE-" name) (,@args)
-              (cl-prevalence:execute-transaction
-               (,name hacrm::*store* ,@args))))))
+       (defun ,(alexandria:symbolicate "EXECUTE-" name) (,@args)
+         (cl-prevalence:execute-transaction
+          (,name hacrm::*store* ,@args))))))
 
 
 (defun get-root-object (name)

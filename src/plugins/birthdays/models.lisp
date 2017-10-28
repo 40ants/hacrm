@@ -51,20 +51,26 @@ Should be applied to the user input before storing it into the database."
 
 
 (hacrm.models.core:define-transaction tx-set-birthday (contact-id date)
+  "If a new fact was created, second returned value is \"true\"."
   (let* ((date (clean-date date))
          (contact (hacrm.models.contact:find-contact-by-id contact-id))
-         (birthday (get-birthday contact)))
+         (birthday (get-birthday contact))
+         created)
     (cond
+      ;; Fact already exists
       (birthday
        (setf (slot-value birthday 'date)
              date))
+      ;; New fact should be created
       (t (setf birthday (make-object 'birthday
                                      :date date
-                                     :contact contact))
+                                     :contact contact)
+               created t)
+               
          (push birthday
                (hacrm.models.core:get-root-object :facts))))
 
-    birthday))
+    (values birthday created)))
 
 
 (defun set-birthday (contact date)
@@ -72,5 +78,14 @@ Should be applied to the user input before storing it into the database."
 
 Returns a new `birthday' fact."
 
-  (execute-tx-set-birthday (hacrm.models.core:get-object-id contact)
-                           date))
+  (let* ((contact-id (hacrm.models.core:get-object-id contact)))
+    (multiple-value-bind (fact created)
+        (execute-tx-set-birthday contact-id date)
+
+      (weblocks.hooks:call-hook (if created
+                                    :fact-created
+                                    :fact-updated)
+                                contact
+                                fact)
+
+      (values fact created))))
