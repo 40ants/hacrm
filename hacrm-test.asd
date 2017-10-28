@@ -12,12 +12,12 @@
                :weblocks-testutils)
   :serial t
   :components ((:module t
-                :components ((:file utils)
-                             (:file facts)
-                             (:file contacts)
+                :components ((:test-file utils)
+                             (:test-file facts)
+                             (:test-file contacts)
                              (:module plugins
-                              :components ((:file birthdays)
-                                           (:file tags)
-                                           (:file notes)
-                                           (:file phones)
-                                           (:file email)))))))
+                              :components ((:test-file birthdays)
+                                           (:test-file tags)
+                                           (:test-file notes)
+                                           (:test-file phones)
+                                           (:test-file email)))))))
