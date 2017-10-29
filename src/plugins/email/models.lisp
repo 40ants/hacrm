@@ -36,12 +36,16 @@
   (check-type email-address string)
   (check-type contact-id integer)
   
-  (let ((contact (hacrm.models.contact:find-contact-by-id contact-id)))
+  (let* ((contact (hacrm.models.contact:find-contact-by-id
+                   contact-id))
+         (email (make-object 'email
+                             :address email-address
+                             :contact contact)))
     (push
-     (make-object 'email
-                  :address email-address
-                  :contact contact)
-     (hacrm.models.core:get-root-object :facts))))
+     email
+     (hacrm.models.core:get-root-object :facts))
+
+    email))
 
 
 (defun add-email (contact email-address)
@@ -49,8 +53,15 @@
     (when exists
       (error 'already-exists))
 
-    (execute-tx-add-email (hacrm.models.core:get-object-id contact)
-                          email-address)))
+    (let ((fact (execute-tx-add-email
+                 (hacrm.models.core:get-object-id contact)
+                 email-address)))
+
+      (weblocks.hooks:call-hook :fact-created
+                                contact
+                                fact)
+
+      fact)))
 
 
 (hacrm.models.core:define-transaction tx-remove-email (contact-id email-to-remove)
@@ -76,8 +87,15 @@
 
 
 (defun remove-email (contact email-to-remove)
-  (execute-tx-remove-email (hacrm.models.core:get-object-id contact)
-                           email-to-remove))
+  (let* ((contact-id (hacrm.models.core:get-object-id contact))
+         (removed-emails (execute-tx-remove-email contact-id
+                                                  email-to-remove)))
+    (dolist (removed-email removed-emails)
+      (weblocks.hooks:call-hook :fact-removed
+                                contact
+                                removed-email))
+
+    removed-emails))
 
 
 (defmethod hacrm.models.contact:find-contacts-by ((keyword (eql :email)) value)

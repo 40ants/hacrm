@@ -107,6 +107,7 @@
 
                              (:file desktop))
                 :depends-on (hacrm
-                             conf))))
+                             conf)))
+  :in-order-to ((test-op (test-op hacrm-test))))
 
 

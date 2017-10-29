@@ -5,8 +5,8 @@
 
 ;; Пока устанавливаем параметры таким образом:
 
-(setf (ubiquitous:value :hacrm.plugins.email :accounts)
-      '((:host "imap.yandex.ru" :username "art@allmychanges.com" :password "****")))
+;; (setf (ubiquitous:value :hacrm.plugins.email :accounts)
+;;       '((:host "imap.yandex.ru" :username "art@allmychanges.com" :password "****")))
 
 
 (defun read-headers (message)
@@ -77,8 +77,8 @@
 
 (defun create-contact-and-feed-item (contact text)
   (let ((email (getf contact :email))
-        (name (getf contact :name))))
-  )
+        (name (getf contact :name)))
+    (list email name text)))
 
 
 (defun process-messages ()
@@ -88,4 +88,4 @@
            (loop for account in accounts
                  append (apply #'fetch-messages-from account))))
     (loop for message in messages
-          do (apply #'create-contact-and-feed-item message))))
+          collect (apply #'create-contact-and-feed-item message))))

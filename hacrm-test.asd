@@ -10,6 +10,7 @@
   :depends-on (:hacrm
                :hamcrest-prove
                :weblocks-testutils)
+  :defsystem-depends-on (:prove-asdf)
   :serial t
   :components ((:module t
                 :components ((:test-file utils)
@@ -20,4 +21,6 @@
                                            (:test-file tags)
                                            (:test-file notes)
                                            (:test-file phones)
-                                           (:test-file email)))))))
+                                           (:test-file email))))))
+  :perform (test-op :after (op c)
+                    (funcall (intern #.(string :run) :prove) c)))

@@ -32,7 +32,7 @@
 
           (subtest "Hook should be called"
             (assert-hooks-called
-             (contains :fact-created contact birthday))))))))
+             (:fact-created contact birthday))))))))
 
 
 (subtest "Birthday can be set and updated"
@@ -63,8 +63,8 @@
 
           (subtest "When birthday is updated, a :fact-updated should be called"
             (assert-hooks-called
-             (contains :fact-created contact birthday)
-             (contains :fact-updated contact birthday)))
+             (:fact-created contact birthday)
+             (:fact-updated contact birthday)))
 
           (subtest "If date was entered with spaces, they are stripped"
             (set-birthday contact "  2001-01-02")

@@ -41,7 +41,7 @@
 
             (subtest "And one call to fact-created hook should be made"
               (assert-hooks-called
-               (contains :fact-created contact1 tag)))))))))
+               (:fact-created contact1 tag)))))))))
 
 
 (subtest "Untagging contact"
@@ -83,7 +83,7 @@
 
           (subtest "Untagging should emit a hook call"
             (assert-hooks-called
-             (contains :fact-removed contact1 tag))))))))
+             (:fact-removed contact1 tag))))))))
 
 
 (finalize)
