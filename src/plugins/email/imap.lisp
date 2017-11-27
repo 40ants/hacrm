@@ -5,8 +5,9 @@
 
 ;; Пока устанавливаем параметры таким образом:
 
-;; (setf (ubiquitous:value :hacrm.plugins.email :accounts)
-;;       '((:host "imap.yandex.ru" :username "art@allmychanges.com" :password "****")))
+(defun set-password (password)
+ (setf (ubiquitous:value :hacrm.plugins.email :accounts)
+        `((:host "imap.yandex.ru" :username "art@allmychanges.com" :password ,password))))
 
 
 (defun read-headers (message)
@@ -56,10 +57,16 @@
   
   (let* ((text (get-usable-text message))
          (headers (read-headers message))
-         (from (alexandria:assoc-value headers :from)))
-    
-    (list (parse-from-address from)
-          text)))
+         (from (alexandria:assoc-value headers :from))
+         (message-id (alexandria:assoc-value headers :message-id))
+         (subject (alexandria:assoc-value headers :subject))
+         (time (alexandria:assoc-value headers :date)))
+
+    (list :from (parse-from-address from)
+          :subject (cl-rfc2047:decode* subject)
+          :message-id message-id
+          :time (hacrm.utils:parse-time time)
+          :text text)))
 
 
 (defun fetch-messages-from (&key host port username password)
@@ -75,9 +82,14 @@
     (mapcar #'fetch-message messages)))
 
 
-(defun create-contact-and-feed-item (contact text)
-  (let ((email (getf contact :email))
-        (name (getf contact :name)))
+(defun create-contact-and-feed-item (message)
+  (let* ((from (getf message :from))
+         (email (getf from :email))
+         (name (getf from :name))
+         (subject (getf from :subect))
+         (message-id (getf from :message-id))
+         (time (getf from :time))
+         (text (getf from :text)))
     (list email name text)))
 
 
@@ -87,5 +99,7 @@
          (messages
            (loop for account in accounts
                  append (apply #'fetch-messages-from account))))
+    (unless accounts
+      (error "No accounts"))
     (loop for message in messages
-          collect (apply #'create-contact-and-feed-item message))))
+          collect (create-contact-and-feed-item message))))

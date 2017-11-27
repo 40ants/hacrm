@@ -13,7 +13,8 @@
   :defsystem-depends-on (:prove-asdf)
   :serial t
   :components ((:module t
-                :components ((:test-file utils)
+                :components ((:file utils)
+                             (:test-file utils-tests)
                              (:test-file facts)
                              (:test-file contacts)
                              (:module plugins

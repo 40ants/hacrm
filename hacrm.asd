@@ -35,6 +35,8 @@
                :ubiquitous ;; from email plugin
                :sanitize   ;; from email plugin
                :cl-rfc2047 ;; from email plugin
+               :local-time
+               :cl-date-time-parser ;; to parse datetime in email plugin
                )
   :serial t
   :components ((:file hacrm)

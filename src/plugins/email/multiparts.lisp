@@ -273,9 +273,13 @@
         (close stream)
         t))))
 
+
 (defun base64->string (string charset)
-  (flexi-streams:octets-to-string (mel.mime::decode-base64 string)
-   :external-format (or (keyword-symbol charset) :utf-8)))
+  (babel:octets-to-string
+   (cl-base64:base64-string-to-usb8-array string)
+   :encoding (or (keyword-symbol charset)
+                 :utf-8)))
+
 
 (defun part-body-decode (&key part msg string-fn)
   (let ((string (cond (part
@@ -287,6 +291,7 @@
                        (msg
                         (eml-content-charset msg))))
         (transfer-encoding (mel.mime:content-transfer-encoding (or part msg))))
+    (break)
     (when string
       (if (eq transfer-encoding :base64)
           (progn

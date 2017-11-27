@@ -20,7 +20,7 @@
 (in-package hacrm.t.plugins.email)
 
 
-(plan 3)
+(plan 7)
 
 
 (subtest "Email can be associated with a contact"
@@ -85,5 +85,46 @@
       (is-condition (add-email second-contact "some@example.com")
                     'already-exists))))
 
+
+(subtest "Check if mel-base strips first space from header value"
+  (let ((result (mel:parse-rfc2822-header "Subject: hello   world")))
+    (is result '((:subject . "hello   world")))))
+
+
+(subtest "Check if mel-base unfolds header value"
+  (subtest "Unfoldering should work for strings started from space"
+    (let ((result (mel:parse-rfc2822-header "Subject: hello
+ world")))
+      (is result '((:subject . "hello world")))))
+
+  (subtest "And from tabs"
+    (let* ((raw-header (concatenate 'string
+                                    "Subject: hello"
+                                    (coerce (list #\Return #\Linefeed #\Tab)
+                                            'string)
+                                    "world"))
+           (expected-value (concatenate 'string
+                                        "hello"
+                                        (coerce (list #\Tab)
+                                                'string)
+                                        "world"))
+           (result (mel:parse-rfc2822-header raw-header)))
+      (is result `((:subject . ,expected-value))))))
+
+
+(subtest "Check consume function"
+  (with-input-from-string (stream "   foo")
+    (mel.mime::consume stream #\Space)
+    (subtest "First three spaces should be skipped and next char is 'f'."
+      (is (read-char stream)
+          #\f))))
+
+
+(subtest "Check if email is parsed correctly"
+  ;; Temporary test
+  (hacrm.plugins.email.imap::set-password "xak40yw74f")
+  (prove:isnt (ignore-errors
+               (hacrm.plugins.email.imap::process-messages))
+              nil))
 
 (finalize)

@@ -10,7 +10,8 @@
   (:export
    #:remove-object
    #:find-object
-   #:render-markup))
+   #:render-markup
+   #:parse-time))
 (in-package #:hacrm.utils)
 
 
@@ -30,6 +31,12 @@
     (if filter
         (remove-if-not filter objects)
         objects)))
+
+
+(defun parse-time (string)
+  (let ((universal (cl-date-time-parser:parse-date-time string)))
+    (local-time:universal-to-timestamp universal)))
+
 
 (defun format-time (universal-time)
   "Возвращает строку в формате YYYY-MM-DD hh:mm"
