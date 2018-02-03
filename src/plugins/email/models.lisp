@@ -57,7 +57,7 @@
                  (hacrm.models.core:get-object-id contact)
                  email-address)))
 
-      (weblocks.hooks:call-hook :fact-created
+      (weblocks/hooks:call-hook :fact-created
                                 contact
                                 fact)
 
@@ -91,7 +91,7 @@
          (removed-emails (execute-tx-remove-email contact-id
                                                   email-to-remove)))
     (dolist (removed-email removed-emails)
-      (weblocks.hooks:call-hook :fact-removed
+      (weblocks/hooks:call-hook :fact-removed
                                 contact
                                 removed-email))
 

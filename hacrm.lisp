@@ -1,7 +1,7 @@
 (defpackage #:hacrm
-  (:use :cl :weblocks
-        :cl-who
-        :f-underscore :anaphora)
+  (:use #:cl
+        #:f-underscore
+        #:anaphora)
   (:import-from :hunchentoot #:header-in
 		#:set-cookie #:set-cookie* #:cookie-in
 		#:user-agent #:referer)
@@ -21,21 +21,21 @@
 
 ;; A macro that generates a class or this webapp
 
-(defwebapp hacrm
+(weblocks/app:defapp hacrm
   :prefix "/"
   :description "hacrm: A new application"
-  :init-user-session 'hacrm::init-user-session
-  :subclasses (weblocks.ui.app:webapp)
+  ;; :init-user-session 'hacrm::init-user-session
+  ;; :subclasses (weblocks-ui/core:webapp) ;; отсюда брались зависимости
 ;;  :subclasses (weblocks-twitter-bootstrap-application:twitter-bootstrap-webapp)
   :autostart nil                     ;; have to start the app manually
-  :ignore-default-dependencies nil   ;; accept the defaults
+  ;; :ignore-default-dependencies nil   ;; accept the defaults
   :debug t
   :js-backend :jquery
   )
 
 
-(defmethod weblocks.dependencies:get-dependencies ((app hacrm))
-  (append (list (weblocks.lass:make-dependency
+(defmethod weblocks/dependencies:get-dependencies ((app hacrm))
+  (append (list (weblocks-lass:make-dependency
                  '(body
                    :position absolute
                    :height 100%
@@ -75,19 +75,19 @@
   "Starts the application by calling 'start-weblocks' with appropriate
 arguments."
 
-  (setf weblocks.dependencies:*cache-remote-dependencies-in*
+  (setf weblocks/dependencies:*cache-remote-dependencies-in*
         #P"/tmp/weblocks-cache/hacrm/")
-  (apply #'weblocks.server:start-weblocks args)
+  (apply #'weblocks/server:start args)
 
   ;; For some reason admin-app should be started before
-  ;; all other app, otherwise weblocks::*active-webapps*
+  ;; all other app, otherwise weblocks/app::*active-webapps*
   ;; will contain only weblocks-cms application
   ;; and static files will not be served propertly
   ;;
   ;; Hmm, but now I tried to swap them again, and
   ;; seems it works anyway.
   (setf hacrm-app
-        (start-webapp 'hacrm))
+        (weblocks/app:start 'hacrm))
   ;; (setf admin-app
   ;;       (start-webapp 'weblocks-cms:weblocks-cms))
 
@@ -103,7 +103,7 @@ arguments."
   (ignore-errors
    (stop-webapp 'hacrm))
 
-  (weblocks.server:stop-weblocks)
+  (weblocks/server:stop)
 
   ;; TODO: make this happen using hooks
   ;; (weblocks-stores:close-stores)

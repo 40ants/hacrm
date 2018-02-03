@@ -26,7 +26,7 @@
                :cl-prevalence
                ;;:weblocks-twitter-bootstrap-application
                :ceramic
-               :swank
+               ;; :swank
                :find-port
                :3bmd
                ;; :weblocks-cms

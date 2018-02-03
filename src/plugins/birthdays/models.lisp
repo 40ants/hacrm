@@ -82,7 +82,7 @@ Returns a new `birthday' fact."
     (multiple-value-bind (fact created)
         (execute-tx-set-birthday contact-id date)
 
-      (weblocks.hooks:call-hook (if created
+      (weblocks/hooks:call-hook (if created
                                     :fact-created
                                     :fact-updated)
                                 contact

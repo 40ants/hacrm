@@ -1,13 +1,10 @@
 (defpackage #:hacrm.widgets.contacts-list
   (:use #:cl
-        #:weblocks
         #:hacrm.models.contact
         #:f-underscore)
-  (:import-from #:cl-who
-                #:esc)
   (:import-from #:parenscript
                 #:@)
-  (:import-from #:weblocks.ui.form
+  (:import-from #:weblocks-ui/form
                 #:render-link)
   (:export
    #:make-contacts-list
@@ -18,7 +15,7 @@
 (in-package hacrm.widgets.contacts-list)
 
 
-(defwidget contact-card (hacrm.widgets.base:base)
+(weblocks/widget:defwidget contact-card (hacrm.widgets.base:base)
   ((contact :type 'contact
             :initarg :contact
             :reader contact)
@@ -32,7 +29,7 @@
            :reader number)))
 
 
-(defwidget contacts-list (hacrm.widgets.base:base)
+(weblocks/widget:defwidget contacts-list (hacrm.widgets.base:base)
   ((contacts :initarg :contacts
              :reader contacts)))
 
@@ -85,15 +82,14 @@ in contact list mode, redefine this method.")
                               number)))))
 
 
-(defmethod render-widget-body ((widget contact-card) &rest rest)
+(defmethod weblocks/widget:render ((widget contact-card))
   "Internal helper to render single contact in the contact's list."
-  (declare (ignorable rest))
   
   (let ((contact (contact widget))
         (fact-group-widgets (fact-groups widget))
         (on-click-callback (on-click widget)))
 
-    (with-html
+    (weblocks/html:with-html
       (:div :class "contact-list__contact"
             :id (format nil
                         "contact-~a"
@@ -102,27 +98,24 @@ in contact list mode, redefine this method.")
                                             contact))
                               (name contact))
                  (:span :class "contact-list__contact-number"
-                        (esc (princ-to-string (number widget)))))
+                        (princ-to-string (number widget))))
 
-            (mapcar #'render-widget fact-group-widgets)))))
+            (mapcar #'weblocks/widget:render fact-group-widgets)))))
 
 
-(defmethod render-widget-body ((widget contacts-list) &rest rest)
-  (declare (ignorable rest))
-  
+(defmethod weblocks/widget:render ((widget contacts-list))
   (let ((contacts (contacts widget)))
 
     (if contacts
-        (mapcar #'render-widget
+        (mapcar #'weblocks/widget:render
                 contacts)
-        
         ;; No contacts
-        (with-html
+        (weblocks/html:with-html
           (:p "No contacts")))))
 
 
-(defmethod weblocks.dependencies:get-dependencies  ((widget contacts-list))
-  (list (weblocks.parenscript:make-dependency
+(defmethod weblocks/dependencies:get-dependencies  ((widget contacts-list))
+  (list (weblocks-parenscript:make-dependency
           (let ((numbers-are-visible nil))
 
             ;; With this code we give user ability to press Alt+1, Alt+2,...
@@ -160,7 +153,7 @@ in contact list mode, redefine this method.")
                          ((@ numbers hide))
                          (setf numbers-are-visible nil)))))))
           )
-        (weblocks.lass:make-dependency
+        (weblocks-lass:make-dependency
           '(.contact-list__contact-number
             :display none
             :position relative

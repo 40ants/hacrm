@@ -13,7 +13,7 @@
     (let ((birthday (set-birthday contact date)))
 
       (hacrm.widgets.main:reset-user-input widget)
-      (weblocks:mark-dirty widget)
-      (weblocks.hooks:call-hook :fact-created contact birthday)
+      (weblocks/widget:update widget)
+      (weblocks/hooks:call-hook :fact-created contact birthday)
       (values))))
 

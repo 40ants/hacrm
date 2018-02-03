@@ -1,6 +1,5 @@
 (defpackage #:hacrm.plugins.tags
   (:use #:cl
-        #:cl-who
         #:hacrm.models.core
         #:hacrm.models.facts.core
         #:f-underscore)

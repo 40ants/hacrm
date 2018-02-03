@@ -13,8 +13,8 @@
     (let ((email-fact (add-email contact address)))
 
       (hacrm.widgets.main:reset-user-input widget)
-      (weblocks:mark-dirty widget)
-      (weblocks.hooks:call-hook :fact-created
+      (weblocks/widget:update widget)
+      (weblocks/hooks:call-hook :fact-created
                                 contact
                                 email-fact)
       (values))))
@@ -32,9 +32,9 @@
 
       (when removed-facts
         (hacrm.widgets.main:reset-user-input widget)
-        (weblocks:mark-dirty widget)
+        (weblocks/widget:update widget)
         
         (dolist (fact removed-facts)
-          (weblocks.hooks:call-hook :fact-removed contact fact))
+          (weblocks/hooks:call-hook :fact-removed contact fact))
         (values)))))
 

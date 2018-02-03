@@ -9,31 +9,31 @@
 ;;      (define-key company-active-map (kbd "M-/") 'helm-company)))
 
 
-(add-hook 'slime-repl-mode-hook
-          (lambda ()
-            (slime-eval '(ql:quickload '(hacrm prove)))
-            (slime-eval '(cl:setf prove:*enable-colors* nil
-                                  prove:*debug-on-error* t))
-            ;; (slime-eval '(ql:quickload :hacrm-test))
-            )
+;; (add-hook 'slime-repl-mode-hook
+;;           (lambda ()
+;;             (slime-eval '(ql:quickload '(hacrm prove)))
+;;             (slime-eval '(cl:setf prove:*enable-colors* nil
+;;                                   prove:*debug-on-error* t))
+;;             ;; (slime-eval '(ql:quickload :hacrm-test))
+;;             )
           
-          ;; append
-          t)
+;;           ;; append
+;;           t)
 
-(add-hook 'lisp-mode-hook
-          (lambda ()
-            (hs-minor-mode 1)
-            (hs-hide-all)
+;; (add-hook 'lisp-mode-hook
+;;           (lambda ()
+;;             (hs-minor-mode 1)
+;;             (hs-hide-all)
             
-            (local-set-key (kbd "C-c <up>") 'hs-hide-block)
-            (local-set-key (kbd "C-c C-x <up>") 'hs-hide-all)
-            (local-set-key (kbd "C-c <left>") 'bm-previous)
-            (local-set-key (kbd "C-c <down>") 'hs-show-block)
-            (local-set-key (kbd "C-c <right>") 'bm-next))
-          ;; append
-          t)
+;;             (local-set-key (kbd "C-c <up>") 'hs-hide-block)
+;;             (local-set-key (kbd "C-c C-x <up>") 'hs-hide-all)
+;;             (local-set-key (kbd "C-c <left>") 'bm-previous)
+;;             (local-set-key (kbd "C-c <down>") 'hs-show-block)
+;;             (local-set-key (kbd "C-c <right>") 'bm-next))
+;;           ;; append
+;;           t)
 
-(slime)
+;; (slime)
 
 
 ;; (load "~/.roswell/lisp/quicklisp/log4slime-setup.el")

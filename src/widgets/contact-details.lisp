@@ -1,7 +1,5 @@
 (defpackage #:hacrm.widgets.contact-details
   (:use #:cl
-        #:cl-who
-        #:weblocks
         #:f-underscore
         #:hacrm.models.contact)
   (:export #:make-contact-details-widget
@@ -13,7 +11,7 @@
 (in-package hacrm.widgets.contact-details)
 
 
-(defwidget contact-details (hacrm.widgets.base:base)
+(weblocks/widget:defwidget contact-details (hacrm.widgets.base:base)
   ((contact :type 'contact
             :initarg :contact
             :reader get-contact)
@@ -25,10 +23,11 @@
 
 (defmethod initialize-instance ((details-widget contact-details)
                                 &key contact)
-  (flet ((update-feed-widget ()
+  (flet ((update-feed-widget (&key redraw-p)
            (setf (slot-value details-widget 'feed)
                  (hacrm.widgets.feed:make-feed-widget contact))
-           (mark-dirty details-widget))
+           (when redraw-p
+             (weblocks/widget:update details-widget)))
 
          (update-fact-widgets ()
            "Creates widgets to render fact groups for the contact."
@@ -54,15 +53,15 @@
     (update-fact-widgets)
 
     ;; Now we'll add hooks to update this widgets when something changed
-    (weblocks.hooks:add-session-hook
+    (weblocks/hooks:add-session-hook
         :feed-item-created
         handle-new-feed-item (item)
       
       (declare (ignorable item))
       ;; TODO: add check if added item is related to the contact
-      (update-feed-widget))
+      (update-feed-widget :redraw-p t))
 
-    (weblocks.hooks:add-session-hook
+    (weblocks/hooks:add-session-hook
         :fact-created
         handle-new-fact (object fact)
       
@@ -70,7 +69,7 @@
       ;; TODO: add check if added item is related to the contact
       (update-fact-widgets))
 
-    (weblocks.hooks:add-session-hook
+    (weblocks/hooks:add-session-hook
         :fact-removed
         handle-removed-fact (object fact)
       
@@ -83,29 +82,28 @@
 
 
 (defun make-contact-details-widget (contact)
-  (make-instance 'contact-details
-                 :contact contact))
+  (let ((widget (make-instance 'contact-details
+                               :contact contact)))
+    widget))
 
 
-(defmethod render-widget-body ((widget contact-details) &rest args)
-  (declare (ignorable args))
-
+(defmethod weblocks/widget:render ((widget contact-details))
   (with-accessors ((contact get-contact))
       widget
-    (with-html
+    (weblocks/html:with-html
       (:table :class "contact"
               (:tr (:td :class "contact__details"
-                        (:h1 (esc (name contact)))
+                        (:h1 (name contact))
 
                         (dolist (fact-group-widget (fact-groups widget))
-                          (render-widget fact-group-widget)))
+                          (weblocks/widget:render fact-group-widget)))
                    
                    (:td :class "contact__feed"
-                        (render-widget (contact-feed-widget widget))))))))
+                        (weblocks/widget:render (contact-feed-widget widget))))))))
 
 
-(defmethod weblocks.dependencies:get-dependencies  ((widget contact-details))
-  (list (weblocks.lass:make-dependency
+(defmethod weblocks/dependencies:get-dependencies  ((widget contact-details))
+  (list (weblocks-lass:make-dependency
          '(.contact-details
            (table :width 100%
             (td :vertical-align top)

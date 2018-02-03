@@ -1,7 +1,5 @@
 (defpackage #:hacrm.widgets.notes
   (:use #:cl
-        #:cl-who
-        #:weblocks
         #:hacrm)
   (:export
    :render-contact-notes
@@ -10,14 +8,15 @@
 (in-package hacrm.widgets.notes)
 
 
-(defwidget notes ()
+(weblocks/widget:defwidget notes ()
   ((contact :initform nil
             :initarg :contact
             :accessor notes-contact)))
 
 
 (defmethod (setf notes-contact) :after (contact (widget notes))
-  (mark-dirty widget))
+  (declare (ignorable contact))
+  (weblocks/widget:update widget))
 
 
 (defun make-notes-widget ()
@@ -28,7 +27,7 @@
   (log:debug "Adding new note for" contact "with" text)
   ;; (hacrm.models.note:save-note 
   ;;  (hacrm.models.note:make-note contact text))
-  (mark-dirty widget))
+  (weblocks/widget:update widget))
 
 
 (defun render-new-note-form (widget contact)
@@ -60,16 +59,14 @@
   )
 
 
-(defmethod render-widget-body ((widget notes) &rest args)
-  (declare (ignorable args))
-  
+(defmethod weblocks/widget:render ((widget notes))
   (let* ((contact (notes-contact widget))
          (notes ;; (hacrm.models.note:find-notes contact)
                 ))
     (when contact
       (render-new-note-form widget contact))
     
-    (with-html
+    (weblocks/html:with-html
       (:h1 "Заметки")
       (:ul (loop for note in notes
                  do (render note))))))

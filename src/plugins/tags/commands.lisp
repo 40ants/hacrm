@@ -13,7 +13,7 @@
       (let* ((contact (hacrm.widgets.contact-details:get-contact widget)))
         (hacrm.plugins.tags:tag-contact contact tag-name))))
 
-  (weblocks:mark-dirty widget)
+  (weblocks/widget:update widget)
   (hacrm.widgets.main:reset-user-input widget)
   (hacrm.search:index-contacts)
   (values))
@@ -30,7 +30,7 @@
     (dolist (tag tags-to-remove)
       (untag-contact contact tag)))
 
-  (weblocks:mark-dirty widget)
+  (weblocks/widget:update widget)
   (hacrm.widgets.main:reset-user-input widget)
   (hacrm.search:index-contacts)
   (values))

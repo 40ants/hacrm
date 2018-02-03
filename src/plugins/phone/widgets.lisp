@@ -1,12 +1,10 @@
 (in-package asdf)
 (defpackage #:hacrm.plugins.phone.widgets
-  (:use #:cl
-        #:cl-who
-        #:weblocks))
+  (:use #:cl))
 (in-package hacrm.plugins.phone.widgets)
 
 
-(defwidget phones ()
+(weblocks/widget:defwidget phones ()
   ((contact :initarg :contact
             :reader contact)))
 
@@ -19,22 +17,19 @@
                  :contact contact))
 
 
-(defmethod render-widget-body ((widget phones)
-                               &rest args)
-  (declare (ignorable args))
-
+(defmethod weblocks/widget:render ((widget phones))
   (let* ((contact (contact widget))
          (phones (hacrm.plugins.phone:get-phones contact)))
     
-    (with-html
+    (weblocks/html:with-html
       (:h1 "Phones")
       (:ul
        (dolist (phone phones)
-         (htm (:li (esc (hacrm.plugins.phone:number phone)))))))))
+         (:li (hacrm.plugins.phone:number phone)))))))
 
 
-(defmethod weblocks.dependencies:get-dependencies ((widget phones))
-  (list (weblocks.lass:make-dependency
+(defmethod weblocks/dependencies:get-dependencies ((widget phones))
+  (list (weblocks-lass:make-dependency
          '(.phones
            (h1 :font-size 20px
                :line-height 30px

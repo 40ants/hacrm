@@ -1,12 +1,10 @@
 (in-package asdf)
 (defpackage #:hacrm.plugins.birthdays.widgets
-  (:use #:cl
-        #:cl-who
-        #:weblocks))
+  (:use #:cl))
 (in-package hacrm.plugins.birthdays.widgets)
 
 
-(defwidget birthday ()
+(weblocks/widget:defwidget birthday ()
   ((contact :initarg :contact
             :reader contact)
    (birthday :initarg :birthday
@@ -40,19 +38,16 @@
   1)
 
 
-(defmethod render-widget-body ((widget birthday)
-                               &rest args)
-  (declare (ignorable args))
-
-  (with-html
+(defmethod weblocks/widget:render ((widget birthday))
+  (weblocks/html:with-html
     (:h1 "Birthday")
-    (:p (esc (hacrm.plugins.birthdays::date
-              (birthday widget))))))
+    (:p (hacrm.plugins.birthdays::date
+         (birthday widget)))))
 
 
 
-(defmethod weblocks.dependencies:get-dependencies ((widget birthday))
-  (list (weblocks.lass:make-dependency
+(defmethod weblocks/dependencies:get-dependencies ((widget birthday))
+  (list (weblocks-lass:make-dependency
          '(.birthday
            (h1 :font-size 20px
                :line-height 30px

@@ -1,6 +1,5 @@
 ;; (defpackage #:hacrm.models.facts.tag
 ;;   (:use #:cl
-;;         #:cl-who
 ;;         #:hacrm.models.facts.core
 ;;         #:f-underscore)
 ;;   (:export

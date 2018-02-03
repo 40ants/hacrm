@@ -32,7 +32,7 @@
 (defun tag-contact (contact tag-name)
   (let ((tag (execute-tx-tag-contact (get-object-id contact)
                                      tag-name)))
-    (weblocks.hooks:call-hook :fact-created contact tag)
+    (weblocks/hooks:call-hook :fact-created contact tag)
     
     tag))
 
@@ -48,7 +48,7 @@
                                                 tag-name)))
 
     (dolist (tag removed-tags)
-      (weblocks.hooks:call-hook :fact-removed contact tag))))
+      (weblocks/hooks:call-hook :fact-removed contact tag))))
 
 
 (defun get-contact-tags (contact)

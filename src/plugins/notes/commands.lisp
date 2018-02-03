@@ -12,7 +12,7 @@
          (note (add-note contact rest-text)))
 
     (hacrm.widgets.main:reset-user-input widget)
-    (mark-dirty widget)
+    (weblocks/widget:update widget)
     
-    (weblocks.hooks:call-hook :feed-item-created note)
+    (weblocks/hooks:call-hook :feed-item-created note)
     (values)))

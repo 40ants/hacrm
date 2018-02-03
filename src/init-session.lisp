@@ -65,19 +65,18 @@
   "Если true, то рисуем рамки вокруг виджетов.")
 
 
-(defmethod render-widget :around ((widget widget) &rest args)
-  (declare (ignorable args))
+(defmethod weblocks/widget:render :around ((widget weblocks/widget:widget))
   (log:info "Rendering" widget)
   
-  (when (equal (widget-name widget)
-               "root")
-    (with-html
-      (:style (str (get-debug-style)))))
+  (when (equal (weblocks/widgets/dom:dom-id widget)
+               "dom0")
+    (weblocks/html:with-html
+      (:style (:raw (get-debug-style)))))
   
   (if *debug-widgets-structure*
-      (with-html
+      (weblocks/html:with-html
         (:div :class "debug-frame"
-              (:h1 :class "debug-frame__header" (esc (format nil "~A" widget)))
+              (:h1 :class "debug-frame__header" (format nil "~A" widget))
               (call-next-method)))
       (call-next-method)))
 
@@ -220,9 +219,6 @@
 ;;                 :value "Добавить"))))
 
 
-(defun init-user-session (root)
-  (let ((main-window (hacrm.widgets.main:make-main-window)))
-    
-    (setf (widget-children root)
-          (list main-window))))
+(defmethod weblocks/session:init ((app hacrm))
+  (hacrm.widgets.main:make-main-window))
 

@@ -1,7 +1,5 @@
 (defpackage #:hacrm.widgets.feed
   (:use #:cl
-        #:weblocks
-        #:cl-who
         #:f-underscore)
   (:export
    #:make-feed-widget
@@ -9,7 +7,7 @@
 (in-package hacrm.widgets.feed)
 
 
-(defwidget feed ()
+(weblocks/widget:defwidget feed ()
   ((contact :initform nil
             :initarg :contact
             :reader contact)
@@ -44,17 +42,15 @@
     feed-widget))
 
 
-(defmethod render-widget-body ((widget feed) &rest args)
-  (declare (ignorable args))
-  
+(defmethod weblocks/widget:render ((widget feed))
   (let ((items (items widget)))
     
-    (with-html
+    (weblocks/html:with-html
       (:h1 "Активность")
       (dolist (item items)
-        (render-widget item)))))
+        (weblocks/widget:render item)))))
 
 
-(defmethod weblocks.dependencies:get-dependencies  ((widget feed))
-  (list (weblocks.lass:make-dependency
+(defmethod weblocks/dependencies:get-dependencies  ((widget feed))
+  (list (weblocks-lass:make-dependency
          '(.feed))))

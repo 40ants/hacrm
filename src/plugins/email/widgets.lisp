@@ -1,12 +1,10 @@
 (in-package asdf)
 (defpackage #:hacrm.plugins.email.widgets
-  (:use #:cl
-        #:cl-who
-        #:weblocks))
+  (:use #:cl))
 (in-package hacrm.plugins.email.widgets)
 
 
-(defwidget emails ()
+(weblocks/widget:defwidget emails ()
   ((contact :initarg :contact
             :reader contact)))
 
@@ -19,26 +17,23 @@
                  :contact contact))
 
 
-(defmethod render-widget-body ((widget emails)
-                               &rest args)
-  (declare (ignorable args))
-
+(defmethod weblocks/widget:render ((widget emails))
   (let* ((contact (contact widget))
          (emails (hacrm.plugins.email:get-emails contact)))
-    
-    (with-html
+
+    (weblocks/html:with-html
       (:h1 "Emails")
       (:ul
        (dolist (email emails)
-         (htm (:li (:a :href (concatenate 'string
-                                          "mailto:"
-                                          (hacrm.plugins.email:address email))
-                       (esc (hacrm.plugins.email:address email))))))))))
+         (:li (:a :href (concatenate 'string
+                                     "mailto:"
+                                     (hacrm.plugins.email:address email))
+                  (hacrm.plugins.email:address email))))))))
 
 
 
-(defmethod weblocks.dependencies:get-dependencies ((widget emails))
-  (list (weblocks.lass:make-dependency
+(defmethod weblocks/dependencies:get-dependencies ((widget emails))
+  (list (weblocks-lass:make-dependency
          '(.emails
            (h1 :font-size 20px
                :line-height 30px

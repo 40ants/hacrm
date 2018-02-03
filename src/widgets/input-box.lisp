@@ -1,21 +1,17 @@
 (defpackage #:hacrm.widgets.input-box
-  (:use #:cl
-        #:weblocks)
-  (:import-from #:cl-who
-                #:esc
-                #:htm)
+  (:use #:cl)
   (:export
    #:make-input-box))
 (in-package hacrm.widgets.input-box)
 
 
-(defwidget counter-box ()
+(weblocks/widget:defwidget counter-box ()
   ((counter :initform nil
             :accessor counter
             :affects-dirty-status-p t)))
 
 
-(defwidget input-box (hacrm.widgets.base:base)
+(weblocks/widget:defwidget input-box (hacrm.widgets.base:base)
   ((counter :initform (make-instance 'counter-box)
             :reader counter)))
 
@@ -33,31 +29,25 @@
 
 
 
-(defmethod render-widget-body ((widget input-box)
-                               &rest rest)
-  (declare (ignorable rest))
-  
+(defmethod weblocks/widget:render ((widget input-box))
   (flet ((process-user-input (&key query &allow-other-keys)
            (let* ((app-window (hacrm.widgets.base:window widget)))
              (hacrm.commands:process-query app-window query))))
-    (weblocks.ui.form:with-html-form (:post #'process-user-input)
+    (weblocks-ui/form:with-html-form (:post #'process-user-input)
       (:input :type "text"
               :name "query"
               :autofocus t
               :placeholder "Enter a command or query here."
               :value "")
-      (:div :width 40 :height 40
-            (render-widget (counter widget))))))
+      (:div :style "width:40; height:40"
+            (weblocks/widget:render (counter widget))))))
 
 
-(defmethod render-widget-body ((widget counter-box)
-                               &rest rest)
-  (declare (ignorable rest))
-
-  (with-html
+(defmethod weblocks/widget:render ((widget counter-box))
+  (weblocks/html:with-html
     (:div (if (counter widget)
-              (with-html (:span (esc (format nil "~a" (counter widget)))))
-              (weblocks.ui.form:render-link
+              (weblocks/html:with-html (:span (format nil "~a" (counter widget))))
+              (weblocks-ui/form:render-link
                (lambda (&rest args)
                  (declare (ignorable args))
                  (setf (counter widget)
@@ -71,8 +61,8 @@
                "Start counter")))))
 
 
-(defmethod weblocks.dependencies:get-dependencies ((widget input-box))
-  (append (list (weblocks.lass:make-dependency
+(defmethod weblocks/dependencies:get-dependencies ((widget input-box))
+  (append (list (weblocks-lass:make-dependency
                  '(.input-box
                    ((:or form input)
                     ;; bootstrap.css changes margin for forms and inputs
@@ -94,8 +84,8 @@
           (call-next-method)))
 
 
-(defmethod weblocks.dependencies:get-dependencies ((widget counter-box))
-  (append (list (weblocks.lass:make-dependency
+(defmethod weblocks/dependencies:get-dependencies ((widget counter-box))
+  (append (list (weblocks-lass:make-dependency
                   '(.counter-box
                     :position fixed
                     :bottom 0

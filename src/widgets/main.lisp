@@ -1,5 +1,5 @@
 (defpackage #:hacrm.widgets.main
-  (:use #:cl #:weblocks)
+  (:use #:cl)
   (:export
    #:make-main-window
    #:change-widget
@@ -9,7 +9,7 @@
 (in-package hacrm.widgets.main)
 
 
-(defwidget main-window ()
+(weblocks/widget:defwidget main-window ()
   ((input-box :type (or input-box
                         null)
               :initarg :input-box
@@ -20,9 +20,9 @@
                 :accessor main-widget)))
 
 
-(defmethod weblocks.dependencies:get-dependencies ((widget main-window))
+(defmethod weblocks/dependencies:get-dependencies ((widget main-window))
   ;; http://css-live.ru/articles/vizualnoe-rukovodstvo-po-svojstvam-flexbox-iz-css3.html
-  (append (list (weblocks.lass:make-dependency
+  (append (list (weblocks-lass:make-dependency
                  '(.main-window
                    :position absolute
                    :width 100%
@@ -58,16 +58,14 @@
     app-window))
 
 
-(defmethod render-widget-body ((window main-window)
-                               &rest rest)
-  (declare (ignorable rest))
+(defmethod weblocks/widget:render ((window main-window))
   (log:info "Rendering main window")
   
-  (with-html
+  (weblocks/html:with-html
     (:div :class "main-window__working-area"
-          (render-widget (main-widget window)))
+          (weblocks/widget:render (main-widget window)))
     (:div :class "main-window__input"
-          (render-widget (input-box window)))))
+          (weblocks/widget:render (input-box window)))))
 
 
 (defun change-widget (current-widget new-widget)
@@ -80,13 +78,13 @@
     (setf (hacrm.widgets.base:window new-widget)
           app-window)
 
-    (mark-dirty app-window)))
+    (weblocks/widget:update app-window)))
 
 
 (defun reset-user-input (current-widget)
   (let* ((app-window (hacrm.widgets.base:window current-widget))
          (input-box (input-box app-window)))
-    (weblocks:mark-dirty input-box)))
+    (weblocks/widget:update input-box)))
 
 
 (defmethod hacrm.commands:command ((window main-window) command query)

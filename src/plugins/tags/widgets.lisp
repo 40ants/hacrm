@@ -1,14 +1,12 @@
 (defpackage #:hacrm.plugins.tags.widgets
   (:use #:cl
-        #:weblocks
-        #:cl-who
         #:f-underscore
         #:hacrm.plugins.tags))
 
 (in-package hacrm.plugins.tags.widgets)
 
 
-(defwidget tags ()
+(weblocks/widget:defwidget tags ()
   ((object :initarg :object
            :reader object
            :type hacrm.models.contact:contact)))
@@ -32,9 +30,7 @@
   0)
 
 
-(defmethod render-widget-body ((widget tags) &rest rest)
-  (declare (ignorable rest))
-
+(defmethod weblocks/widget:render ((widget tags))
   (let* ((contact (object widget))
          (tags (get-contact-tags contact))
          (tag-names (sort (mapcar #'name tags)
@@ -44,5 +40,5 @@
                                                        _))
                                       tag-names))
          (tags-string (cl-strings:join tag-names-with-hash :separator ", ")))
-    (weblocks:with-html
-      (:p (:span (esc tags-string))))))
+    (weblocks/html:with-html
+      (:p (:span tags-string)))))
