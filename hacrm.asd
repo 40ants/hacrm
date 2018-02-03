@@ -20,16 +20,13 @@
                :cl-markdown
                :weblocks
                :weblocks-lass
-;;               :weblocks-stores
+               :weblocks-stores
                :weblocks-prevalence
                :weblocks-ui
                :cl-prevalence
-               ;;:weblocks-twitter-bootstrap-application
                :ceramic
-               ;; :swank
                :find-port
                :3bmd
-               ;; :weblocks-cms
                :weblocks-websocket
                :mel-base   ;; from email plugin
                :ubiquitous ;; from email plugin

@@ -6,8 +6,9 @@ github cl-prevalence 40ants/cl-prevalence
 
 github weblocks 40ants/weblocks :ref v0.25.0
 github weblocks-ui 40ants/weblocks-ui :ref v0.6.0
-github weblocks-lass 40ants/weblocks-lass
-github weblocks-parenscript 40ants/weblocks-parenscript
+github weblocks-lass 40ants/weblocks-lass :ref v0.2.0
+github weblocks-stores 40ants/weblocks-stores :ref v0.6.0
+github weblocks-parenscript 40ants/weblocks-parenscript :ref v0.3.0
 
 github websocket-driver fukamachi/websocket-driver :ref a3046b11dfb9803ac3bff7734dd017390c2b54bb
 github weblocks-websocket 40ants/weblocks-websocket :ref v0.1.1
