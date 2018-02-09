@@ -12,7 +12,6 @@
          (note (add-note contact rest-text)))
 
     (hacrm.widgets.main:reset-user-input widget)
-    (weblocks/widget:update widget)
     
     (weblocks/hooks:with-feed-item-created-hook (note))
     (values)))
