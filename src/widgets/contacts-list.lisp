@@ -25,8 +25,8 @@
              :initarg :on-click
              :reader on-click)
    (number :type integer
-           :initarg :number
-           :reader number)))
+    :initarg :number
+    :reader get-number)))
 
 
 (weblocks/widget:defwidget contacts-list (hacrm.widgets.base:base)
@@ -93,12 +93,12 @@ in contact list mode, redefine this method.")
       (:div :class "contact-list__contact"
             :id (format nil
                         "contact-~a"
-                        (number widget))
+                        (get-number widget))
             (:h1 (render-link (f_% (funcall on-click-callback
                                             contact))
                               (name contact))
                  (:span :class "contact-list__contact-number"
-                        (princ-to-string (number widget))))
+                        (princ-to-string (get-number widget))))
 
             (mapcar #'weblocks/widget:render fact-group-widgets)))))
 

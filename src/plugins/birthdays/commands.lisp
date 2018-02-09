@@ -14,6 +14,6 @@
 
       (hacrm.widgets.main:reset-user-input widget)
       (weblocks/widget:update widget)
-      (weblocks/hooks:call-hook :fact-created contact birthday)
+      (weblocks/hooks:call-fact-created-hook contact birthday)
       (values))))
 

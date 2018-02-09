@@ -53,24 +53,21 @@
     (update-fact-widgets)
 
     ;; Now we'll add hooks to update this widgets when something changed
-    (weblocks/hooks:add-session-hook
-        :feed-item-created
+    (weblocks/hooks:on-session-hook-feed-item-created
         handle-new-feed-item (item)
       
       (declare (ignorable item))
       ;; TODO: add check if added item is related to the contact
       (update-feed-widget :redraw-p t))
 
-    (weblocks/hooks:add-session-hook
-        :fact-created
+    (weblocks/hooks:on-session-hook-fact-created
         handle-new-fact (object fact)
       
       (declare (ignorable object fact))
       ;; TODO: add check if added item is related to the contact
       (update-fact-widgets))
 
-    (weblocks/hooks:add-session-hook
-        :fact-removed
+    (weblocks/hooks:on-session-hook-fact-removed
         handle-removed-fact (object fact)
       
       (declare (ignorable object fact))

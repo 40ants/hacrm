@@ -3,12 +3,12 @@
 (deffact phone
     ((number :type string
              :initarg :number
-             :reader number)))
+             :reader get-number)))
 
 
 (defmethod print-object ((object phone) stream)
   (print-unreadable-object (object stream :type t)
-    (princ (number object)
+    (princ (get-number object)
            stream)))
 
 

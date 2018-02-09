@@ -14,5 +14,5 @@
     (hacrm.widgets.main:reset-user-input widget)
     (weblocks/widget:update widget)
     
-    (weblocks/hooks:call-hook :feed-item-created note)
+    (weblocks/hooks:with-feed-item-created-hook (note))
     (values)))

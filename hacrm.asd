@@ -1,10 +1,3 @@
-(defpackage #:hacrm-asd
-  (:use
-   :cl
-   :asdf))
-
-(in-package :hacrm-asd)
-
 (defsystem hacrm
   :name "hacrm"
   :version "0.0.1"
@@ -18,7 +11,7 @@
                :local-time
                :split-sequence
                :cl-markdown
-               :weblocks
+               (:version :weblocks "0.26.0")
                :weblocks-lass
                :weblocks-stores
                :weblocks-prevalence
@@ -43,6 +36,7 @@
                (:module src
                 :components ((:file auto-links)
                              (:file utils)
+                             (:file hooks)
                              (:file commands)
                              (:file conditions)
                              (:module models
