@@ -10,4 +10,6 @@
    #:remove-note
    #:get-notes
    #:get-object
-   #:text))
+   #:text
+   #:get-all-notes
+   #:get-contact-notes))

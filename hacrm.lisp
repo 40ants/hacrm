@@ -107,8 +107,9 @@ arguments."
 
   ;; TODO: make this happen using hooks
   ;; (weblocks-stores:close-stores)
-  (cl-prevalence:snapshot *store*)
-  (setf *store* nil))
+  (when *store*
+    (cl-prevalence:snapshot *store*)
+    (setf *store* nil)))
 
 
 ;; (defun reset-hunchentoot-routes ()

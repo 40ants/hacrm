@@ -3,79 +3,37 @@
 (in-package #:playground)
 
 
-(defstruct foo
-  bar)
+;; Проверим куда пропали теги
+(defvar all-users (hacrm.models.contact:all-contacts))
+(defvar all-tags (hacrm.plugins.tags:get-all-tags))
+
+(defvar bound-tags (loop for contact in all-users
+               for contact-tags = (hacrm.plugins.tags:get-contact-tags contact)
+               appending contact-tags))
+(defvar missing-tags (remove-if (lambda (tag)
+                                  (member tag bound-tags))
+                                all-tags))
+
+(defvar tags-missing-because-nil-contact
+  (remove-if-not (lambda (tag)
+               (null (hacrm.plugins.tags:contact tag)))
+             missing-tags))
 
 
-(defgeneric print-obj (obj))
+;; Проверим куда пропали заметки
+(defvar all-notes (hacrm.plugins.notes:get-all-notes))
 
+(defvar bound-notes
+  (loop for contact in all-users
+        for contact-notes = (hacrm.plugins.notes:get-contact-notes contact)
+        appending contact-notes))
 
-(defmethod print-obj ((obj foo))
-  (format t "Foo~%"))
+(defvar missing-notes (remove-if (lambda (note)
+                                  (member note bound-notes))
+                                all-notes))
 
-
-(defmethod print-obj :around ((obj foo))
-  (format t "Before~%")
-  (call-next-method)
-  (format t "After~%"))
-
-
-(defmethod print-obj :after (obj)
-  (format t "After ANY METHOD~%"))
-
-
-(defclass object ()
-  (;; (id :initform (progn (log:info "Making new id")
-   ;;                      (random 100))
-   ;;     :reader object-id)
-   (name :initarg :name
-         :initform "Bblah"
-         :reader object-name)))
-
-(defun make-object (name)
-  (make-instance 'object :name name))
-
-(defmethod object-id ((obj object))
-  (log:info "Getting object id for" obj)
-  (call-next-method))
-
-
-(defmethod print-object ((obj object) stream)
-  (format stream "Some object"))
-
-(defmethod describe-object ((obj object) stream)
-  (format stream "Some object description"))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defpackage #:bar
-  (:use #:cl))
-(in-package #:bar)
-
-
-(defstruct (bar (:include playground::foo)))
-
-(defmethod playground::print-obj :around ((obj bar))
-  (format t "BAR Before~%")
-  (call-next-method)
-  (format t "BAR After~%"))
-
-
-(defmethod playground::print-obj :before ((obj bar))
-  (format t "Before BAR METHODs~%"))
-
-(defmethod playground::print-obj :after ((obj bar))
-  (format t "After BAR METHODs~%"))
-
-
-;;; Попробуем сделать макро с параметрами, как указано в Google Styleguide
-
-(defmacro with-foo ((&key some)  &body body)
-  "doc"
-  `(progn (format t "~&FOO~%")
-          ,@body)
-  )
-
-
-(with-foo ()
-  (format t "~&BAR~%"))
+(defvar notes-missing-because-nil-contact
+  (remove-if-not
+   (lambda (note)
+     (null (hacrm.plugins.notes:get-object note)))
+   missing-notes))

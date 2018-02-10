@@ -58,6 +58,7 @@
   (execute-tx-remove-note (get-object-id note)))
 
 
+;; TODO: rename get-notes into get-contact-notes
 (defun get-notes (contact)
   (check-type contact hacrm.models.contact:contact)
   
@@ -67,3 +68,11 @@
                                                  contact)))
                                        full-feed)))
     contact-notes))
+
+(defun get-contact-notes (contact)
+  (get-notes contact))
+
+(defun get-all-notes ()
+  (let* ((all-feed-items (get-root-object :feed-items)))
+    (remove-if-not (f_ (typep _ 'note))
+                   all-feed-items)))

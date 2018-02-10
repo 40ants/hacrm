@@ -3,70 +3,53 @@
 (in-package playground)
 
 
-(defparameter *system-location* (pathname "/tmp/test-prevalence-system/"))
+(defmacro fact-fields ((fact) &body body)
+  `(list :|created-at| (hacrm.models.facts.core::created-at ,fact)
+         :|updated-at| (hacrm.models.facts.core::updated-at ,fact)
+         ,@body))
+
+(defgeneric prepare-fact (fact)
+  (:method ((fact hacrm.plugins.birthdays::birthday))
+    (fact-fields (fact)
+        :|type| "birthday"
+        :|date| (hacrm.plugins.birthdays:date fact)))
+  
+  (:method ((fact hacrm.plugins.tags::tag))
+    (fact-fields (fact)
+        :|type| "tag"
+        :|name| (hacrm.plugins.tags:name fact)))
+
+  (:method ((fact hacrm.plugins.phone::phone))
+    (fact-fields (fact)
+        :|type| "phone"
+        :|number| (hacrm.plugins.phone::get-number fact)))
+  
+  (:method ((fact hacrm.plugins.email::email))
+    (fact-fields (fact)
+        :|type| "email"
+        :|address| (hacrm.plugins.email::address fact))))
 
 
-(defclass node ()
-  ((id :initform (random 100000000)
-       :reader get-id)
-   (name :initarg :name
-         :reader get-name)))
+(defun prepare-note (note)
+  (list :|text| (hacrm.plugins.notes:text note)
+        :|created-at| (hacrm.models.feed::created-at note)
+        :|updated-at| (hacrm.models.feed::updated-at note)))
 
 
-(defmethod print-object ((obj node) stream)
-  (print-unreadable-object (obj stream :type t)
-    (format stream "name=~a" (get-name obj))))
+(defun export-data ()
+  (let ((contacts
+          (loop for contact in (hacrm.models.contact:all-contacts)
+                for facts = (hacrm.models.facts.core:find-contact-facts contact)
+                for notes = (hacrm.plugins.notes:get-contact-notes contact)
+                collect (list
+                         :|name| (hacrm.models.contact:name contact)
+                         :|created| (hacrm.models.contact:created contact)
+                         :|facts| (mapcar #'prepare-fact facts)
+                         :|notes| (mapcar #'prepare-note notes)))))
+    (jonathan:to-json contacts)))
 
 
-(defclass edge ()
-  ((from :initarg :from
-         :reader get-from)
-   (to :initarg :to
-       :reader get-to)
-   (name :initarg :name
-         :reader get-name)))
-
-
-(defun tx-init-system (system)
-  (setf (cl-prevalence:get-root-object system :nodes)
-        nil)
-  (setf (cl-prevalence:get-root-object system :edges)
-        nil))
-
-
-(defun init-system (system)
-  (unless (cl-prevalence:get-root-object system :nodes)
-    (cl-prevalence:execute system (cl-prevalence:make-transaction 'tx-init-system)))
-  system)
-
-
-(defvar *db* (init-system (cl-prevalence:make-prevalence-system *system-location*)))
-
-
-(defun tx-create-node (system name)
-  (push
-   (make-instance 'node :name name)
-   (cl-prevalence:get-root-object system :nodes)))
-
-
-(defun create-node (name)
-  (cl-prevalence:execute *db*
-                         (cl-prevalence:make-transaction
-                          'tx-create-node
-                          name)))
-
-(defun tx-create-edge (system name from to)
-  (push (make-instance 'edge
-                       :name name
-                       :from from
-                       :to to)
-        (cl-prevalence:get-root-object system :edges)))
-
-
-(defun create-edge (name from to)
-  (cl-prevalence:execute *db*
-                         (cl-prevalence:make-transaction
-                          'tx-create-edge
-                          name
-                          from
-                          to)))
+(defun export-to-file (filename)
+  (alexandria:with-output-to-file (stream filename)
+    (write-string (export-data)
+                  stream)))

@@ -1,5 +1,6 @@
 (defpackage  #:hacrm.models.contact
-  (:use #:cl)
+  (:use #:cl
+        #:f-underscore)
   (:import-from #:hacrm.models.core
                 #:define-transaction
                 #:make-object
@@ -55,6 +56,12 @@ contacts by some associated data."))
       (return-from find-contact-by-id
         contact))))
 
+
+(defmethod find-contacts-by ((keyword (eql :name)) value)
+  (hacrm.utils:find-object :contacts
+                           :filter
+                           (f_ (string-equal (name _)
+                                             value))))
 
 (defmethod print-object ((contact contact) stream)
   (format stream "#<CONTACT ~S>"

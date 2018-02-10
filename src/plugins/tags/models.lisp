@@ -58,3 +58,8 @@
                     (eql (contact _)
                          contact)))))
 
+(defun get-all-tags ()
+  (hacrm.utils:find-object
+   :facts
+   :filter (f_ (typep _ 'tag))))
+
