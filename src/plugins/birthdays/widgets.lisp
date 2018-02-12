@@ -1,14 +1,13 @@
-(in-package asdf)
-(defpackage #:hacrm.plugins.birthdays.widgets
+(defpackage #:hacrm/plugins/birthdays/widgets
   (:use #:cl))
-(in-package hacrm.plugins.birthdays.widgets)
+(in-package hacrm/plugins/birthdays/widgets)
 
 
 (weblocks/widget:defwidget birthday ()
   ((contact :initarg :contact
             :reader contact)
    (birthday :initarg :birthday
-             :type hacrm.plugins.birthdays::birthday
+             :type hacrm/plugins/birthdays/models::birthday
              :reader birthday)))
 
 
@@ -18,13 +17,13 @@
   (call-next-method)
 
   (let* ((contact (contact widget))
-         (birthday (hacrm.plugins.birthdays:get-birthday contact)))
+         (birthday (hacrm/plugins/birthdays/models:get-birthday contact)))
 
     (setf (slot-value widget 'birthday)
           birthday)))
 
 
-(defmethod hacrm.widgets.facts:make-facts-group-widget ((group (eql :birthday))
+(defmethod hacrm/widgets/facts:make-facts-group-widget ((group (eql :birthday))
                                                         contact)
   (declare (ignorable group))
 
@@ -32,7 +31,7 @@
                  :contact contact))
 
 
-(defmethod hacrm.widgets.facts:fact-group-weight ((widget birthday))
+(defmethod hacrm/widgets/facts:fact-group-weight ((widget birthday))
   "Birthday is important and should go right after tags."
   (declare (ignorable widget))
   1)
@@ -41,7 +40,7 @@
 (defmethod weblocks/widget:render ((widget birthday))
   (weblocks/html:with-html
     (:h1 "Birthday")
-    (:p (hacrm.plugins.birthdays::date
+    (:p (hacrm/plugins/birthdays/models::date
          (birthday widget)))))
 
 

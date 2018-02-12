@@ -1,4 +1,4 @@
-(defpackage #:hacrm.widgets.main
+(defpackage #:hacrm/widgets/main
   (:use #:cl)
   (:export
    #:make-main-window
@@ -6,7 +6,7 @@
    #:main-widget
    #:input-box
    #:reset-user-input))
-(in-package hacrm.widgets.main)
+(in-package hacrm/widgets/main)
 
 
 (weblocks/widget:defwidget main-window ()
@@ -14,7 +14,7 @@
                         null)
               :initarg :input-box
               :reader input-box)
-   (main-widget :type (or hacrm.widgets.base:base
+   (main-widget :type (or hacrm/widgets/base:base
                           null)
                 :initarg :main-widget
                 :accessor main-widget)))
@@ -42,17 +42,17 @@
 
 
 (defun make-main-window ()
-  (let* ((help-widget (hacrm.widgets.help:make-help-widget nil))
+  (let* ((help-widget (hacrm/widgets/help:make-help-widget nil))
          (app-window (make-instance 'main-window
                                 :main-widget help-widget))
-         (input-box (hacrm.widgets.input-box:make-input-box app-window))
-         ;; (help-widget (hacrm.widgets.help:make-help-widget window))
+         (input-box (hacrm/widgets/input-box:make-input-box app-window))
+         ;; (help-widget (hacrm/widgets/help:make-help-widget window))
          )
     (setf (slot-value app-window 'input-box)
           input-box)
 
     ;; Now we need to link back from the current widget to the app window
-    (setf (hacrm.widgets.base:window help-widget)
+    (setf (hacrm/widgets/base:window help-widget)
           app-window)
 
     app-window))
@@ -70,24 +70,24 @@
 
 (defun change-widget (current-widget new-widget)
   "Changes main widget of the application."
-  (let ((app-window (hacrm.widgets.base:window current-widget)))
+  (let ((app-window (hacrm/widgets/base:window current-widget)))
     (setf (main-widget app-window)
           new-widget)
 
     ;; We need to link back from new widget to the app window
-    (setf (hacrm.widgets.base:window new-widget)
+    (setf (hacrm/widgets/base:window new-widget)
           app-window)
 
     (weblocks/widget:update app-window)))
 
 
 (defun reset-user-input (current-widget)
-  (let* ((app-window (hacrm.widgets.base:window current-widget))
+  (let* ((app-window (hacrm/widgets/base:window current-widget))
          (input-box (input-box app-window)))
     (weblocks/widget:update input-box)))
 
 
-(defmethod hacrm.commands:command ((window main-window) command query)
+(defmethod hacrm/commands:command ((window main-window) command query)
   "This method is a proxy, used to pass call to currently active main widget."
 
-  (hacrm.commands:command (main-widget window) command query))
+  (hacrm/commands:command (main-widget window) command query))

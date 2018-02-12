@@ -1,8 +1,10 @@
-(defpackage #:hacrm.plugins.notes
+(defpackage #:hacrm/plugins/notes/plugin
+  (:nicknames #:hacrm/plugins/notes)
   (:use #:cl
-        #:hacrm.models.feed
-        #:hacrm.models.core
-        #:f-underscore)
+        ;; #:hacrm.models.feed
+        ;; #:hacrm.models.core
+        ;; #:f-underscore
+        )
   (:export
    #:note
    #:make-note

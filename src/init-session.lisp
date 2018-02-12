@@ -1,4 +1,8 @@
-(in-package hacrm)
+(defpackage #:hacrm/init-session
+  (:use #:cl)
+  (:import-from #:hacrm/widgets/main
+                #:make-main-window))
+(in-package hacrm/init-session)
 
 
 ;; (defwidget list-dependencies ()
@@ -220,5 +224,5 @@
 
 
 (defmethod weblocks/session:init ((app hacrm))
-  (hacrm.widgets.main:make-main-window))
+  (make-main-window))
 

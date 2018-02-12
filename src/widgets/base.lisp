@@ -1,9 +1,9 @@
-(defpackage #:hacrm.widgets.base
+(defpackage #:hacrm/widgets/base
   (:use #:cl)
   (:export
    #:window
    #:base))
-(in-package hacrm.widgets.base)
+(in-package hacrm/widgets/base)
 
 
 (weblocks/widget:defwidget base ()

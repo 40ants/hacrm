@@ -1,4 +1,4 @@
-(defpackage #:hacrm.models.feed
+(defpackage #:hacrm/models/feed
   (:use #:cl
         #:f-underscore)
   (:export
@@ -7,10 +7,10 @@
    #:created-at
    #:updated-at
    #:related-to-object-p))
-(in-package hacrm.models.feed)
+(in-package hacrm/models/feed)
 
 
-(defclass feed-item (hacrm.models.core:base)
+(defclass feed-item (hacrm/models/core:base)
   ((created-at :initform (get-universal-time)
                :reader created-at)
    (updated-at :initform (get-universal-time)

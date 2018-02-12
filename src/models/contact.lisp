@@ -1,10 +1,16 @@
-(defpackage  #:hacrm.models.contact
+(defpackage  #:hacrm/models/contact
   (:use #:cl
         #:f-underscore)
-  (:import-from #:hacrm.models.core
+  (:import-from #:hacrm/models/core
+                #:get-object-id
                 #:define-transaction
                 #:make-object
                 #:get-root-object)
+  (:import-from #:hacrm/utils
+                #:find-object)
+  (:import-from #:cl-strings
+                #:join
+                #:split)
   (:export #:contact
            #:make-contact
            #:name
@@ -13,10 +19,10 @@
            #:get-name-synonyms
            #:all-contacts
            #:find-contact-by-id))
-(in-package hacrm.models.contact)
+(in-package hacrm/models/contact)
 
 
-(defclass contact (hacrm.models.core:base)
+(defclass contact (hacrm/models/core:base)
   ((name :type string
          :initarg :name
          :accessor name)
@@ -39,7 +45,7 @@
 
 
 (defun all-contacts ()
-  (cl-prevalence:get-root-object hacrm::*store* :contacts))
+  (get-root-object :contacts))
 
 
 (defgeneric find-contacts-by (keyword value)
@@ -51,17 +57,17 @@ contacts by some associated data."))
 
 (defun find-contact-by-id (value)
   (dolist (contact (all-contacts))
-    (when (eql (hacrm.models.core:get-object-id contact)
+    (when (eql (get-object-id contact)
                value)
       (return-from find-contact-by-id
         contact))))
 
 
 (defmethod find-contacts-by ((keyword (eql :name)) value)
-  (hacrm.utils:find-object :contacts
-                           :filter
-                           (f_ (string-equal (name _)
-                                             value))))
+  (find-object :contacts
+               :filter
+               (f_ (string-equal (name _)
+                                 value))))
 
 (defmethod print-object ((contact contact) stream)
   (format stream "#<CONTACT ~S>"
@@ -98,7 +104,7 @@ replaced with different synonyms."))
 (defmethod get-name-synonyms ((name string))
   "Returns other variants of contact's name, like
 Alexander, Sasha, Shura."
-  (let* ((parts (cl-strings:split name #\Space))
+  (let* ((parts (split name #\Space))
          (parts2 (mapcar (lambda (item)
                            (gethash item
                                     *name-synonyms-hash*
@@ -115,8 +121,8 @@ Alexander, Sasha, Shura."
                              (first rest)
                              (rest rest))
                       ;; or return resulting name
-                      (list (cl-strings:join (reverse (cons current collected))
-                                             :separator " "))))
+                      (list (join (reverse (cons current collected))
+                                  :separator " "))))
                  ;; If item is a list of different synonyms, then we need to
                  ;; fanout them into the multiple variants of the name
                  (list

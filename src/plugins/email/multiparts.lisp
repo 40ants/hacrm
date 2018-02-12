@@ -291,7 +291,7 @@
                        (msg
                         (eml-content-charset msg))))
         (transfer-encoding (mel.mime:content-transfer-encoding (or part msg))))
-    (break)
+    ;; (break)
     (when string
       (if (eq transfer-encoding :base64)
           (progn

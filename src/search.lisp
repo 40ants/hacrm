@@ -1,11 +1,11 @@
-(defpackage #:hacrm.search
+(defpackage #:hacrm/search
   (:use #:cl
-        #:hacrm.models.contact)
+        #:hacrm/models/contact)
   (:export
    #:index-contacts
    #:search-contacts
    #:index-facts))
-(in-package hacrm.search)
+(in-package hacrm/search)
 
 
 (defvar *index* nil
@@ -51,17 +51,17 @@ If you want the facts added by your plugin were searchable, define this method."
                    contact)
              (incf *next-document-id*)
              
-             (dolist (name (hacrm.models.contact:get-name-synonyms contact))
+             (dolist (name (hacrm/models/contact:get-name-synonyms contact))
                (montezuma:add-field doc (montezuma:make-field
                                          "name"
                                          name)))
 
-             (loop for fact-group in (hacrm.models.facts.core:fact-groups contact)
+             (loop for fact-group in (hacrm/models/facts/core:fact-groups contact)
                    do (index-facts fact-group contact doc))
              
              doc)))
     
-    (loop for contact in (hacrm.models.contact:all-contacts)
+    (loop for contact in (hacrm/models/contact:all-contacts)
           do (montezuma:add-document-to-index
               *index*
               (transform-to-document contact)))))
@@ -118,31 +118,31 @@ If you want the facts added by your plugin were searchable, define this method."
                                "django")))))
 
 
-(defmethod hacrm.commands:command ((widget hacrm.widgets.base:base)
+(defmethod hacrm/commands:command ((widget hacrm/widgets/base:base)
                                    (command (eql :search))
                                    query)
   "If no handler processed the query, then we'll try to search a contact."
 
   (log:debug "Trying to search contact" query)
   
-  (let* ((contacts (hacrm.search:search-contacts query))
+  (let* ((contacts (hacrm/search:search-contacts query))
          (contacts-count (length contacts)))
     (log:debug "Search completed" contacts-count)
     
     (cond
       ((eql contacts-count 1)
-       (hacrm.widgets.main:change-widget
+       (hacrm/widgets.main:change-widget
         widget
-        (hacrm.widgets.contact-details:make-contact-details-widget (car contacts))))
+        (hacrm/widgets/contact-details:make-contact-details-widget (car contacts))))
       (t
        (flet ((on-contact-selection (contact)
                 (log:debug "Displaying contact" contact)
-                (hacrm.widgets.main:change-widget
+                (hacrm/widgets/main:change-widget
                  widget
-                 (hacrm.widgets.contact-details:make-contact-details-widget
+                 (hacrm/widgets/contact-details:make-contact-details-widget
                   contact))))
-         (hacrm.widgets.main:change-widget
+         (hacrm/widgets/main:change-widget
           widget
-          (hacrm.widgets.contacts-list:make-contacts-list
+          (hacrm/widgets/contacts-list:make-contacts-list
            contacts
            :on-contact-click #'on-contact-selection)))))))

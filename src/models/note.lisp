@@ -1,4 +1,4 @@
-(defpackage #:hacrm.models.note
+(defpackage #:hacrm/models/note
   (:use #:cl #:weblocks #:f-underscore)
   (:export #:note
            #:make-note
@@ -11,10 +11,10 @@
            #:created
            #:text
            #:contact))
-(in-package hacrm.models.note)
+(in-package hacrm/models/note)
 
 
-(defclass note (hacrm.models.core:base)
+(defclass note (hacrm/models/core:base)
   ((contact :initarg :contact
             :reader note-contact)
    (text :type string
@@ -51,15 +51,15 @@
 
 (defmethod print-object ((note note) stream)
   (format stream "#<NOTE created=~A text=~S>"
-          (hacrm.utils:format-time (note-created note))
-          (hacrm.utils:first-line (note-text note))))
+          (hacrm/utils:format-time (note-created note))
+          (hacrm/utils:first-line (note-text note))))
 
 
 (defmacro for-each (var-name &body body)
   `(error "For-each was removed")
   ;; (loop for ,var-name in (weblocks-stores:find-persistent-objects
   ;;                          hacrm::*store*
-  ;;                          'hacrm.models.note:note)
+  ;;                          'hacrm/models/note:note)
   ;;        do ,@body)
   )
 
@@ -67,20 +67,20 @@
 (defun migrate-old-notes ()
   "Временная функция чтобы трансформировать данные перенеся данные на плагин"
   
-  (let* ((old-notes (hacrm.models.core:get-root-object :notes))
-         (contacts (hacrm.models.core:get-root-object :contacts))
+  (let* ((old-notes (hacrm/models/core:get-root-object :notes))
+         (contacts (hacrm/models/core:get-root-object :contacts))
          (contacts-by-name (make-hash-table :test 'equal)))
 
     ;; Заполним словарик с контактами
     (loop for contact in contacts
-          do (setf (gethash (hacrm.models.contact:name contact)
+          do (setf (gethash (hacrm/models/contact:name contact)
                             contacts-by-name)
                    contact))
 
     (loop for note in old-notes
           collect (let* ((note-text (note-text note))
-                         (contact-name (hacrm.models.contact:name (note-contact note)))
+                         (contact-name (hacrm/models/contact:name (note-contact note)))
                          (contact (gethash (cl-strings:clean contact-name)
                                            contacts-by-name)))
 
-                    (hacrm.plugins.notes:add-note contact note-text))))) 
+                    (hacrm/plugins/notes:add-note contact note-text))))) 

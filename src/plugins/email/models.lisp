@@ -1,4 +1,17 @@
-(in-package hacrm.plugins.email)
+(defpackage #:hacrm/plugins/email/models
+  (:use #:cl
+        #:f-underscore)
+  (:import-from #:hacrm/models/facts/core
+                #:contact
+                #:deffact)
+  (:import-from #:hacrm/models/core
+                #:get-object-id
+                #:get-root-object
+                #:make-object
+                #:find-object)
+  (:import-from #:hacrm/models/contact
+                #:find-contact-by-id))
+(in-package hacrm/plugins/email/models)
 
 (deffact email
     ((address :type string
@@ -25,36 +38,36 @@
 
 (defun get-emails (contact)
   "Returns all emails bound to the contact."
-  (hacrm.utils:find-object
+  (find-object
    :facts
    :filter (f_ (and (typep _ 'email)
                     (equal (contact _)
                            contact)))))
 
 
-(hacrm.models.core:define-transaction tx-add-email (contact-id email-address)
+(hacrm/models/core:define-transaction tx-add-email (contact-id email-address)
   (check-type email-address string)
   (check-type contact-id integer)
   
-  (let* ((contact (hacrm.models.contact:find-contact-by-id
+  (let* ((contact (find-contact-by-id
                    contact-id))
          (email (make-object 'email
                              :address email-address
                              :contact contact)))
     (push
      email
-     (hacrm.models.core:get-root-object :facts))
+     (get-root-object :facts))
 
     email))
 
 
 (defun add-email (contact email-address)
-  (let ((exists (hacrm.models.contact:find-contacts-by :email email-address)))
+  (let ((exists (hacrm/models/contact:find-contacts-by :email email-address)))
     (when exists
       (error 'already-exists))
 
     (let ((fact (execute-tx-add-email
-                 (hacrm.models.core:get-object-id contact)
+                 (hacrm/models/core:get-object-id contact)
                  email-address)))
 
       (weblocks/hooks:call-fact-created-hook contact fact)
@@ -62,11 +75,11 @@
       fact)))
 
 
-(hacrm.models.core:define-transaction tx-remove-email (contact-id email-to-remove)
+(hacrm/models/core:define-transaction tx-remove-email (contact-id email-to-remove)
   (check-type contact-id integer)
   (check-type email-to-remove string)
 
-  (let* ((contact (hacrm.models.contact:find-contact-by-id contact-id))
+  (let* ((contact (hacrm/models/contact:find-contact-by-id contact-id))
          (emails (get-emails contact))
          removed)
     
@@ -77,15 +90,15 @@
         (log:debug "Removing email from contact" email contact)
         (push email removed)))
 
-    (setf (hacrm.models.core:get-root-object :facts)
+    (setf (hacrm/models/core:get-root-object :facts)
           (remove-if (f_ (member _ removed :test #'eql))
-                     (hacrm.models.core:get-root-object :facts)))
+                     (hacrm/models/core:get-root-object :facts)))
 
     removed))
 
 
 (defun remove-email (contact email-to-remove)
-  (let* ((contact-id (hacrm.models.core:get-object-id contact))
+  (let* ((contact-id (get-object-id contact))
          (removed-emails (execute-tx-remove-email contact-id
                                                   email-to-remove)))
     (dolist (removed-email removed-emails)
@@ -94,11 +107,11 @@
     removed-emails))
 
 
-(defmethod hacrm.models.contact:find-contacts-by ((keyword (eql :email)) value)
-  (let* ((facts (hacrm.utils:find-object :facts
-                                         :filter
-                                         (f_ (and (typep _ 'email)
-                                                  (string-equal (address _)
-                                                                value))))))
+(defmethod hacrm/models/contact:find-contacts-by ((keyword (eql :email)) value)
+  (let* ((facts (find-object :facts
+                             :filter
+                             (f_ (and (typep _ 'email)
+                                      (string-equal (address _)
+                                                    value))))))
     (loop for fact in facts
           collect (contact fact))))

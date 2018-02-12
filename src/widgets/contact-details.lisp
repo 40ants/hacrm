@@ -1,17 +1,17 @@
-(defpackage #:hacrm.widgets.contact-details
+(defpackage #:hacrm/widgets/contact-details
   (:use #:cl
         #:f-underscore
-        #:hacrm.models.contact)
+        #:hacrm/models/contact)
   (:export #:make-contact-details-widget
            #:contact-details-contact
            #:make-contact-details-widget
            #:contact-details
            #:get-contact
            #:render-facts))
-(in-package hacrm.widgets.contact-details)
+(in-package hacrm/widgets/contact-details)
 
 
-(weblocks/widget:defwidget contact-details (hacrm.widgets.base:base)
+(weblocks/widget:defwidget contact-details (hacrm/widgets/base:base)
   ((contact :type 'contact
             :initarg :contact
             :reader get-contact)
@@ -25,7 +25,7 @@
                                 &key contact)
   (flet ((update-feed-widget (&key redraw-p)
            (setf (slot-value details-widget 'feed)
-                 (hacrm.widgets.feed:make-feed-widget contact))
+                 (hacrm/widgets/feed:make-feed-widget contact))
            (when redraw-p
              (weblocks/widget:update details-widget)))
 
@@ -33,8 +33,8 @@
            "Creates widgets to render fact groups for the contact."
            (log:debug "Updating fact widgets.")
            
-           (let* ((fact-groups (hacrm.models.facts.core:fact-groups contact))
-                  (fact-group-widgets (mapcar (f_ (hacrm.widgets.facts:make-facts-group-widget
+           (let* ((fact-groups (hacrm/models/facts/core:fact-groups contact))
+                  (fact-group-widgets (mapcar (f_ (hacrm/widgets/facts:make-facts-group-widget
                                                    _
                                                    contact))
                                               fact-groups))
@@ -43,7 +43,7 @@
                   ;; for your widget.
                   (sorted-widgets (sort fact-group-widgets
                                         #'<
-                                        :key #'hacrm.widgets.facts:fact-group-weight)))
+                                        :key #'hacrm/widgets/facts:fact-group-weight)))
              (setf (slot-value details-widget 'fact-groups)
                    sorted-widgets))))
     

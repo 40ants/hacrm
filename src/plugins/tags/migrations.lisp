@@ -1,8 +1,8 @@
-(defpackage #:hacrm.plugins.tags.migrations
+(defpackage #:hacrm/plugins/tags/migrations
   (:use #:cl)
   (:export
    #:move-tags-to-plugin-package))
-(in-package hacrm.plugins.tags.migrations)
+(in-package hacrm/plugins/tags/migrations)
 
 
 ;; (defun remove-old-tags ()

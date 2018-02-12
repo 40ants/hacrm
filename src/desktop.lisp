@@ -1,9 +1,9 @@
-(defpackage #:hacrm.desktop
+(defpackage #:hacrm/desktop
   (:use #:cl)
   (:export
    #:start-dev-app
    #:stop-dev-app))
-(in-package hacrm.desktop)
+(in-package hacrm/desktop)
 
 (defvar *window* nil)
 

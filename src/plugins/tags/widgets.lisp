@@ -1,18 +1,18 @@
-(defpackage #:hacrm.plugins.tags.widgets
+(defpackage #:hacrm/plugins/tags/widgets
   (:use #:cl
         #:f-underscore
-        #:hacrm.plugins.tags))
+        #:hacrm/plugins/tags/models))
 
-(in-package hacrm.plugins.tags.widgets)
+(in-package hacrm/plugins/tags/widgets)
 
 
 (weblocks/widget:defwidget tags ()
   ((object :initarg :object
            :reader object
-           :type hacrm.models.contact:contact)))
+           :type hacrm/models/contact:contact)))
 
 
-(defmethod hacrm.widgets.facts:make-facts-group-widget ((fact-group (eql :tags))
+(defmethod hacrm/widgets/facts:make-facts-group-widget ((fact-group (eql :tags))
                                                         object)
   (declare (ignorable fact-group))
 
@@ -20,11 +20,11 @@
                  :object object))
 
 
-(defmethod hacrm.widgets.contacts-list:show-fact-group-in-contact-list-p ((fact-group (eql :tags)))
+(defmethod hacrm/widgets/contacts-list:show-fact-group-in-contact-list-p ((fact-group (eql :tags)))
   t)
 
 
-(defmethod hacrm.widgets.facts:fact-group-weight ((widget tags))
+(defmethod hacrm/widgets/facts:fact-group-weight ((widget tags))
   "Tags should be on the top, right under the name."
   (declare (ignorable widget))
   0)

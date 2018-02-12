@@ -1,23 +1,17 @@
-(in-package asdf)
-
-(defpackage #:hacrm.t.facts
+(defpackage #:hacrm-test/facts
   (:use #:cl
-        #:prove
-        #:hamcrest.prove
-        #:hacrm.t.utils
-        #:hacrm.models.facts.core)
+        #:rove
+        #:hamcrest/rove
+        #:hacrm-test/utils
+        #:hacrm/models/facts/core)
   
-  (:import-from #:hacrm.models.contact
+  (:import-from #:hacrm/models/contact
                 #:make-contact))
-(in-package hacrm.t.facts)
+(in-package hacrm-test/facts)
 
+(deftest no-groups-if-no-facts
+  (with-empty-db
+      (testing "If there is no facts about contact, then there is no groups."
+        (let ((contact (make-contact "Petya")))
+          (ng (fact-groups contact))))))
 
-(plan 1)
-
-(with-empty-db
-    (subtest "If there is no facts about contact, then there is no groups."
-      (let ((contact (make-contact "Petya")))
-        (is (fact-groups contact)
-            nil))))
-
-(finalize)

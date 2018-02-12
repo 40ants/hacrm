@@ -1,6 +1,13 @@
-(defpackage #:hacrm.models.facts.core
+(defpackage #:hacrm/models/facts/core
   (:use #:cl
         #:f-underscore)
+  (:import-from #:hacrm/models/core
+                #:find-object
+                #:get-root-object)
+  (:import-from #:alexandria
+                #:with-gensyms)
+  (:import-from #:hacrm/models/contact
+                #:find-contact-by-id)
   (:export
    #:fact
    #:deffact
@@ -10,10 +17,10 @@
    #:fact-group
    #:all-facts
    #:remove-facts))
-(in-package hacrm.models.facts.core)
+(in-package hacrm/models/facts/core)
 
 
-(defclass fact (hacrm.models.core:base)
+(defclass fact (hacrm/models/core:base)
   ((created-at :initform (get-universal-time)
                :reader created-at)
    (updated-at :initform (get-universal-time)
@@ -73,7 +80,7 @@ This keyword is used to group together similar facts like contacts or links to w
 
 
 (defun find-contact-facts (contact)
-  (hacrm.utils:find-object
+  (find-object
    :facts
    :filter (f_ (equal (contact _)
                       contact))))
@@ -91,37 +98,37 @@ This keyword is used to group together similar facts like contacts or links to w
 
 
 (defun all-facts ()
-  (cl-prevalence:get-root-object hacrm::*store* :facts))
+  (get-root-object :facts))
 
 
-(defun fix-facts-contacts ()
-  "Чиним ссылки на контактах в фактах. Из-за weblocks-stores они местами попортились."
-  ;; TODO: remove this function if everything is all righth
+;; (defun fix-facts-contacts ()
+;;   "Чиним ссылки на контактах в фактах. Из-за weblocks-stores они местами попортились."
+;;   ;; TODO: remove this function if everything is all righth
 
-  (let ((contacts-by-id (make-hash-table))
-        (contacts (hacrm.models.contact:all-contacts))
-        (facts (all-facts)))
+;;   (let ((contacts-by-id (make-hash-table))
+;;         (contacts (hacrm/models/contact:all-contacts))
+;;         (facts (all-facts)))
     
-    (loop for contact in contacts
-          do (setf (gethash (weblocks-stores:object-id contact)
-                            contacts-by-id)
-                   contact))
+;;     (loop for contact in contacts
+;;           do (setf (gethash (weblocks-stores:object-id contact)
+;;                             contacts-by-id)
+;;                    contact))
 
-    (loop for fact in facts
-          for fact-contact = (contact fact)
-          for fact-contact-id = (weblocks-stores:object-id fact-contact)
-          for real-contact = (gethash fact-contact-id contacts-by-id)
-          when (not (equal fact-contact
-                           real-contact))
-            collect (list
-                     :fact fact
-                     :fact-contact fact-contact
-                     :it-s-facts (hacrm.models.facts.core:find-contact-facts fact-contact)
-                     :real-contact real-contact
-                     :it-s-facts (hacrm.models.facts.core:find-contact-facts real-contact))
-            and do
-              (setf (slot-value fact 'contact)
-                    real-contact))))
+;;     (loop for fact in facts
+;;           for fact-contact = (contact fact)
+;;           for fact-contact-id = (weblocks-stores:object-id fact-contact)
+;;           for real-contact = (gethash fact-contact-id contacts-by-id)
+;;           when (not (equal fact-contact
+;;                            real-contact))
+;;             collect (list
+;;                      :fact fact
+;;                      :fact-contact fact-contact
+;;                      :it-s-facts (hacrm/models/facts/core:find-contact-facts fact-contact)
+;;                      :real-contact real-contact
+;;                      :it-s-facts (hacrm/models/facts/core:find-contact-facts real-contact))
+;;             and do
+;;               (setf (slot-value fact 'contact)
+;;                     real-contact))))
 
 
 (defmacro remove-facts ((contact-id &key type) &body rules)
@@ -141,10 +148,10 @@ and to checked fact during rules evaluation.
 
 Returns a list of removed facts.
 "
-  (alexandria:with-gensyms (all-facts filtered-facts removed-facts)
-    `(let* ((contact (hacrm.models.contact:find-contact-by-id ,contact-id))
+  (with-gensyms (all-facts filtered-facts removed-facts)
+    `(let* ((contact (find-contact-by-id ,contact-id))
             ;; Tags are the facts which stored in a facts collection
-            (,all-facts (hacrm.models.core:get-root-object :facts))
+            (,all-facts (get-root-object :facts))
             ;; Now we need to filter-out facts, related to the contact and
             ;; having the given name
             ,filtered-facts
@@ -162,7 +169,7 @@ Returns a list of removed facts.
              (push fact ,removed-facts)
              (push fact ,filtered-facts)))
        ;; Now, filtered facts should be saved back to the collection
-       (setf (hacrm.models.core:get-root-object :facts)
+       (setf (get-root-object :facts)
              (nreverse ,filtered-facts))
 
        ;; Return removed facts

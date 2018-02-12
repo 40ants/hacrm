@@ -1,4 +1,5 @@
 (defpackage #:3bmd-auto-links
+  (:nicknames #:hacrm/auto-links)
   (:use :cl :esrap :3bmd-ext)
   (:export #:*auto-links*))
 

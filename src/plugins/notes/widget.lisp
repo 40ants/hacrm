@@ -1,4 +1,6 @@
-(in-package hacrm.plugins.notes)
+(defpackage #:hacrm/plugins/notes/widget
+  (:use #:cl))
+(in-package hacrm/plugins/notes/widget)
 
 
 (weblocks/widget:defwidget note-widget ()
@@ -7,7 +9,7 @@
          :reader note)))
 
 
-(defmethod hacrm.widgets.feed:make-feed-item-widget ((note note)
+(defmethod hacrm/widgets/feed:make-feed-item-widget ((note note)
                                                      parent-widget)
   (declare (ignorable parent-widget))
   (make-instance 'note-widget :note note))
@@ -19,7 +21,7 @@
          (formatted-date (local-time:format-rfc1123-timestring
                           nil
                           (local-time:universal-to-timestamp created-at)))
-         (rendered-text (hacrm.utils:render-markup (text note))))
+         (rendered-text (hacrm/utils:render-markup (text note))))
     (weblocks/html:with-html
       (:p :class "note__metadata"
           (:span formatted-date))

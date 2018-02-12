@@ -1,3 +1,8 @@
+;; Запрещаем добавлять пробел после двоеточия в любых случаях
+(setq lispy-colon-no-space-regex
+      '((lisp-mode . ".*")))
+
+
 ;; (require 'slime)
 
 ;; (slime-setup '(slime-company slime-fancy))

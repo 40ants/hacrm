@@ -1,7 +1,6 @@
-(in-package asdf)
-(defpackage #:hacrm.plugins.phone.widgets
+(defpackage #:hacrm/plugins/phone/widgets
   (:use #:cl))
-(in-package hacrm.plugins.phone.widgets)
+(in-package hacrm/plugins/phone/widgets)
 
 
 (weblocks/widget:defwidget phones ()
@@ -9,7 +8,7 @@
             :reader contact)))
 
 
-(defmethod hacrm.widgets.facts:make-facts-group-widget ((group (eql :phones))
+(defmethod hacrm/widgets/facts:make-facts-group-widget ((group (eql :phones))
                                                         contact)
   (declare (ignorable group))
 
@@ -19,13 +18,13 @@
 
 (defmethod weblocks/widget:render ((widget phones))
   (let* ((contact (contact widget))
-         (phones (hacrm.plugins.phone:get-phones contact)))
+         (phones (hacrm/plugins/phone/models:get-phones contact)))
     
     (weblocks/html:with-html
       (:h1 "Phones")
       (:ul
        (dolist (phone phones)
-         (:li (hacrm.plugins.phone:number phone)))))))
+         (:li (hacrm/plugins/phone/models:number phone)))))))
 
 
 (defmethod weblocks/dependencies:get-dependencies ((widget phones))

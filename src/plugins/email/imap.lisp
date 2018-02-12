@@ -1,12 +1,18 @@
-(defpackage #:hacrm.plugins.email.imap
-  (:use #:cl))
-(in-package hacrm.plugins.email.imap)
+(defpackage #:hacrm/plugins/email/imap
+  (:use #:cl)
+  (:import-from #:ubiquitous)
+  (:import-from #:mel-base)
+  (:import-from #:cl-rfc2047)
+  (:import-from #:sanitize)
+  ;; This module brings :sf.mel package
+  (:import-from #:hacrm/plugins/email/multiparts))
+(in-package hacrm/plugins/email/imap)
 
 
 ;; Пока устанавливаем параметры таким образом:
 
 (defun set-password (password)
- (setf (ubiquitous:value :hacrm.plugins.email :accounts)
+  (setf (ubiquitous:value :hacrm/plugins/email :accounts)
         `((:host "imap.yandex.ru" :username "art@allmychanges.com" :password ,password))))
 
 
@@ -65,7 +71,7 @@
     (list :from (parse-from-address from)
           :subject (cl-rfc2047:decode* subject)
           :message-id message-id
-          :time (hacrm.utils:parse-time time)
+          :time (hacrm/utils:parse-time time)
           :text text)))
 
 
@@ -95,7 +101,7 @@
 
 (defun process-messages ()
   "This function fetches new emails, creates contacts and feed items."
-  (let* ((accounts (ubiquitous:value :hacrm.plugins.email :accounts))
+  (let* ((accounts (ubiquitous:value :hacrm/plugins/email :accounts))
          (messages
            (loop for account in accounts
                  append (apply #'fetch-messages-from account))))

@@ -1,4 +1,13 @@
-(in-package hacrm.plugins.birthdays)
+(defpackage #:hacrm/plugins/birthdays/models
+  (:use #:cl
+        #:f-underscore)
+  (:import-from #:hacrm/models/facts/core
+                #:contact
+                #:deffact)
+  (:import-from #:hacrm/models/core
+                #:make-object
+                #:find-object))
+(in-package hacrm/plugins/birthdays/models)
 
 (deffact birthday
     ((date :type string
@@ -43,17 +52,17 @@ Should be applied to the user input before storing it into the database."
 
 (defun get-birthday (contact)
   (first
-   (hacrm.utils:find-object
+   (find-object
     :facts
     :filter (f_ (and (typep _ 'birthday)
                      (equal (contact _)
                             contact))))))
 
 
-(hacrm.models.core:define-transaction tx-set-birthday (contact-id date)
+(hacrm/models/core:define-transaction tx-set-birthday (contact-id date)
   "If a new fact was created, second returned value is \"true\"."
   (let* ((date (clean-date date))
-         (contact (hacrm.models.contact:find-contact-by-id contact-id))
+         (contact (hacrm/models/contact:find-contact-by-id contact-id))
          (birthday (get-birthday contact))
          created)
     (cond
@@ -68,7 +77,7 @@ Should be applied to the user input before storing it into the database."
                created t)
                
          (push birthday
-               (hacrm.models.core:get-root-object :facts))))
+               (hacrm/models/core:get-root-object :facts))))
 
     (values birthday created)))
 
@@ -78,7 +87,7 @@ Should be applied to the user input before storing it into the database."
 
 Returns a new `birthday' fact."
 
-  (let* ((contact-id (hacrm.models.core:get-object-id contact)))
+  (let* ((contact-id (hacrm/models/core:get-object-id contact)))
     (multiple-value-bind (fact created)
         (execute-tx-set-birthday contact-id date)
 

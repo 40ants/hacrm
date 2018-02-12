@@ -1,8 +1,19 @@
-(in-package hacrm.plugins.notes)
+(defpackage #:hacrm/plugins/notes/models
+  (:use #:cl
+        #:f-underscore)
+  (:import-from #:hacrm/models/feed
+                #:def-feed-item
+                #:related-to-object-p)
+  (:import-from #:hacrm/models/core
+                #:get-root-object
+                #:make-object
+                #:get-object-id
+                #:define-transaction))
+(in-package hacrm/plugins/notes/models)
 
 
 (def-feed-item note
-    ((object :type hacrm.models.contact
+    ((object :type hacrm/models/contact
              :initarg :object
              :accessor get-object)
      (text :type string
@@ -12,13 +23,13 @@
 
 (defmethod print-object ((note note) stream)
   (format stream "#<NOTE created=~A object=~A text=~S>"
-          (hacrm.utils:format-time (created-at note))
+          (hacrm/utils:format-time (created-at note))
           (when (slot-boundp note 'object)
             (get-object note))
-          (hacrm.utils:first-line (text note))))
+          (hacrm/utils:first-line (text note))))
 
 
-(defmethod hacrm.models.feed:related-to-object-p ((note note)
+(defmethod related-to-object-p ((note note)
                                                   object)
   (eql (get-object note)
        object))
@@ -30,8 +41,8 @@
   (make-instance 'note :text text))
 
 
-(hacrm.models.core:define-transaction tx-add-note (contact-id text)
-  (let* ((contact (hacrm.models.contact:find-contact-by-id contact-id))
+(hacrm/models/core:define-transaction tx-add-note (contact-id text)
+  (let* ((contact (hacrm/models/contact:find-contact-by-id contact-id))
          (new-note (when contact
                      (make-object 'note
                                   :object contact
@@ -43,12 +54,12 @@
     new-note))
 
 
-(hacrm.models.core:define-transaction tx-remove-note (note-id)
-  (hacrm.models.core:remove-object-by-id :feed-items note-id))
+(define-transaction tx-remove-note (note-id)
+  (hacrm/models/core:remove-object-by-id :feed-items note-id))
 
 
 (defun add-note (contact text)
-  (check-type contact hacrm.models.contact:contact)
+  (check-type contact hacrm/models/contact:contact)
   (execute-tx-add-note (get-object-id contact)
                        text))
 
@@ -60,7 +71,7 @@
 
 ;; TODO: rename get-notes into get-contact-notes
 (defun get-notes (contact)
-  (check-type contact hacrm.models.contact:contact)
+  (check-type contact hacrm/models/contact:contact)
   
   (let* ((full-feed (get-root-object :feed-items))
          (contact-notes (remove-if-not (f_ (and (typep _ 'note)

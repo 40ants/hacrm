@@ -1,11 +1,11 @@
-(defpackage #:hacrm.widgets.help
+(defpackage #:hacrm/widgets/help
   (:use #:cl)
   (:export
    #:make-help-widget))
-(in-package hacrm.widgets.help)
+(in-package hacrm/widgets/help)
 
 
-(weblocks/widget:defwidget help (hacrm.widgets.base:base)
+(weblocks/widget:defwidget help (hacrm/widgets/base:base)
   ((commands :type list
              :initarg :commands
              :reader commands)))
@@ -25,7 +25,7 @@
   "Creates a help widget to show commands list available for the given widget."
   
   (make-instance 'help
-                 :commands (hacrm.commands:help previous-widget)))
+                 :commands (hacrm/commands:help previous-widget)))
 
 
 (defmethod weblocks/dependencies:get-dependencies  ((widget help))

@@ -1,8 +1,8 @@
-(defpackage #:hacrm.hooks
+(defpackage #:hacrm/hooks
   (:use #:cl)
   (:import-from #:weblocks/hooks
                 #:defhook))
-(in-package hacrm.hooks)
+(in-package hacrm/hooks)
 
 (defhook feed-item-created)
 (defhook fact-created)

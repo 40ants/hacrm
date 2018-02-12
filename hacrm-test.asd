@@ -1,27 +1,27 @@
-(defpackage #:hacrm-test-asd
-  (:use
-   :cl
-   :asdf))
-
-(in-package hacrm-test-asd)
-
-
 (defsystem hacrm-test
+  :class :package-inferred-system
+  :pathname "t"
   :depends-on (:hacrm
-               :hamcrest-prove
-               :weblocks-testutils)
-  :defsystem-depends-on (:prove-asdf)
-  :serial t
-  :components ((:module t
-                :components ((:file utils)
-                             (:test-file utils-tests)
-                             (:test-file facts)
-                             (:test-file contacts)
-                             (:module plugins
-                              :components ((:test-file birthdays)
-                                           (:test-file tags)
-                                           (:test-file notes)
-                                           (:test-file phones)
-                                           (:test-file email))))))
+               ;; :hamcrest/rove
+               ;; :weblocks-testutils
+               "hacrm-test/utils-tests"
+               "hacrm-test/facts"
+               "hacrm-test/contacts"
+               "hacrm-test/plugins/birthdays"
+               "hacrm-test/plugins/tags"
+               "hacrm-test/plugins/notes"
+               "hacrm-test/plugins/phones"
+               "hacrm-test/plugins/email")
+  ;; :components ((:module t
+  ;;               :components ((:file utils)
+  ;;                            (:file utils-tests)
+  ;;                            (:file facts)
+  ;;                            (:file contacts)
+  ;;                            (:module plugins
+  ;;                             :components ((:file birthdays)
+  ;;                                          (:file tags)
+  ;;                                          (:file notes)
+  ;;                                          (:file phones)
+  ;;                                          (:file email))))))
   :perform (test-op :after (op c)
-                    (funcall (intern #.(string :run) :prove) c)))
+                    (call-symbol :rove :run c)))

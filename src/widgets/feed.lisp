@@ -1,10 +1,10 @@
-(defpackage #:hacrm.widgets.feed
+(defpackage #:hacrm/widgets/feed
   (:use #:cl
         #:f-underscore)
   (:export
    #:make-feed-widget
    #:make-feed-item-widget))
-(in-package hacrm.widgets.feed)
+(in-package hacrm/widgets/feed)
 
 
 (weblocks/widget:defwidget feed ()
@@ -22,16 +22,16 @@
 
 
 (defun make-feed-widget (contact)
-  (let* ((all-feed-items (hacrm.models.core:get-root-object :feed-items))
+  (let* ((all-feed-items (hacrm/models/core:get-root-object :feed-items))
          (items-for-the-contact
-           (remove-if-not (f_ (hacrm.models.feed:related-to-object-p
+           (remove-if-not (f_ (hacrm/models/feed:related-to-object-p
                                _
                                contact))
                           all-feed-items))
          ;; feed items are sorted from recent to oldest
          (sorted-objects (sort items-for-the-contact
                                #'>
-                               :key #'hacrm.models.feed:created-at))
+                               :key #'hacrm/models/feed:created-at))
          (feed-widget (make-instance 'feed :contact contact)))
     
     (let* ((items (mapcar (f_ (make-feed-item-widget _ feed-widget))

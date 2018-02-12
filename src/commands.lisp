@@ -1,4 +1,4 @@
-(defpackage #:hacrm.commands
+(defpackage #:hacrm/commands
   (:use #:cl
         #:f-underscore)
   (:export
@@ -6,7 +6,7 @@
    #:process-query
    #:default-command
    #:help))
-(in-package hacrm.commands)
+(in-package hacrm/commands)
 
 
 (defgeneric default-command (widget)
@@ -32,7 +32,7 @@ It is called with current main widget and a symbol user entered in the input box
 First user's toke is considered as a command name and transformed to a keyword.
 
 If no method was defined to handle a keyword, then another call to `command' will
-be made but with (hacrm.widgets.base:default-command widget) in place of the keyword."))
+be made but with (hacrm/widgets/base:default-command widget) in place of the keyword."))
 
 
 (define-condition no-command-error ()
@@ -52,7 +52,7 @@ be made but with (hacrm.widgets.base:default-command widget) in place of the key
 It consider any text a form, by adding an implicit braces around it.
 
 If first item of a list is a symbol, then it is converted to a keyword
-and then generic function hacrm.command:command is called."
+and then generic function hacrm/command:command is called."
   (let* ((first-token (first (cl-strings:split text #\Space)))
          (rest-text (subseq text (min (length text)
                                       (+ (length first-token)
@@ -95,7 +95,7 @@ and then generic function hacrm.command:command is called."
 
 (defun help (widget)
   "Returns a list with tuples where first element is string with command's name and second – command's description."
-  (let* ((all-commands (closer-mop:generic-function-methods #'hacrm.commands:command))
+  (let* ((all-commands (closer-mop:generic-function-methods #'command))
          (filtered-commands (remove-if-not (f_ (applicablep _ widget))
                                            all-commands)))
     (sort (mapcar #'get-command-description

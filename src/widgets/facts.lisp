@@ -1,9 +1,9 @@
-(defpackage #:hacrm.widgets.facts
+(defpackage #:hacrm/widgets/facts
   (:use #:cl)
   (:export
    #:make-facts-group-widget
    #:fact-group-weight))
-(in-package hacrm.widgets.facts)
+(in-package hacrm/widgets/facts)
 
 
 (defgeneric make-facts-group-widget (fact-group object)
@@ -11,7 +11,7 @@
 facts about given object.
 
 `Fact-group' is a keyword identifying the group. It should be one
-of keywords, returned by `hacrm.models.facts.core:fact-groups' function."))
+of keywords, returned by `hacrm/models/facts/core:fact-groups' function."))
 
 
 (defgeneric fact-group-weight (fact-group-widget)

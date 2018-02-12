@@ -1,6 +1,6 @@
-(defpackage #:hacrm.widgets.contacts-list
+(defpackage #:hacrm/widgets/contacts-list
   (:use #:cl
-        #:hacrm.models.contact
+        #:hacrm/models/contact
         #:f-underscore)
   (:import-from #:parenscript
                 #:@)
@@ -12,10 +12,10 @@
    #:contacts
    #:render-facts
    #:show-fact-group-in-contact-list-p))
-(in-package hacrm.widgets.contacts-list)
+(in-package hacrm/widgets/contacts-list)
 
 
-(weblocks/widget:defwidget contact-card (hacrm.widgets.base:base)
+(weblocks/widget:defwidget contact-card (hacrm/widgets/base:base)
   ((contact :type 'contact
             :initarg :contact
             :reader contact)
@@ -29,7 +29,7 @@
     :reader get-number)))
 
 
-(weblocks/widget:defwidget contacts-list (hacrm.widgets.base:base)
+(weblocks/widget:defwidget contacts-list (hacrm/widgets/base:base)
   ((contacts :initarg :contacts
              :reader contacts)))
 
@@ -48,13 +48,13 @@ in contact list mode, redefine this method.")
 
 
 (defun make-contact-card (contact on-click number)
-  (let* ((all-fact-groups (hacrm.models.facts.core:fact-groups
+  (let* ((all-fact-groups (hacrm/models/facts/core:fact-groups
                        contact))
          (fact-groups (remove-if-not #'show-fact-group-in-contact-list-p
                                      all-fact-groups))
          (fact-group-widgets
            (mapcar
-            (f_ (hacrm.widgets.facts:make-facts-group-widget
+            (f_ (hacrm/widgets/facts:make-facts-group-widget
                  _
                  contact))
             fact-groups)))

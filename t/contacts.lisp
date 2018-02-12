@@ -1,22 +1,20 @@
-(defpackage #:hacrm.t.contacts
+(defpackage #:hacrm-test/contacts
   (:use #:cl
-        #:prove
-        #:hamcrest.prove)
-  (:import-from #:hacrm.models.core
+        #:rove
+        #:hamcrest/rove)
+  (:import-from #:hacrm/models/core
                 #:get-object-id)
-  (:import-from #:hacrm.models.contact
+  (:import-from #:hacrm/models/contact
                 #:make-contact
                 #:get-name-synonyms
                 #:name
                 #:all-contacts)
-  (:import-from #:hacrm.t.utils
+  (:import-from #:hacrm-test/utils
                 #:with-empty-db))
-(in-package hacrm.t.contacts)
+(in-package hacrm-test/contacts)
 
 
-(plan 2)
-
-(subtest "get-name-synonyms"
+(deftest get-name-synonyms-test
   (with-empty-db
     (let* ((contact (make-contact "саша шульгин"))
            (result (get-name-synonyms contact)))
@@ -26,25 +24,24 @@
                              "шурик шульгин"
                              "шура шульгин")))))
 
-(subtest "make-contact saves data to database and assigns it a sequential id"
-  (with-empty-db
-    (let* ((contact (make-contact "саша шульгин"))
-           (result (all-contacts)))
-      (subtest "make-contact should return created object"
-        (assert-that contact
-                     (has-slots 'name "саша шульгин"))
-        (is (get-object-id contact)
-            1
-            "Contact has id=1"))
-    
-      (subtest "Database should contain one contact with given name."
-        (assert-that result
-                     (contains (has-slots 'name "саша шульгин"))))
+(deftest saving-data-to-the-database
+  (testing "make-contact saves data to database and assigns it a sequential id"
+    (with-empty-db
+      (let* ((contact (make-contact "саша шульгин"))
+             (result (all-contacts)))
+        (testing "make-contact should return created object"
+          (assert-that contact
+                       (has-slots 'name "саша шульгин"))
+          (ok (eql (get-object-id contact)
+                   1)
+              "Contact has id=1"))
+        
+        (testing "Database should contain one contact with given name."
+          (assert-that result
+                       (contains (has-slots 'name "саша шульгин"))))
 
-      (subtest "Next contact should have incremented id"
-        (let ((contact (make-contact "next contact")))
-          (is (get-object-id contact)
-              2
-              "Next contact's id is 2"))))))
-
-(prove:finalize)
+        (testing "Next contact should have incremented id"
+          (let ((contact (make-contact "next contact")))
+            (ok (eql (get-object-id contact)
+                     2)
+                "Next contact's id is 2")))))))

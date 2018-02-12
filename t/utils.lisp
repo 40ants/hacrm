@@ -1,10 +1,17 @@
-(defpackage #:hacrm.t.utils
+(defpackage #:hacrm-test/utils
   (:use #:cl
-        #:prove
-        #:hamcrest.prove)
+        #:rove
+        #:hamcrest/rove)
+  ;; (:import-from :hacrm)
+  (:import-from #:hacrm/db
+                #:*transactions*
+                #:*log-transactions*
+                #:*transaction-log-length*
+                #:open-store
+                #:*store*)
   (:export
    #:with-empty-db))
-(in-package hacrm.t.utils)
+(in-package hacrm-test/utils)
 
 
 ;; For unittests we don't want to clutter console with debug information
@@ -25,9 +32,9 @@
                                "/")))
      (uiop:with-temporary-file (:pathname name :prefix prefix)
        (let* ((db-directory (uiop:pathname-directory-pathname name))
-              (hacrm::*store* (hacrm::open-store db-directory))
-              (hacrm::*transaction-log-length* 0)
-              (hacrm::*log-transactions* t)
-              (hacrm::*transactions* nil))
+              (*store* (open-store db-directory))
+              (*transaction-log-length* 0)
+              (*log-transactions* t)
+              (*transactions* nil))
          ,@body))))
 

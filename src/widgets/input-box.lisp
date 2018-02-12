@@ -1,8 +1,8 @@
-(defpackage #:hacrm.widgets.input-box
+(defpackage #:hacrm/widgets/input-box
   (:use #:cl)
   (:export
    #:make-input-box))
-(in-package hacrm.widgets.input-box)
+(in-package hacrm/widgets/input-box)
 
 
 (weblocks/widget:defwidget counter-box ()
@@ -11,7 +11,7 @@
             :affects-dirty-status-p t)))
 
 
-(weblocks/widget:defwidget input-box (hacrm.widgets.base:base)
+(weblocks/widget:defwidget input-box (hacrm/widgets/base:base)
   ((counter :initform (make-instance 'counter-box)
             :reader counter)))
 
@@ -31,8 +31,8 @@
 
 (defmethod weblocks/widget:render ((widget input-box))
   (flet ((process-user-input (&key query &allow-other-keys)
-           (let* ((app-window (hacrm.widgets.base:window widget)))
-             (hacrm.commands:process-query app-window query))))
+           (let* ((app-window (hacrm/widgets/base:window widget)))
+             (hacrm/commands:process-query app-window query))))
     (weblocks-ui/form:with-html-form (:post #'process-user-input)
       (:input :type "text"
               :name "query"

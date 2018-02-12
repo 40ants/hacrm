@@ -1,7 +1,6 @@
-(in-package asdf)
-(defpackage #:hacrm.plugins.email.widgets
+(defpackage #:hacrm/plugins/email/widgets
   (:use #:cl))
-(in-package hacrm.plugins.email.widgets)
+(in-package hacrm/plugins/email/widgets)
 
 
 (weblocks/widget:defwidget emails ()
@@ -9,7 +8,7 @@
             :reader contact)))
 
 
-(defmethod hacrm.widgets.facts:make-facts-group-widget ((group (eql :emails))
+(defmethod hacrm/widgets/facts:make-facts-group-widget ((group (eql :emails))
                                                         contact)
   (declare (ignorable group))
 
@@ -19,7 +18,7 @@
 
 (defmethod weblocks/widget:render ((widget emails))
   (let* ((contact (contact widget))
-         (emails (hacrm.plugins.email:get-emails contact)))
+         (emails (hacrm/plugins/email:get-emails contact)))
 
     (weblocks/html:with-html
       (:h1 "Emails")
@@ -27,8 +26,8 @@
        (dolist (email emails)
          (:li (:a :href (concatenate 'string
                                      "mailto:"
-                                     (hacrm.plugins.email:address email))
-                  (hacrm.plugins.email:address email))))))))
+                                     (hacrm/plugins/email:address email))
+                  (hacrm/plugins/email:address email))))))))
 
 
 
