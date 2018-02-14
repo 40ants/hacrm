@@ -1,20 +1,34 @@
-(defpackage #:hacrm/plugins/birthdays/commands
-  (:use #:cl))
-(in-package hacrm/plugins/birthdays/commands)
+(defpackage #:hacrm-birthdays/commands
+  (:use #:cl)
+  (:import-from #:hacrm/widgets/contact-details
+                #:get-contact
+                #:contact-details)
+  (:import-from #:hacrm/commands
+                #:command)
+  (:import-from #:hacrm/widgets/main
+                #:reset-user-input)
+  (:import-from #:weblocks/widget
+                #:update)
+  (:import-from #:weblocks/hooks
+                #:call-fact-created-hook)
+  (:import-from #:hacrm-birthdays/models
+                #:set-birthday))
+(in-package hacrm-birthdays/commands)
 
-(defmethod hacrm/commands:command ((widget hacrm/widgets/contact-details:contact-details)
-                                   (keyword (eql :birthday))
-                                   date)
+
+(defmethod command ((widget contact-details)
+                    (keyword (eql :birthday))
+                    date)
   "Sets a birthday. Accepts one argument like 1980-03-15"
   
-  (let* ((contact (hacrm/widgets/contact-details:get-contact widget)))
+  (let* ((contact (get-contact widget)))
     (log:debug "Setting a birthday" contact date)
   
 
     (let ((birthday (set-birthday contact date)))
 
-      (hacrm/widgets.main:reset-user-input widget)
-      (weblocks/widget:update widget)
-      (weblocks/hooks:call-fact-created-hook contact birthday)
+      (reset-user-input widget)
+      (update widget)
+      (call-fact-created-hook contact birthday)
       (values))))
 

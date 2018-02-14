@@ -1,26 +1,5 @@
-(defpackage #:hacrm/plugins/email/plugin
-  (:nicknames #:hacrm/plugins/email)
+(defpackage #:hacrm-email/plugin
+  (:nicknames #:hacrm-email)
   (:use #:cl)
-  (:export
-   #:get-emails
-   #:add-email
-   #:remove-email
-   #:address
-   #:already-exists
-   #:email
-   #:other-contact))
-(in-package hacrm/plugins/email/plugin)
-
-;; (defpackage #:hacrm.plugins.email
-;;   (:use #:cl
-;;         #:hacrm.models.core
-;;         #:hacrm.models.facts.core
-;;         #:f-underscore)
-;;   (:export
-;;    #:get-emails
-;;    #:add-email
-;;    #:remove-email
-;;    #:address
-;;    #:already-exists
-;;    #:email
-;;    #:other-contact))
+  (:import-from #:hacrm-email/widgets)
+  (:import-from #:hacrm-email/commands))

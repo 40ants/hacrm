@@ -1,6 +1,20 @@
-(defpackage #:hacrm/plugins/phone/models
-  (:use #:cl))
-(in-package hacrm/plugins/phone/models)
+(defpackage #:hacrm-phone/models
+  (:use #:cl
+        #:f-underscore)
+  (:import-from #:hacrm/models/facts/core
+                #:contact
+                #:remove-facts
+                #:fact
+                #:fact-group
+                #:deffact)
+  (:import-from #:hacrm/models/core
+                #:get-object-id
+                #:get-root-object
+                #:define-transaction
+                #:find-object)
+  (:import-from #:hacrm/models/contact
+                #:find-contact-by-id))
+(in-package hacrm-phone/models)
 
 (deffact phone
     ((number :type string
@@ -20,7 +34,7 @@
 
 (defun get-phones (contact)
   "Returns all phone bound to the contact."
-  (hacrm/utils:find-object
+  (find-object
    :facts
    :filter (f_ (and
                 (typep _ 'phone)
@@ -31,7 +45,7 @@
 (define-transaction tx-add-phone (contact-id number)
   (check-type contact-id integer)
   (check-type number string)
-  (let* ((contact (hacrm/models/contact:find-contact-by-id contact-id))
+  (let* ((contact (find-contact-by-id contact-id))
          (phone (make-instance 'phone
                                :contact contact
                                :number number)))
@@ -52,7 +66,7 @@
   (check-type number string)
 
   (remove-facts (contact-id :type 'phone)
-    (string-equal (number fact)
+    (string-equal (get-number fact)
                   number)))
 
 

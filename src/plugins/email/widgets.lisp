@@ -1,24 +1,35 @@
-(defpackage #:hacrm/plugins/email/widgets
-  (:use #:cl))
-(in-package hacrm/plugins/email/widgets)
+(defpackage #:hacrm-email/widgets
+  (:use #:cl)
+  (:import-from #:weblocks-lass)
+  (:import-from #:weblocks/widget
+                #:render
+                #:defwidget)
+  (:import-from #:hacrm/widgets/facts
+                #:make-facts-group-widget)
+  (:import-from #:hacrm-email/models
+                #:address
+                #:get-emails)
+  (:import-from #:weblocks/dependencies
+                #:get-dependencies))
+(in-package hacrm-email/widgets)
 
 
-(weblocks/widget:defwidget emails ()
+(defwidget emails ()
   ((contact :initarg :contact
             :reader contact)))
 
 
-(defmethod hacrm/widgets/facts:make-facts-group-widget ((group (eql :emails))
-                                                        contact)
+(defmethod make-facts-group-widget ((group (eql :emails))
+                                    contact)
   (declare (ignorable group))
 
   (make-instance 'emails
                  :contact contact))
 
 
-(defmethod weblocks/widget:render ((widget emails))
+(defmethod render ((widget emails))
   (let* ((contact (contact widget))
-         (emails (hacrm/plugins/email:get-emails contact)))
+         (emails (get-emails contact)))
 
     (weblocks/html:with-html
       (:h1 "Emails")
@@ -26,12 +37,12 @@
        (dolist (email emails)
          (:li (:a :href (concatenate 'string
                                      "mailto:"
-                                     (hacrm/plugins/email:address email))
-                  (hacrm/plugins/email:address email))))))))
+                                     (address email))
+                  (address email))))))))
 
 
 
-(defmethod weblocks/dependencies:get-dependencies ((widget emails))
+(defmethod get-dependencies ((widget emails))
   (list (weblocks-lass:make-dependency
          '(.emails
            (h1 :font-size 20px

@@ -1,17 +1,23 @@
-(defpackage #:hacrm/plugins/email/models
+(defpackage #:hacrm-email/models
   (:use #:cl
         #:f-underscore)
   (:import-from #:hacrm/models/facts/core
+                #:fact-group
                 #:contact
                 #:deffact)
   (:import-from #:hacrm/models/core
+                #:define-transaction
                 #:get-object-id
                 #:get-root-object
                 #:make-object
                 #:find-object)
   (:import-from #:hacrm/models/contact
-                #:find-contact-by-id))
-(in-package hacrm/plugins/email/models)
+                #:find-contacts-by
+                #:find-contact-by-id)
+  (:import-from #:weblocks/hooks
+                #:call-fact-removed-hook
+                #:call-fact-created-hook))
+(in-package hacrm-email/models)
 
 (deffact email
     ((address :type string
@@ -45,7 +51,7 @@
                            contact)))))
 
 
-(hacrm/models/core:define-transaction tx-add-email (contact-id email-address)
+(define-transaction tx-add-email (contact-id email-address)
   (check-type email-address string)
   (check-type contact-id integer)
   
@@ -62,24 +68,24 @@
 
 
 (defun add-email (contact email-address)
-  (let ((exists (hacrm/models/contact:find-contacts-by :email email-address)))
+  (let ((exists (find-contacts-by :email email-address)))
     (when exists
       (error 'already-exists))
 
     (let ((fact (execute-tx-add-email
-                 (hacrm/models/core:get-object-id contact)
+                 (get-object-id contact)
                  email-address)))
 
-      (weblocks/hooks:call-fact-created-hook contact fact)
+      (call-fact-created-hook contact fact)
 
       fact)))
 
 
-(hacrm/models/core:define-transaction tx-remove-email (contact-id email-to-remove)
+(define-transaction tx-remove-email (contact-id email-to-remove)
   (check-type contact-id integer)
   (check-type email-to-remove string)
 
-  (let* ((contact (hacrm/models/contact:find-contact-by-id contact-id))
+  (let* ((contact (find-contact-by-id contact-id))
          (emails (get-emails contact))
          removed)
     
@@ -90,9 +96,9 @@
         (log:debug "Removing email from contact" email contact)
         (push email removed)))
 
-    (setf (hacrm/models/core:get-root-object :facts)
+    (setf (get-root-object :facts)
           (remove-if (f_ (member _ removed :test #'eql))
-                     (hacrm/models/core:get-root-object :facts)))
+                     (get-root-object :facts)))
 
     removed))
 
@@ -102,12 +108,12 @@
          (removed-emails (execute-tx-remove-email contact-id
                                                   email-to-remove)))
     (dolist (removed-email removed-emails)
-      (weblocks/hooks:call-fact-removed-hook contact removed-email))
+      (call-fact-removed-hook contact removed-email))
 
     removed-emails))
 
 
-(defmethod hacrm/models/contact:find-contacts-by ((keyword (eql :email)) value)
+(defmethod find-contacts-by ((keyword (eql :email)) value)
   (let* ((facts (find-object :facts
                              :filter
                              (f_ (and (typep _ 'email)

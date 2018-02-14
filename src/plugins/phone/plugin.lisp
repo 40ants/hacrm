@@ -1,12 +1,5 @@
-(defpackage #:hacrm/plugins/phone/plugin
-  (:nicknames #:hacrm/plugins/phone)
-  (:use #:cl
-        ;; #:hacrm.models.core
-        ;; #:hacrm.models.facts.core
-        ;; #:f-underscore
-        )
-  (:export
-   #:get-phones
-   #:add-phone
-   #:remove-phone
-   #:number))
+(defpackage #:hacrm-phone/plugin
+  (:nicknames #:hacrm-phone)
+  (:use #:cl)
+  (:import-from #:hacrm-phone/widgets)
+  (:import-from #:hacrm-phone/commands))

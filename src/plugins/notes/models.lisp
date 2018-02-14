@@ -1,19 +1,27 @@
-(defpackage #:hacrm/plugins/notes/models
+(defpackage #:hacrm-notes/models
   (:use #:cl
         #:f-underscore)
   (:import-from #:hacrm/models/feed
                 #:def-feed-item
                 #:related-to-object-p)
   (:import-from #:hacrm/models/core
+                #:remove-object-by-id
                 #:get-root-object
                 #:make-object
                 #:get-object-id
-                #:define-transaction))
-(in-package hacrm/plugins/notes/models)
+                #:define-transaction)
+  (:import-from #:hacrm/utils
+                #:first-line
+                #:format-time)
+  (:import-from #:hacrm/models/contact
+                #:find-contact-by-id)
+  (:import-from #:hacrm/models/feed
+                #:created-at))
+(in-package hacrm-notes/models)
 
 
 (def-feed-item note
-    ((object :type hacrm/models/contact
+    ((object :type hacrm/models/contact:contact
              :initarg :object
              :accessor get-object)
      (text :type string
@@ -23,14 +31,14 @@
 
 (defmethod print-object ((note note) stream)
   (format stream "#<NOTE created=~A object=~A text=~S>"
-          (hacrm/utils:format-time (created-at note))
+          (format-time (created-at note))
           (when (slot-boundp note 'object)
             (get-object note))
-          (hacrm/utils:first-line (text note))))
+          (first-line (text note))))
 
 
 (defmethod related-to-object-p ((note note)
-                                                  object)
+                                object)
   (eql (get-object note)
        object))
 
@@ -41,8 +49,8 @@
   (make-instance 'note :text text))
 
 
-(hacrm/models/core:define-transaction tx-add-note (contact-id text)
-  (let* ((contact (hacrm/models/contact:find-contact-by-id contact-id))
+(define-transaction tx-add-note (contact-id text)
+  (let* ((contact (find-contact-by-id contact-id))
          (new-note (when contact
                      (make-object 'note
                                   :object contact
@@ -55,7 +63,7 @@
 
 
 (define-transaction tx-remove-note (note-id)
-  (hacrm/models/core:remove-object-by-id :feed-items note-id))
+  (remove-object-by-id :feed-items note-id))
 
 
 (defun add-note (contact text)

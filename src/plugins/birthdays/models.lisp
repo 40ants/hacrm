@@ -1,13 +1,14 @@
-(defpackage #:hacrm/plugins/birthdays/models
+(defpackage #:hacrm-birthdays/models
   (:use #:cl
         #:f-underscore)
   (:import-from #:hacrm/models/facts/core
+                #:fact-group
                 #:contact
                 #:deffact)
   (:import-from #:hacrm/models/core
                 #:make-object
                 #:find-object))
-(in-package hacrm/plugins/birthdays/models)
+(in-package hacrm-birthdays/models)
 
 (deffact birthday
     ((date :type string

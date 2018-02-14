@@ -2,6 +2,24 @@
   (:use #:cl
         #:f-underscore
         #:hacrm/models/contact)
+  (:import-from #:hacrm/models/facts/core)
+  (:import-from #:weblocks-lass)
+  (:import-from #:hacrm/widgets/feed
+                #:make-feed-widget)
+  (:import-from #:weblocks/widget
+                #:render
+                #:defwidget
+                #:update)
+  (:import-from #:hacrm/widgets/facts
+                #:make-facts-group-widget)
+  (:import-from #:hacrm/widgets/base
+                #:base)
+  (:import-from #:weblocks/hooks
+                #:on-session-hook-fact-removed
+                #:on-session-hook-fact-created
+                #:on-session-hook-feed-item-created)
+  (:import-from #:weblocks/dependencies
+                #:get-dependencies)
   (:export #:make-contact-details-widget
            #:contact-details-contact
            #:make-contact-details-widget
@@ -11,7 +29,7 @@
 (in-package hacrm/widgets/contact-details)
 
 
-(weblocks/widget:defwidget contact-details (hacrm/widgets/base:base)
+(defwidget contact-details (base)
   ((contact :type 'contact
             :initarg :contact
             :reader get-contact)
@@ -25,16 +43,16 @@
                                 &key contact)
   (flet ((update-feed-widget (&key redraw-p)
            (setf (slot-value details-widget 'feed)
-                 (hacrm/widgets/feed:make-feed-widget contact))
+                 (make-feed-widget contact))
            (when redraw-p
-             (weblocks/widget:update details-widget)))
+             (update details-widget)))
 
          (update-fact-widgets ()
            "Creates widgets to render fact groups for the contact."
            (log:debug "Updating fact widgets.")
-           
+
            (let* ((fact-groups (hacrm/models/facts/core:fact-groups contact))
-                  (fact-group-widgets (mapcar (f_ (hacrm/widgets/facts:make-facts-group-widget
+                  (fact-group-widgets (mapcar (f_ (make-facts-group-widget
                                                    _
                                                    contact))
                                               fact-groups))
@@ -53,22 +71,22 @@
     (update-fact-widgets)
 
     ;; Now we'll add hooks to update this widgets when something changed
-    (weblocks/hooks:on-session-hook-feed-item-created
-        handle-new-feed-item (item)
+    (on-session-hook-feed-item-created
+      handle-new-feed-item (item)
       
       (declare (ignorable item))
       ;; TODO: add check if added item is related to the contact
       (update-feed-widget :redraw-p t))
 
-    (weblocks/hooks:on-session-hook-fact-created
-        handle-new-fact (object fact)
+    (on-session-hook-fact-created
+      handle-new-fact (object fact)
       
       (declare (ignorable object fact))
       ;; TODO: add check if added item is related to the contact
       (update-fact-widgets))
 
-    (weblocks/hooks:on-session-hook-fact-removed
-        handle-removed-fact (object fact)
+    (on-session-hook-fact-removed
+      handle-removed-fact (object fact)
       
       (declare (ignorable object fact))
        ;; TODO: add check if added item is related to the contact
@@ -84,7 +102,7 @@
     widget))
 
 
-(defmethod weblocks/widget:render ((widget contact-details))
+(defmethod render ((widget contact-details))
   (with-accessors ((contact get-contact))
       widget
     (weblocks/html:with-html
@@ -93,13 +111,13 @@
                         (:h1 (name contact))
 
                         (dolist (fact-group-widget (fact-groups widget))
-                          (weblocks/widget:render fact-group-widget)))
+                          (render fact-group-widget)))
                    
                    (:td :class "contact__feed"
-                        (weblocks/widget:render (contact-feed-widget widget))))))))
+                        (render (contact-feed-widget widget))))))))
 
 
-(defmethod weblocks/dependencies:get-dependencies  ((widget contact-details))
+(defmethod get-dependencies  ((widget contact-details))
   (list (weblocks-lass:make-dependency
          '(.contact-details
            (table :width 100%

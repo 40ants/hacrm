@@ -1,7 +1,16 @@
 (defpackage #:hacrm/init-session
   (:use #:cl)
+  (:import-from #:hacrm/app
+                #:hacrm)
   (:import-from #:hacrm/widgets/main
-                #:make-main-window))
+                #:make-main-window)
+  (:import-from #:weblocks/widget
+                #:widget
+                #:render)
+  (:import-from #:weblocks/widgets/dom
+                #:dom-id)
+  (:import-from #:weblocks/html
+                #:with-html))
 (in-package hacrm/init-session)
 
 
@@ -69,16 +78,16 @@
   "Если true, то рисуем рамки вокруг виджетов.")
 
 
-(defmethod weblocks/widget:render :around ((widget weblocks/widget:widget))
+(defmethod render :around ((widget widget))
   (log:info "Rendering" widget)
   
-  (when (equal (weblocks/widgets/dom:dom-id widget)
+  (when (equal (dom-id widget)
                "dom0")
     (weblocks/html:with-html
       (:style (:raw (get-debug-style)))))
   
   (if *debug-widgets-structure*
-      (weblocks/html:with-html
+      (with-html
         (:div :class "debug-frame"
               (:h1 :class "debug-frame__header" (format nil "~A" widget))
               (call-next-method)))

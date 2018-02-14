@@ -1,13 +1,25 @@
-(defpackage #:hacrm/plugins/birthdays/widgets
-  (:use #:cl))
-(in-package hacrm/plugins/birthdays/widgets)
+(defpackage #:hacrm-birthdays/widgets
+  (:use #:cl)
+  (:import-from #:hacrm-birthdays/models)
+  (:import-from #:weblocks-lass)
+  (:import-from #:weblocks/widget
+                #:render
+                #:defwidget)
+  (:import-from #:hacrm/widgets/facts
+                #:fact-group-weight
+                #:make-facts-group-widget)
+  (:import-from #:weblocks/html
+                #:with-html)
+  (:import-from #:weblocks/dependencies
+                #:get-dependencies))
+(in-package hacrm-birthdays/widgets)
 
 
-(weblocks/widget:defwidget birthday ()
+(defwidget birthday ()
   ((contact :initarg :contact
             :reader contact)
    (birthday :initarg :birthday
-             :type hacrm/plugins/birthdays/models::birthday
+             :type hacrm-birthdays/models::birthday
              :reader birthday)))
 
 
@@ -17,35 +29,35 @@
   (call-next-method)
 
   (let* ((contact (contact widget))
-         (birthday (hacrm/plugins/birthdays/models:get-birthday contact)))
+         (birthday (hacrm-birthdays/models::get-birthday contact)))
 
     (setf (slot-value widget 'birthday)
           birthday)))
 
 
-(defmethod hacrm/widgets/facts:make-facts-group-widget ((group (eql :birthday))
-                                                        contact)
+(defmethod make-facts-group-widget ((group (eql :birthday))
+                                    contact)
   (declare (ignorable group))
 
   (make-instance 'birthday
                  :contact contact))
 
 
-(defmethod hacrm/widgets/facts:fact-group-weight ((widget birthday))
+(defmethod fact-group-weight ((widget birthday))
   "Birthday is important and should go right after tags."
   (declare (ignorable widget))
   1)
 
 
-(defmethod weblocks/widget:render ((widget birthday))
-  (weblocks/html:with-html
+(defmethod render ((widget birthday))
+  (with-html
     (:h1 "Birthday")
-    (:p (hacrm/plugins/birthdays/models::date
+    (:p (hacrm-birthdays/models::date
          (birthday widget)))))
 
 
 
-(defmethod weblocks/dependencies:get-dependencies ((widget birthday))
+(defmethod get-dependencies ((widget birthday))
   (list (weblocks-lass:make-dependency
          '(.birthday
            (h1 :font-size 20px

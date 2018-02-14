@@ -1,17 +1,5 @@
-(defpackage #:hacrm/plugins/birthdays/plugin
-  (:nicknames #:hacrm/plugins/birthdays)
+(defpackage #:hacrm-birthdays/plugin
+  (:nicknames #:hacrm-birthdays)
   (:use #:cl)
-  (:export
-   #:make-birthday-fact
-   #:date
-   #:invalid-date-format
-   #:get-birthday
-   #:set-birthday))
-(in-package hacrm/plugins/birthdays/plugin)
-
-;; (defpackage #:hacrm.plugins.birthdays
-;;   (:use #:cl
-;;         #:hacrm.models.core
-;;         #:hacrm.models.facts.core
-;;         #:f-underscore)
-;; )
+  (:import-from #:hacrm-birthdays/widgets)
+  (:import-from #:hacrm-birthdays/commands))

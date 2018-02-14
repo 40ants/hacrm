@@ -45,7 +45,11 @@
   ())
 
 
-(defun open-store (path &rest args)
+(defun open-store (&optional (path *default-db-path*)
+                   &rest args)
+  (when *store*
+    (error "Please, close previously opened store before opening the new one."))
+  
   (let* ((store (apply #'make-instance 'hacrm-prevalence-system :directory path args))
          (lock-name (format nil "Prevalence lock for store ~S" store))
          (lock (bordeaux-threads:make-lock lock-name)))
@@ -64,12 +68,27 @@
               (push transaction
                     *transactions*))))
 
+    (setf *store* store)
     store))
 
 
-(defun close-store (store)
-  (snapshot store))
+(defun close-store ()
+  (when *store*
+    (snapshot *store*)
+    (setf *store* nil)))
 
+
+(defun switch-to-db (path)
+  (close-store)
+  (open-store path))
+
+
+(defun dev-db ()
+  (switch-to-db *dev-db-path*))
+
+
+(defun default-db ()
+  (switch-to-db *default-db-path*))
 
 
 ;; (defun get-objects-of-class (store class)

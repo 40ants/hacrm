@@ -17,6 +17,15 @@
                (:version :asdf "3.3.1")
                (:version :weblocks "0.26.0")
                "hacrm/hooks"
+               "hacrm/init-session"
+               "hacrm/toplevel-commands"
+               "hacrm/search"
+               :hacrm-birthdays
+               :hacrm-tags
+               :hacrm-email
+               :hacrm-phone
+               :hacrm-notes
+               ;; "hacrm/plugins/notes/plugin"
                ;; :weblocks-lass
                ;; :weblocks-stores
                ;; :weblocks-prevalence

@@ -1,5 +1,8 @@
 (defpackage #:hacrm/widgets/main
   (:use #:cl)
+  (:import-from #:hacrm/widgets/base)
+  (:import-from #:hacrm/widgets/help)
+  (:import-from #:hacrm/widgets/input-box)
   (:export
    #:make-main-window
    #:change-widget

@@ -1,17 +1,25 @@
 (defpackage #:hacrm/widgets/input-box
   (:use #:cl)
+  (:import-from #:hacrm/widgets/base)
+  (:import-from #:weblocks-ui/form
+                #:render-link
+                #:with-html-form)
+  (:import-from #:hacrm/commands
+                #:process-query)
+  (:import-from #:weblocks/widget
+                #:defwidget)
   (:export
    #:make-input-box))
 (in-package hacrm/widgets/input-box)
 
 
-(weblocks/widget:defwidget counter-box ()
+(defwidget counter-box ()
   ((counter :initform nil
             :accessor counter
             :affects-dirty-status-p t)))
 
 
-(weblocks/widget:defwidget input-box (hacrm/widgets/base:base)
+(defwidget input-box (hacrm/widgets/base:base)
   ((counter :initform (make-instance 'counter-box)
             :reader counter)))
 
@@ -32,8 +40,8 @@
 (defmethod weblocks/widget:render ((widget input-box))
   (flet ((process-user-input (&key query &allow-other-keys)
            (let* ((app-window (hacrm/widgets/base:window widget)))
-             (hacrm/commands:process-query app-window query))))
-    (weblocks-ui/form:with-html-form (:post #'process-user-input)
+             (process-query app-window query))))
+    (with-html-form (:post #'process-user-input)
       (:input :type "text"
               :name "query"
               :autofocus t
@@ -47,7 +55,7 @@
   (weblocks/html:with-html
     (:div (if (counter widget)
               (weblocks/html:with-html (:span (format nil "~a" (counter widget))))
-              (weblocks-ui/form:render-link
+              (render-link
                (lambda (&rest args)
                  (declare (ignorable args))
                  (setf (counter widget)

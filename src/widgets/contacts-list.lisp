@@ -2,10 +2,24 @@
   (:use #:cl
         #:hacrm/models/contact
         #:f-underscore)
+  (:import-from #:weblocks-parenscript)
+  (:import-from #:weblocks-lass)
   (:import-from #:parenscript
                 #:@)
   (:import-from #:weblocks-ui/form
                 #:render-link)
+  (:import-from #:weblocks/widget
+                #:render
+                #:defwidget)
+  (:import-from #:hacrm/widgets/base
+                #:base)
+  (:import-from #:hacrm/models/facts/core)
+  (:import-from #:hacrm/widgets/facts
+                #:make-facts-group-widget)
+  (:import-from #:weblocks/html
+                #:with-html)
+  (:import-from #:weblocks/dependencies
+                #:get-dependencies)
   (:export
    #:make-contacts-list
    #:contacts-list
@@ -15,7 +29,7 @@
 (in-package hacrm/widgets/contacts-list)
 
 
-(weblocks/widget:defwidget contact-card (hacrm/widgets/base:base)
+(defwidget contact-card (base)
   ((contact :type 'contact
             :initarg :contact
             :reader contact)
@@ -29,7 +43,7 @@
     :reader get-number)))
 
 
-(weblocks/widget:defwidget contacts-list (hacrm/widgets/base:base)
+(defwidget contacts-list (base)
   ((contacts :initarg :contacts
              :reader contacts)))
 
@@ -49,12 +63,12 @@ in contact list mode, redefine this method.")
 
 (defun make-contact-card (contact on-click number)
   (let* ((all-fact-groups (hacrm/models/facts/core:fact-groups
-                       contact))
+                           contact))
          (fact-groups (remove-if-not #'show-fact-group-in-contact-list-p
                                      all-fact-groups))
          (fact-group-widgets
            (mapcar
-            (f_ (hacrm/widgets/facts:make-facts-group-widget
+            (f_ (make-facts-group-widget
                  _
                  contact))
             fact-groups)))
@@ -82,14 +96,14 @@ in contact list mode, redefine this method.")
                               number)))))
 
 
-(defmethod weblocks/widget:render ((widget contact-card))
+(defmethod render ((widget contact-card))
   "Internal helper to render single contact in the contact's list."
   
   (let ((contact (contact widget))
         (fact-group-widgets (fact-groups widget))
         (on-click-callback (on-click widget)))
 
-    (weblocks/html:with-html
+    (with-html
       (:div :class "contact-list__contact"
             :id (format nil
                         "contact-~a"
@@ -100,21 +114,21 @@ in contact list mode, redefine this method.")
                  (:span :class "contact-list__contact-number"
                         (princ-to-string (get-number widget))))
 
-            (mapcar #'weblocks/widget:render fact-group-widgets)))))
+            (mapcar #'render fact-group-widgets)))))
 
 
-(defmethod weblocks/widget:render ((widget contacts-list))
+(defmethod render ((widget contacts-list))
   (let ((contacts (contacts widget)))
 
     (if contacts
-        (mapcar #'weblocks/widget:render
+        (mapcar #'render
                 contacts)
         ;; No contacts
-        (weblocks/html:with-html
+        (with-html
           (:p "No contacts")))))
 
 
-(defmethod weblocks/dependencies:get-dependencies  ((widget contacts-list))
+(defmethod get-dependencies  ((widget contacts-list))
   (list (weblocks-parenscript:make-dependency
           (let ((numbers-are-visible nil))
 

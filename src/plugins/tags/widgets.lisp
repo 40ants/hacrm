@@ -1,36 +1,51 @@
-(defpackage #:hacrm/plugins/tags/widgets
+(defpackage #:hacrm-tags/widgets
   (:use #:cl
-        #:f-underscore
-        #:hacrm/plugins/tags/models))
+        #:f-underscore)
+  (:import-from #:hacrm/models/contact)
+  (:import-from #:weblocks/widget
+                #:render
+                #:defwidget)
+  (:import-from #:hacrm/widgets/facts
+                #:fact-group-weight
+                #:make-facts-group-widget)
+  (:import-from #:hacrm/widgets/contacts-list
+                #:show-fact-group-in-contact-list-p)
+  (:import-from #:cl-strings
+                #:join)
+  (:import-from #:weblocks/html
+                #:with-html)
+  (:import-from #:hacrm-tags/models
+                #:name
+                #:get-contact-tags))
 
-(in-package hacrm/plugins/tags/widgets)
+(in-package hacrm-tags/widgets)
 
 
-(weblocks/widget:defwidget tags ()
+(defwidget tags ()
   ((object :initarg :object
            :reader object
            :type hacrm/models/contact:contact)))
 
 
-(defmethod hacrm/widgets/facts:make-facts-group-widget ((fact-group (eql :tags))
-                                                        object)
+(defmethod make-facts-group-widget ((fact-group (eql :tags))
+                                    object)
   (declare (ignorable fact-group))
 
   (make-instance 'tags
                  :object object))
 
 
-(defmethod hacrm/widgets/contacts-list:show-fact-group-in-contact-list-p ((fact-group (eql :tags)))
+(defmethod show-fact-group-in-contact-list-p ((fact-group (eql :tags)))
   t)
 
 
-(defmethod hacrm/widgets/facts:fact-group-weight ((widget tags))
+(defmethod fact-group-weight ((widget tags))
   "Tags should be on the top, right under the name."
   (declare (ignorable widget))
   0)
 
 
-(defmethod weblocks/widget:render ((widget tags))
+(defmethod render ((widget tags))
   (let* ((contact (object widget))
          (tags (get-contact-tags contact))
          (tag-names (sort (mapcar #'name tags)
@@ -39,6 +54,6 @@
                                                        "#"
                                                        _))
                                       tag-names))
-         (tags-string (cl-strings:join tag-names-with-hash :separator ", ")))
-    (weblocks/html:with-html
+         (tags-string (join tag-names-with-hash :separator ", ")))
+    (with-html
       (:p (:span tags-string)))))

@@ -1,8 +1,10 @@
-(defpackage #:hacrm/plugins/tags/models
+(defpackage #:hacrm-tags/models
   (:use #:cl
         #:f-underscore)
   (:import-from #:hacrm/hooks)
   (:import-from #:hacrm/models/facts/core
+                #:fact-group
+                #:contact
                 #:remove-facts
                 #:fact
                 #:deffact)
@@ -11,8 +13,13 @@
                 #:get-root-object
                 #:make-object
                 #:get-object-id
-                #:define-transaction))
-(in-package hacrm/plugins/tags/models)
+                #:define-transaction)
+  (:import-from #:hacrm/models/contact
+                #:find-contact-by-id)
+  (:import-from #:weblocks/hooks
+                #:call-fact-removed-hook
+                #:call-fact-created-hook))
+(in-package hacrm-tags/models)
 
 (deffact new-tag
     ((name :type string
@@ -34,7 +41,7 @@
   :tags)
 
 (define-transaction tx-tag-contact (contact-id tag-name)
-  (let* ((contact (hacrm/models/contact:find-contact-by-id contact-id))
+  (let* ((contact (find-contact-by-id contact-id))
          (tag (make-object 'tag
                            :contact contact
                            :name tag-name)))
@@ -46,12 +53,12 @@
 (defun tag-contact (contact tag-name)
   (let ((tag (execute-tx-tag-contact (get-object-id contact)
                                      tag-name)))
-    (weblocks/hooks:call-fact-created-hook contact tag)
+    (call-fact-created-hook contact tag)
     
     tag))
 
 
-(hacrm/models/core:define-transaction tx-untag-contact (contact-id tag-name)
+(define-transaction tx-untag-contact (contact-id tag-name)
   (remove-facts (contact-id :type 'tag)
     (string-equal (name fact)
                   tag-name)))
@@ -62,18 +69,18 @@
                                                 tag-name)))
 
     (dolist (tag removed-tags)
-      (weblocks/hooks:call-fact-removed-hook contact tag))))
+      (call-fact-removed-hook contact tag))))
 
 
 (defun get-contact-tags (contact)
   (find-object
    :facts
    :filter (f_ (and (typep _ 'tag)
-                    (eql (hacrm/models/facts/core::contact _)
+                    (eql (contact _)
                          contact)))))
 
 (defun get-all-tags ()
-  (hacrm/utils:find-object
+  (find-object
    :facts
    :filter (f_ (typep _ 'tag))))
 

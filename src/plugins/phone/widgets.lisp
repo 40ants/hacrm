@@ -1,33 +1,45 @@
-(defpackage #:hacrm/plugins/phone/widgets
-  (:use #:cl))
-(in-package hacrm/plugins/phone/widgets)
+(defpackage #:hacrm-phone/widgets
+  (:use #:cl)
+  (:import-from #:weblocks-lass)
+  (:import-from #:weblocks/widget
+                #:render
+                #:defwidget)
+  (:import-from #:hacrm/widgets/facts
+                #:make-facts-group-widget)
+  (:import-from #:hacrm-phone/models
+                #:get-number
+                #:number
+                #:get-phones)
+  (:import-from #:weblocks/dependencies
+                #:get-dependencies))
+(in-package hacrm-phone/widgets)
 
 
-(weblocks/widget:defwidget phones ()
+(defwidget phones ()
   ((contact :initarg :contact
             :reader contact)))
 
 
-(defmethod hacrm/widgets/facts:make-facts-group-widget ((group (eql :phones))
-                                                        contact)
+(defmethod make-facts-group-widget ((group (eql :phones))
+                                    contact)
   (declare (ignorable group))
 
   (make-instance 'phones
                  :contact contact))
 
 
-(defmethod weblocks/widget:render ((widget phones))
+(defmethod render ((widget phones))
   (let* ((contact (contact widget))
-         (phones (hacrm/plugins/phone/models:get-phones contact)))
+         (phones (get-phones contact)))
     
     (weblocks/html:with-html
       (:h1 "Phones")
       (:ul
        (dolist (phone phones)
-         (:li (hacrm/plugins/phone/models:number phone)))))))
+         (:li (get-number phone)))))))
 
 
-(defmethod weblocks/dependencies:get-dependencies ((widget phones))
+(defmethod get-dependencies ((widget phones))
   (list (weblocks-lass:make-dependency
          '(.phones
            (h1 :font-size 20px

@@ -1,6 +1,17 @@
 (defpackage #:hacrm/search
-  (:use #:cl
-        #:hacrm/models/contact)
+  (:use #:cl)
+  (:import-from #:montezuma)
+  (:import-from #:hacrm/widgets/main
+                #:change-widget)
+  (:import-from #:hacrm/widgets/contact-details
+                #:make-contact-details-widget)
+  (:import-from #:hacrm/widgets/contacts-list
+                #:make-contacts-list)
+  (:import-from #:hacrm/models/contact
+                #:all-contacts
+                #:get-name-synonyms)
+  (:import-from #:hacrm/models/facts/core
+                #:fact-groups)
   (:export
    #:index-contacts
    #:search-contacts
@@ -51,17 +62,17 @@ If you want the facts added by your plugin were searchable, define this method."
                    contact)
              (incf *next-document-id*)
              
-             (dolist (name (hacrm/models/contact:get-name-synonyms contact))
+             (dolist (name (get-name-synonyms contact))
                (montezuma:add-field doc (montezuma:make-field
                                          "name"
                                          name)))
 
-             (loop for fact-group in (hacrm/models/facts/core:fact-groups contact)
+             (loop for fact-group in (fact-groups contact)
                    do (index-facts fact-group contact doc))
              
              doc)))
     
-    (loop for contact in (hacrm/models/contact:all-contacts)
+    (loop for contact in (all-contacts)
           do (montezuma:add-document-to-index
               *index*
               (transform-to-document contact)))))
@@ -125,24 +136,24 @@ If you want the facts added by your plugin were searchable, define this method."
 
   (log:debug "Trying to search contact" query)
   
-  (let* ((contacts (hacrm/search:search-contacts query))
+  (let* ((contacts (search-contacts query))
          (contacts-count (length contacts)))
     (log:debug "Search completed" contacts-count)
     
     (cond
       ((eql contacts-count 1)
-       (hacrm/widgets.main:change-widget
+       (change-widget
         widget
-        (hacrm/widgets/contact-details:make-contact-details-widget (car contacts))))
+        (make-contact-details-widget (car contacts))))
       (t
        (flet ((on-contact-selection (contact)
                 (log:debug "Displaying contact" contact)
-                (hacrm/widgets/main:change-widget
+                (change-widget
                  widget
-                 (hacrm/widgets/contact-details:make-contact-details-widget
+                 (make-contact-details-widget
                   contact))))
-         (hacrm/widgets/main:change-widget
+         (change-widget
           widget
-          (hacrm/widgets/contacts-list:make-contacts-list
+          (make-contacts-list
            contacts
            :on-contact-click #'on-contact-selection)))))))

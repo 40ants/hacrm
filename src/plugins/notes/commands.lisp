@@ -1,19 +1,32 @@
-(defpackage #:hacrm/plugins/notes/commands
-  (:use #:cl))
-(in-package hacrm/plugins/notes/commands)
+(defpackage #:hacrm-notes/commands
+  (:use #:cl)
+  (:import-from #:hacrm/commands
+                #:command)
+  (:import-from #:hacrm/widgets/contact-details
+                #:get-contact
+                #:contact-details)
+  (:import-from #:hacrm/widgets/main
+                #:reset-user-input)
+  (:import-from #:weblocks/hooks
+                #:with-feed-item-created-hook)
+  (:import-from #:hacrm-notes/models
+                #:add-note))
+(in-package hacrm-notes/commands)
 
 
-(defmethod hacrm/commands:command ((widget hacrm/widgets/contact-details:contact-details)
-                                   (keyword (eql :note))
-                                   rest-text)
+(defmethod command ((widget contact-details)
+                    (keyword (eql :note))
+                    rest-text)
+  "Add a note to the contact."
+  
   (declare (ignorable keyword))
 
   (log:info "Adding a note for the contact")
   
-  (let* ((contact (hacrm/widgets/contact-details:get-contact widget))
+  (let* ((contact (get-contact widget))
          (note (add-note contact rest-text)))
 
-    (hacrm/widgets/main:reset-user-input widget)
+    (reset-user-input widget)
     
-    (weblocks/hooks:with-feed-item-created-hook (note))
+    (with-feed-item-created-hook (note))
     (values)))
