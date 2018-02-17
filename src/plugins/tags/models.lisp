@@ -3,8 +3,10 @@
         #:f-underscore)
   (:import-from #:hacrm/hooks)
   (:import-from #:hacrm/models/facts/core
+                #:get-facts-of-type
                 #:fact-group
                 #:contact
+                #:add-facts
                 #:remove-facts
                 #:fact
                 #:deffact)
@@ -14,17 +16,17 @@
                 #:make-object
                 #:get-object-id
                 #:define-transaction)
-  (:import-from #:hacrm/models/contact
-                #:find-contact-by-id)
+  (:import-from #:hacrm/models/contact-utils
+                #:find-contact-by)
   (:import-from #:weblocks/hooks
                 #:call-fact-removed-hook
                 #:call-fact-created-hook))
 (in-package hacrm-tags/models)
 
-(deffact new-tag
-    ((name :type string
-           :initarg :name
-           :accessor name)))
+;; (deffact new-tag
+;;     ((name :type string
+;;            :initarg :name
+;;            :accessor name)))
 
 (deffact tag
     ((name :type string
@@ -41,11 +43,10 @@
   :tags)
 
 (define-transaction tx-tag-contact (contact-id tag-name)
-  (let* ((contact (find-contact-by-id contact-id))
-         (tag (make-object 'tag
-                           :contact contact
-                           :name tag-name)))
-    (push tag (get-root-object :facts))
+  (let ((tag (make-object 'tag
+                          :name tag-name)))
+    (add-facts (contact-id)
+               tag)
     
     tag))
 
@@ -73,14 +74,10 @@
 
 
 (defun get-contact-tags (contact)
-  (find-object
-   :facts
-   :filter (f_ (and (typep _ 'tag)
-                    (eql (contact _)
-                         contact)))))
+  (get-facts-of-type contact 'tag))
 
-(defun get-all-tags ()
-  (find-object
-   :facts
-   :filter (f_ (typep _ 'tag))))
+;; (defun get-all-tags ()
+;;   (find-object
+;;    :facts
+;;    :filter (f_ (typep _ 'tag))))
 

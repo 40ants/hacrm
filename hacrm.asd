@@ -22,9 +22,9 @@
                "hacrm/search"
                :hacrm-birthdays
                :hacrm-tags
-               :hacrm-email
-               :hacrm-phone
-               :hacrm-notes
+               ;; :hacrm-email
+               ;; :hacrm-phone
+               ;; :hacrm-notes
                ;; "hacrm/plugins/notes/plugin"
                ;; :weblocks-lass
                ;; :weblocks-stores

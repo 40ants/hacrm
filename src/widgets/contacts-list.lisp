@@ -34,7 +34,7 @@
             :initarg :contact
             :reader contact)
    (fact-groups :initarg :fact-groups
-                :reader fact-groups)
+                :reader get-fact-groups)
    (on-click :type function
              :initarg :on-click
              :reader on-click)
@@ -62,7 +62,7 @@ in contact list mode, redefine this method.")
 
 
 (defun make-contact-card (contact on-click number)
-  (let* ((all-fact-groups (hacrm/models/facts/core:fact-groups
+  (let* ((all-fact-groups (hacrm/models/facts/core:get-fact-groups
                            contact))
          (fact-groups (remove-if-not #'show-fact-group-in-contact-list-p
                                      all-fact-groups))
@@ -100,7 +100,7 @@ in contact list mode, redefine this method.")
   "Internal helper to render single contact in the contact's list."
   
   (let ((contact (contact widget))
-        (fact-group-widgets (fact-groups widget))
+        (fact-group-widgets (get-fact-groups widget))
         (on-click-callback (on-click widget)))
 
     (with-html

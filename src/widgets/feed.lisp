@@ -35,7 +35,10 @@
 
 
 (defun make-feed-widget (contact)
-  (let* ((all-feed-items (get-root-object :feed-items))
+  (let* ((all-feed-items ;; (get-root-object :feed-items)
+           ;; TODO: replace with (get-feed contact)
+           nil
+           )
          (items-for-the-contact
            (remove-if-not (f_ (related-to-object-p
                                _

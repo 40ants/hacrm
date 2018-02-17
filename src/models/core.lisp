@@ -18,22 +18,38 @@
 (in-package hacrm/models/core)
 
 
-(defun tx-increment-max-id (store)
-  (let ((previous (cl-prevalence:get-root-object store
-                                                 :max-id)))
-    (setf (cl-prevalence:get-root-object store
-                                         :max-id)
-          (+ (or previous 0)
-             1))))
+;; (defun tx-increment-max-id (store)
+;;   (let ((previous (cl-prevalence:get-root-object store
+;;                                                  :max-id)))
+;;     (setf (cl-prevalence:get-root-object store
+;;                                          :max-id)
+;;           (+ (or previous 0)
+;;              1))))
 
+(defun get-root-object (name)
+  (unless (member name (list :contacts
+                             :max-id))
+    (error "Root object with name \"~A\" aren't supported"
+           name))
+  
+  (cl-prevalence:get-root-object *store*
+                                 name))
+
+
+(defun (setf get-root-object) (value name)
+  (setf (cl-prevalence:get-root-object *store* name)
+        value))
 
 (defun get-next-id ()
   "Each object should have a unique id.
    This function updates an id counter in the database and return a new value."
   (unless *store*
     (error "Please, setup hacrm/db::*store* first."))
-  (execute-transaction
-   (tx-increment-max-id *store*)))
+  
+  (let ((previous (get-root-object :max-id)))
+    (setf (get-root-object :max-id)
+          (+ (or previous 0)
+             1))))
 
 
 (defclass base ()
@@ -75,15 +91,6 @@ Also, a helper defined to call the transaction on hacrm/db::*store*."
        (defun ,(symbolicate "EXECUTE-" name) (,@args)
          (execute-transaction
           (,name *store* ,@args))))))
-
-
-(defun get-root-object (name)
-  (cl-prevalence:get-root-object *store*
-                                 name))
-
-(defun (setf get-root-object) (value name)
-  (setf (cl-prevalence:get-root-object *store* name)
-        value))
 
 
 (defun find-object (root-object-name &key filter)

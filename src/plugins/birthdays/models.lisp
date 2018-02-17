@@ -2,12 +2,21 @@
   (:use #:cl
         #:f-underscore)
   (:import-from #:hacrm/models/facts/core
+                #:add-facts
+                #:get-facts-of-type
                 #:fact-group
                 #:contact
                 #:deffact)
   (:import-from #:hacrm/models/core
+                #:get-root-object
+                #:get-object-id
                 #:make-object
-                #:find-object))
+                #:find-object)
+  (:import-from #:weblocks/hooks
+                #:call-fact-updated-hook
+                #:call-fact-created-hook)
+  (:import-from #:hacrm/models/contact-utils
+                #:find-contact-by))
 (in-package hacrm-birthdays/models)
 
 (deffact birthday
@@ -53,32 +62,29 @@ Should be applied to the user input before storing it into the database."
 
 (defun get-birthday (contact)
   (first
-   (find-object
-    :facts
-    :filter (f_ (and (typep _ 'birthday)
-                     (equal (contact _)
-                            contact))))))
+   (get-facts-of-type
+    contact
+    'birthday)))
 
 
 (hacrm/models/core:define-transaction tx-set-birthday (contact-id date)
   "If a new fact was created, second returned value is \"true\"."
   (let* ((date (clean-date date))
-         (contact (hacrm/models/contact:find-contact-by-id contact-id))
+         (contact (find-contact-by :id contact-id))
          (birthday (get-birthday contact))
          created)
     (cond
       ;; Fact already exists
+      ;; TODO: сделать поддержку уникальности и обновления в макросе add-facts
       (birthday
        (setf (slot-value birthday 'date)
              date))
       ;; New fact should be created
       (t (setf birthday (make-object 'birthday
-                                     :date date
-                                     :contact contact)
+                                     :date date)
                created t)
-               
-         (push birthday
-               (hacrm/models/core:get-root-object :facts))))
+         (add-facts (contact-id)
+                    birthday)))
 
     (values birthday created)))
 
@@ -88,12 +94,12 @@ Should be applied to the user input before storing it into the database."
 
 Returns a new `birthday' fact."
 
-  (let* ((contact-id (hacrm/models/core:get-object-id contact)))
+  (let* ((contact-id (get-object-id contact)))
     (multiple-value-bind (fact created)
         (execute-tx-set-birthday contact-id date)
 
       (if created
-          (weblocks/hooks:call-fact-created-hook contact fact)
-          (weblocks/hooks:call-fact-updated-hook contact fact))
+          (call-fact-created-hook contact fact)
+          (call-fact-updated-hook contact fact))
 
       (values fact created))))

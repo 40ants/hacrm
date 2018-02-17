@@ -14,7 +14,9 @@
   (:import-from #:hacrm/widgets/contacts-list
                 #:make-contacts-list)
   (:import-from #:hacrm/widgets/help
-                #:make-help-widget))
+                #:make-help-widget)
+  (:import-from #:hacrm/search
+                #:search-contacts))
 (in-package hacrm/toplevel-commands)
 
 
@@ -68,3 +70,33 @@
   (change-widget
    widget
    (make-help-widget widget)))
+
+
+(defmethod command ((widget base)
+                    (command (eql :search))
+                    query)
+  "If no handler processed the query, then we'll try to search a contact."
+
+  (log:debug "Trying to search contact" query)
+  
+  (let* ((contacts (search-contacts query))
+         (contacts-count (length contacts)))
+    (log:debug "Search completed" contacts-count)
+    
+    (cond
+      ((eql contacts-count 1)
+       (change-widget
+        widget
+        (make-contact-details-widget (car contacts))))
+      (t
+       (flet ((on-contact-selection (contact)
+                (log:debug "Displaying contact" contact)
+                (change-widget
+                 widget
+                 (make-contact-details-widget
+                  contact))))
+         (change-widget
+          widget
+          (make-contacts-list
+           contacts
+           :on-contact-click #'on-contact-selection)))))))

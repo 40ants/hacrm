@@ -36,7 +36,7 @@
    (feed :initform nil
          :reader contact-feed-widget)
    (fact-groups :initform nil
-                :reader fact-groups)))
+                :reader get-fact-groups)))
 
 
 (defmethod initialize-instance ((details-widget contact-details)
@@ -51,7 +51,7 @@
            "Creates widgets to render fact groups for the contact."
            (log:debug "Updating fact widgets.")
 
-           (let* ((fact-groups (hacrm/models/facts/core:fact-groups contact))
+           (let* ((fact-groups (hacrm/models/facts/core:get-fact-groups contact))
                   (fact-group-widgets (mapcar (f_ (make-facts-group-widget
                                                    _
                                                    contact))
@@ -110,7 +110,7 @@
               (:tr (:td :class "contact__details"
                         (:h1 (name contact))
 
-                        (dolist (fact-group-widget (fact-groups widget))
+                        (dolist (fact-group-widget (get-fact-groups widget))
                           (render fact-group-widget)))
                    
                    (:td :class "contact__feed"

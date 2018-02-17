@@ -2,27 +2,29 @@
   (:use #:cl
         #:f-underscore)
   (:import-from #:hacrm/models/core
+                #:base
                 #:get-object-id
+                #:find-object
                 #:define-transaction
                 #:make-object
                 #:get-root-object)
-  (:import-from #:hacrm/utils
-                #:find-object)
   (:import-from #:cl-strings
                 #:join
                 #:split)
+  (:import-from #:hacrm/models/facts/core
+                #:object-with-facts-mixin)
+  (:import-from #:hacrm/models/contact-utils
+                #:find-contacts-by)
   (:export #:contact
            #:make-contact
            #:name
            #:created
-           #:find-contacts-by
            #:get-name-synonyms
-           #:all-contacts
-           #:find-contact-by-id))
+           #:all-contacts))
 (in-package hacrm/models/contact)
 
 
-(defclass contact (hacrm/models/core:base)
+(defclass contact (object-with-facts-mixin base)
   ((name :type string
          :initarg :name
          :accessor name)
@@ -47,27 +49,6 @@
 (defun all-contacts ()
   (get-root-object :contacts))
 
-
-(defgeneric find-contacts-by (keyword value)
-  (:documentation "Searches contacts by different facts, for example, by email, or twitter nickname.
-
-Plugins should define methods for this generic, if they want to give ability to search
-contacts by some associated data."))
-
-
-(defun find-contact-by-id (value)
-  (dolist (contact (all-contacts))
-    (when (eql (get-object-id contact)
-               value)
-      (return-from find-contact-by-id
-        contact))))
-
-
-(defmethod find-contacts-by ((keyword (eql :name)) value)
-  (find-object :contacts
-               :filter
-               (f_ (string-equal (name _)
-                                 value))))
 
 (defmethod print-object ((contact contact) stream)
   (format stream "#<CONTACT ~S>"
@@ -135,3 +116,10 @@ Alexander, Sasha, Shura."
       (inner nil
              (first parts2)
              (rest parts2)))))
+
+
+(defmethod find-contacts-by ((keyword (eql :name)) value)
+  (find-object :contacts
+               :filter
+               (f_ (string-equal (name _)
+                                 value))))

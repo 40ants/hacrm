@@ -27,7 +27,7 @@
   
   (let ((tags (split query #\Space)))
     (dolist (tag-name tags)
-      (log:debug "Creating a tag" tag)
+      (log:debug "Creating a tag" tag-name)
       
       (let* ((contact (get-contact widget)))
         (tag-contact contact tag-name))))
