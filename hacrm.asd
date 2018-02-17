@@ -23,7 +23,7 @@
                :hacrm-birthdays
                :hacrm-tags
                ;; :hacrm-email
-               ;; :hacrm-phone
+               :hacrm-phone
                ;; :hacrm-notes
                ;; "hacrm/plugins/notes/plugin"
                ;; :weblocks-lass
