@@ -7,7 +7,7 @@
   (:import-from #:hacrm/widgets/facts
                 #:make-facts-group-widget)
   (:import-from #:hacrm-email/models
-                #:address
+                #:get-address
                 #:get-emails)
   (:import-from #:weblocks/dependencies
                 #:get-dependencies))
@@ -37,8 +37,8 @@
        (dolist (email emails)
          (:li (:a :href (concatenate 'string
                                      "mailto:"
-                                     (address email))
-                  (address email))))))))
+                                     (get-address email))
+                  (get-address email))))))))
 
 
 

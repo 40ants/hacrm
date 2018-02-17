@@ -123,3 +123,12 @@ Alexander, Sasha, Shura."
                :filter
                (f_ (string-equal (name _)
                                  value))))
+
+
+(defmethod find-contacts-by ((keyword (eql :id)) value)
+  (find-object :contacts
+               :filter
+               (f_ (eql (get-object-id _)
+                        value))))
+
+

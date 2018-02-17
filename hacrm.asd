@@ -22,7 +22,7 @@
                "hacrm/search"
                :hacrm-birthdays
                :hacrm-tags
-               ;; :hacrm-email
+               :hacrm-email
                :hacrm-phone
                ;; :hacrm-notes
                ;; "hacrm/plugins/notes/plugin"

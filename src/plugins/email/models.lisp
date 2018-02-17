@@ -2,6 +2,9 @@
   (:use #:cl
         #:f-underscore)
   (:import-from #:hacrm/models/facts/core
+                #:get-facts-of-type
+                #:remove-facts
+                #:add-facts
                 #:fact-group
                 #:contact
                 #:deffact)
@@ -12,8 +15,7 @@
                 #:make-object
                 #:find-object)
   (:import-from #:hacrm/models/contact
-                #:find-contacts-by
-                #:find-contact-by-id)
+                #:find-contacts-by)
   (:import-from #:weblocks/hooks
                 #:call-fact-removed-hook
                 #:call-fact-created-hook))
@@ -22,12 +24,12 @@
 (deffact email
     ((address :type string
             :initarg :address
-            :reader address)))
+            :reader get-address)))
 
 
 (defmethod print-object ((object email) stream)
   (print-unreadable-object (object stream :type t)
-    (princ (address object)
+    (princ (get-address object)
            stream)))
 
 
@@ -44,25 +46,17 @@
 
 (defun get-emails (contact)
   "Returns all emails bound to the contact."
-  (find-object
-   :facts
-   :filter (f_ (and (typep _ 'email)
-                    (equal (contact _)
-                           contact)))))
+  (get-facts-of-type contact 'email))
 
 
 (define-transaction tx-add-email (contact-id email-address)
   (check-type email-address string)
   (check-type contact-id integer)
   
-  (let* ((contact (find-contact-by-id
-                   contact-id))
-         (email (make-object 'email
-                             :address email-address
-                             :contact contact)))
-    (push
-     email
-     (get-root-object :facts))
+  (let* ((email (make-object 'email
+                             :address email-address)))
+    (add-facts (contact-id)
+               email)
 
     email))
 
@@ -81,26 +75,13 @@
       fact)))
 
 
-(define-transaction tx-remove-email (contact-id email-to-remove)
-  (check-type contact-id integer)
-  (check-type email-to-remove string)
-
-  (let* ((contact (find-contact-by-id contact-id))
-         (emails (get-emails contact))
-         removed)
+(define-transaction tx-remove-email
+    (contact-id email-to-remove) (check-type contact-id integer)
+    (check-type email-to-remove string)
     
-    ;; Not optimal, but is ok for prototype
-    (dolist (email emails)
-      (when (string-equal (address email)
-                          email-to-remove)
-        (log:debug "Removing email from contact" email contact)
-        (push email removed)))
-
-    (setf (get-root-object :facts)
-          (remove-if (f_ (member _ removed :test #'eql))
-                     (get-root-object :facts)))
-
-    removed))
+    (remove-facts (contact-id :type 'email)
+      (f_ (string-equal (get-address _)
+                        email-to-remove))))
 
 
 (defun remove-email (contact email-to-remove)
@@ -114,10 +95,11 @@
 
 
 (defmethod find-contacts-by ((keyword (eql :email)) value)
-  (let* ((facts (find-object :facts
-                             :filter
-                             (f_ (and (typep _ 'email)
-                                      (string-equal (address _)
-                                                    value))))))
-    (loop for fact in facts
-          collect (contact fact))))
+  (flet ((has-this-email (contact)
+           (loop for email in (get-emails contact)
+                 when (string-equal (get-address email)
+                                    value)
+                   do (return-from has-this-email t))))
+    (find-object :contacts
+                 :filter
+                 #'has-this-email)))

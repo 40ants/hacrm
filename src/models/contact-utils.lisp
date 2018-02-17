@@ -18,19 +18,6 @@ Plugins should define methods for this generic, if they want to give ability to 
 contacts by some associated data."))
 
 
-(defmethod find-contacts-by ((keyword (eql :id)) value)
-  (find-object :contacts
-               :filter
-               (f_ (eql (get-object-id _)
-                        value)))
-  
-  ;; (dolist (contact (all-contacts))
-  ;;   (when (eql (get-object-id contact)
-  ;;              value)
-  ;;     (return-from find-contact-by-id
-  ;;       contact)))
-  )
-
 (defun find-contact-by (keyword value)
   (let ((results (find-contacts-by keyword value)))
     (when (> (length results) 1)
