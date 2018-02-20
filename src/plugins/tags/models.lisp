@@ -31,12 +31,12 @@
 (deffact tag
     ((name :type string
            :initarg :name
-           :accessor name)))
+           :accessor get-name)))
 
 
 (defmethod print-object ((fact tag) stream)
   (print-unreadable-object (fact stream :type t :identity t)
-    (format stream "~a" (name fact))))
+    (format stream "~a" (get-name fact))))
 
 
 (defmethod fact-group ((fact tag))

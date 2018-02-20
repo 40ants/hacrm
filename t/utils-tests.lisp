@@ -4,7 +4,7 @@
         #:hamcrest/rove
         #:hacrm-test/utils)
   (:import-from #:hacrm/models/contact
-                #:all-contacts)
+                #:get-all-contacts)
   (:export
    #:with-empty-db))
 (in-package hacrm-test/utils-tests)
@@ -14,7 +14,7 @@
   (testing "Checking if a separate database for unittests is created"
            (with-empty-db
              (testing "Macro with-empty-db should reset database"
-               (assert-that (all-contacts)
+               (assert-that (get-all-contacts)
                             (has-length 0)))
              (ok (equal (hacrm/models/core::get-next-id)
                         1)

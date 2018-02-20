@@ -15,22 +15,28 @@
                 #:object-with-facts-mixin)
   (:import-from #:hacrm/models/contact-utils
                 #:find-contacts-by)
+  (:import-from #:hacrm/models/feed
+                #:object-with-feed-mixin)
   (:export #:contact
            #:make-contact
-           #:name
-           #:created
            #:get-name-synonyms
-           #:all-contacts))
+           #:get-all-contacts
+           #:get-name
+           #:get-created
+           #:delete-contact))
 (in-package hacrm/models/contact)
 
 
-(defclass contact (object-with-facts-mixin base)
+(defclass contact (object-with-facts-mixin
+                   object-with-feed-mixin
+                   base)
   ((name :type string
          :initarg :name
-         :accessor name)
-   (created :type integer
-            :initform (get-universal-time)
-            :reader created)))
+         :accessor get-name)
+   (created-at :type integer
+               :initform (get-universal-time)
+               :initarg :created-at
+               :reader get-created-at)))
 
 
 (define-transaction tx-make-contact (name)
@@ -41,18 +47,34 @@
     contact))
 
 
+(define-transaction tx-delete-contact (name)
+  (setf (get-root-object :contacts)
+        (remove-if
+         (lambda (contact)
+           (string-equal (get-name contact)
+                         name))
+         (get-root-object :contacts)))
+
+  (values))
+
+
 (defun make-contact (name)
-  "Создать карточку с контактом."
+  "Create a new contact."
   (execute-tx-make-contact name))
 
 
-(defun all-contacts ()
+(defun delete-contact (name)
+  "Delete a contact."
+  (execute-tx-delete-contact name))
+
+
+(defun get-all-contacts ()
   (get-root-object :contacts))
 
 
 (defmethod print-object ((contact contact) stream)
   (format stream "#<CONTACT ~S>"
-          (name contact)))
+          (get-name contact)))
 
 
 (defparameter *name-synonyms*
@@ -79,7 +101,7 @@ replaced with different synonyms."))
 
 
 (defmethod get-name-synonyms ((contact contact))
-  (get-name-synonyms (string-downcase (name contact))))
+  (get-name-synonyms (string-downcase (get-name contact))))
 
 
 (defmethod get-name-synonyms ((name string))
@@ -121,7 +143,7 @@ Alexander, Sasha, Shura."
 (defmethod find-contacts-by ((keyword (eql :name)) value)
   (find-object :contacts
                :filter
-               (f_ (string-equal (name _)
+               (f_ (string-equal (get-name _)
                                  value))))
 
 

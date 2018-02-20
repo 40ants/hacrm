@@ -108,7 +108,7 @@
     (weblocks/html:with-html
       (:table :class "contact"
               (:tr (:td :class "contact__details"
-                        (:h1 (name contact))
+                        (:h1 (get-name contact))
 
                         (dolist (fact-group-widget (get-fact-groups widget))
                           (render fact-group-widget)))

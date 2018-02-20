@@ -1,20 +1,28 @@
 (defpackage #:hacrm/models/feed
   (:use #:cl
         #:f-underscore)
+  (:import-from #:hacrm/models/contact-utils
+                #:add-list-items
+                #:remove-list-items)
   (:export
    #:def-feed-item
    #:feed-item
-   #:created-at
-   #:updated-at
-   #:related-to-object-p))
+   #:get-feed-items
+   #:object-with-feed-mixin
+   #:remove-feed-items
+   #:add-feed-items
+   #:get-created-at
+   #:get-updated-at))
 (in-package hacrm/models/feed)
 
 
 (defclass feed-item (hacrm/models/core:base)
   ((created-at :initform (get-universal-time)
-               :reader created-at)
+               :initarg :created-at
+               :reader get-created-at)
    (updated-at :initform (get-universal-time)
-               :reader updated-at)))
+               :initarg :updated-at
+               :reader get-updated-at)))
 
 
 (defmacro def-feed-item (name slots)
@@ -24,59 +32,38 @@ of other types."
   
   `(eval-when (:compile-toplevel :load-toplevel :execute)
        (defclass ,name (feed-item)
-         ,slots)
-     
-     ;; (defmethod cl-prevalence::get-root-object ((system hacrm::hacrm-prevalence-system)
-     ;;                                            (name (eql ',name)))
-     ;;   (cl-prevalence::get-root-object system 'feed-item))
+         ,slots)))
 
 
-     ;; (defmethod (setf cl-prevalence::get-root-object) (value
-     ;;                                                   (system hacrm::hacrm-prevalence-system)
-     ;;                                                   (name (eql ',name)))
-     ;;   (setf (cl-prevalence::get-root-object system
-     ;;                                         'feed-item)
-     ;;         value))
-
-     ;; (defmethod weblocks-stores:find-persistent-objects :around
-     ;;     ((store hacrm::hacrm-prevalence-system)
-     ;;      (class-name (eql ',name)) 
-     ;;      &key (filter nil)
-     ;;        order-by
-     ;;        range
-     ;;        slot
-     ;;        (value nil value-given-p)
-     ;;        (test #'equal))
-     ;;   "A wrapper to filter feed items by they actual type."
-
-     ;;   (log:debug "Searching for obj of" class-name)
-     ;;   ;; TODO: unit-test it
-     ;;   (let* ((filter (if filter
-     ;;                      (f_ (and (typep _ ',name)
-     ;;                               (funcall filter _)))
-     ;;                      (f_ (typep _ ',name))))
-     ;;          (params (append (list store
-     ;;                                class-name
-     ;;                                :filter filter
-     ;;                                :order-by order-by
-     ;;                                :range range
-     ;;                                :slot slot
-     ;;                                :test test)
-     ;;                          (when value-given-p
-     ;;                            (list :value value)))))
-     ;;     (apply #'call-next-method params)))
-     ))
+(defclass object-with-feed-mixin ()
+  ((feed-items :type list
+               :initform nil
+               :initarg :feed-items
+               :documentation "A list of feed items, associated with object. Contains objects of classes, derived from `feed-item'.")))
 
 
-(defgeneric related-to-object-p (feed-item object)
-  (:documentation "Should return true, if given feed item is related to the given object.
+(defgeneric get-feed-items (object)
+  (:documentation "Returns a feed items, associated with the object."))
 
-For example, this could check if an email was sent to or by a contact. Or if a feed-item
-is a note about the contact.
 
-Default implementation returns nil.")
+(defmethod get-feed-items ((object t))
+  "By default, we return an empty list, because no item is associated with the object."
+  nil)
 
-  (:method (feed-item object)
-    "Default implementation returns nil, saying that feed item is unrelated."
-    (declare (ignorable feed-item object))
-    nil))
+
+(defmethod get-feed-items ((object object-with-feed-mixin))
+  "By default, we return an empty list, because no item is associated with the object."
+  (slot-value object
+              'feed-items))
+
+
+(defmacro add-feed-items ((contact-id) &body items)
+  `(add-list-items feed-items
+                   (,contact-id)
+                   ,@items))
+
+
+(defmacro remove-feed-items ((contact-id &key type) &body rules)
+  `(remove-list-items feed-items
+       (,contact-id :type ,type)
+     ,@rules))

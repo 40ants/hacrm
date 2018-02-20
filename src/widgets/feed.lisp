@@ -8,8 +8,8 @@
   (:import-from #:hacrm/models/core
                 #:get-root-object)
   (:import-from #:hacrm/models/feed
-                #:created-at
-                #:related-to-object-p)
+                #:get-feed-items
+                #:created-at)
   (:import-from #:weblocks/html
                 #:with-html)
   (:import-from #:weblocks/dependencies
@@ -35,23 +35,13 @@
 
 
 (defun make-feed-widget (contact)
-  (let* ((all-feed-items ;; (get-root-object :feed-items)
-           ;; TODO: replace with (get-feed contact)
-           nil
-           )
-         (items-for-the-contact
-           (remove-if-not (f_ (related-to-object-p
-                               _
-                               contact))
-                          all-feed-items))
-         ;; feed items are sorted from recent to oldest
-         (sorted-objects (sort items-for-the-contact
-                               #'>
-                               :key #'created-at))
+  (let* ((items
+           (get-feed-items contact))
+         
          (feed-widget (make-instance 'feed :contact contact)))
-    
+
     (let* ((items (mapcar (f_ (make-feed-item-widget _ feed-widget))
-                          sorted-objects)))
+                          items)))
       (setf (slot-value feed-widget 'items)
             items))
 

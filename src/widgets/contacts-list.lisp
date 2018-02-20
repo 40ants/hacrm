@@ -110,7 +110,7 @@ in contact list mode, redefine this method.")
                         (get-number widget))
             (:h1 (render-link (f_% (funcall on-click-callback
                                             contact))
-                              (name contact))
+                              (get-name contact))
                  (:span :class "contact-list__contact-number"
                         (princ-to-string (get-number widget))))
 

@@ -2,10 +2,11 @@
   (:use #:cl
         #:f-underscore)
   (:import-from #:hacrm/models/feed
-                #:def-feed-item
-                #:related-to-object-p)
+                #:get-feed-items
+                #:add-feed-items
+                #:remove-feed-items
+                #:def-feed-item)
   (:import-from #:hacrm/models/core
-                #:remove-object-by-id
                 #:get-root-object
                 #:make-object
                 #:get-object-id
@@ -13,34 +14,23 @@
   (:import-from #:hacrm/utils
                 #:first-line
                 #:format-time)
-  (:import-from #:hacrm/models/contact
-                #:find-contact-by-id)
+  (:import-from #:hacrm/models/contact-utils
+                #:find-contact-by)
   (:import-from #:hacrm/models/feed
-                #:created-at))
+                #:get-created-at))
 (in-package hacrm-notes/models)
 
 
 (def-feed-item note
-    ((object :type hacrm/models/contact:contact
-             :initarg :object
-             :accessor get-object)
-     (text :type string
+    ((text :type string
            :initarg :text
            :accessor text)))
 
 
 (defmethod print-object ((note note) stream)
-  (format stream "#<NOTE created=~A object=~A text=~S>"
-          (format-time (created-at note))
-          (when (slot-boundp note 'object)
-            (get-object note))
+  (format stream "#<NOTE created=~A text=~S>"
+          (format-time (get-created-at note))
           (first-line (text note))))
-
-
-(defmethod related-to-object-p ((note note)
-                                object)
-  (eql (get-object note)
-       object))
 
 
 ;; TODO: remove
@@ -50,20 +40,19 @@
 
 
 (define-transaction tx-add-note (contact-id text)
-  (let* ((contact (find-contact-by-id contact-id))
-         (new-note (when contact
-                     (make-object 'note
-                                  :object contact
-                                  :text text))))
-    (when new-note
-      (push new-note
-            (get-root-object :feed-items)))
+  (let* ((new-note (make-object 'note
+                                :text text)))
+    (add-feed-items (contact-id)
+      new-note)
     
     new-note))
 
 
-(define-transaction tx-remove-note (note-id)
-  (remove-object-by-id :feed-items note-id))
+(define-transaction tx-remove-note (contact-id note-id)
+  (let* ((contact (find-contact-by :id contact-id)))
+    (remove-feed-items (contact)
+      (f_ (equal (get-object-id _)
+                 note-id)))))
 
 
 (defun add-note (contact text)
@@ -78,18 +67,18 @@
 
 
 ;; TODO: rename get-notes into get-contact-notes
-(defun get-notes (contact)
-  (check-type contact hacrm/models/contact:contact)
+(defun get-notes (object)
+  (check-type object hacrm/models/contact:contact)
   
-  (let* ((full-feed (get-root-object :feed-items))
-         (contact-notes (remove-if-not (f_ (and (typep _ 'note)
-                                            (eql (get-object _)
-                                                 contact)))
-                                       full-feed)))
-    contact-notes))
+  (let* ((full-feed (get-feed-items object))
+         (object-notes (remove-if-not (f_ (typep _ 'note))
+                                      full-feed)))
+    object-notes))
+
 
 (defun get-contact-notes (contact)
   (get-notes contact))
+
 
 (defun get-all-notes ()
   (let* ((all-feed-items (get-root-object :feed-items)))

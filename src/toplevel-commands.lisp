@@ -5,7 +5,7 @@
   (:import-from #:hacrm/widgets/base
                 #:base)
   (:import-from #:hacrm/models/contact
-                #:all-contacts
+                #:get-all-contacts
                 #:make-contact)
   (:import-from #:hacrm/widgets/main
                 #:change-widget)
@@ -54,7 +54,7 @@
     (change-widget
      widget
      (make-contacts-list
-      (all-contacts)
+      (get-all-contacts)
       :on-contact-click #'on-contact-selection))))
 
 

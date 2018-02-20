@@ -4,15 +4,14 @@
   (:import-from #:hacrm/widgets/main
                 #:change-widget)
   (:import-from #:hacrm/models/contact
-                #:all-contacts
+                #:get-all-contacts
                 #:get-name-synonyms)
   (:import-from #:hacrm/models/facts/core
                 #:get-fact-groups)
   (:export
    #:index-contacts
    #:search-contacts
-   #:index-facts
-   #:find-contacts-by))
+   #:index-facts))
 (in-package hacrm/search)
 
 
@@ -69,7 +68,7 @@ If you want the facts added by your plugin were searchable, define this method."
              
              doc)))
     
-    (loop for contact in (all-contacts)
+    (loop for contact in (get-all-contacts)
           do (montezuma:add-document-to-index
               *index*
               (transform-to-document contact)))))

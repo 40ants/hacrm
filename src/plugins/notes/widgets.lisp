@@ -18,7 +18,7 @@
   (:import-from #:hacrm-notes/models
                 #:note)
   (:import-from #:hacrm/models/feed
-                #:created-at))
+                #:get-created-at))
 (in-package hacrm-notes/widgets)
 
 
@@ -36,7 +36,7 @@
 
 (defmethod render ((widget note-widget))
   (let* ((note (note widget))
-         (created-at (created-at note))
+         (created-at (get-created-at note))
          (formatted-date (format-rfc1123-timestring
                           nil
                           (universal-to-timestamp created-at)))

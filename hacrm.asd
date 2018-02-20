@@ -24,8 +24,7 @@
                :hacrm-tags
                :hacrm-email
                :hacrm-phone
-               ;; :hacrm-notes
-               ;; "hacrm/plugins/notes/plugin"
+               :hacrm-notes
                ;; :weblocks-lass
                ;; :weblocks-stores
                ;; :weblocks-prevalence

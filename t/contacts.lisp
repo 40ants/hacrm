@@ -8,7 +8,7 @@
                 #:make-contact
                 #:get-name-synonyms
                 #:name
-                #:all-contacts)
+                #:get-all-contacts)
   (:import-from #:hacrm-test/utils
                 #:with-empty-db))
 (in-package hacrm-test/contacts)
@@ -28,7 +28,7 @@
   (testing "make-contact saves data to database and assigns it a sequential id"
     (with-empty-db
       (let* ((contact (make-contact "саша шульгин"))
-             (result (all-contacts)))
+             (result (get-all-contacts)))
         (testing "make-contact should return created object"
           (assert-that contact
                        (has-slots 'name "саша шульгин"))

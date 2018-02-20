@@ -15,7 +15,7 @@
   (:import-from #:weblocks/html
                 #:with-html)
   (:import-from #:hacrm-tags/models
-                #:name
+                #:get-name
                 #:get-contact-tags))
 
 (in-package hacrm-tags/widgets)
@@ -48,7 +48,7 @@
 (defmethod render ((widget tags))
   (let* ((contact (object widget))
          (tags (get-contact-tags contact))
-         (tag-names (sort (mapcar #'name tags)
+         (tag-names (sort (mapcar #'get-name tags)
                           #'string-lessp))
          (tag-names-with-hash (mapcar (f_ (concatenate 'string
                                                        "#"
