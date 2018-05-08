@@ -17,14 +17,16 @@
   (:import-from #:hacrm/models/contact-utils
                 #:find-contact-by)
   (:import-from #:hacrm/models/feed
-                #:get-created-at))
+                #:get-created-at)
+  (:export
+   #:get-text))
 (in-package hacrm-notes/models)
 
 
 (def-feed-item note
     ((text :type string
            :initarg :text
-           :accessor text)))
+           :accessor get-text)))
 
 
 (defmethod print-object ((note note) stream)

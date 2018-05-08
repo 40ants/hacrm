@@ -23,7 +23,8 @@
            #:get-all-contacts
            #:get-name
            #:get-created
-           #:delete-contact))
+           #:delete-contact
+           #:get-created-at))
 (in-package hacrm/models/contact)
 
 

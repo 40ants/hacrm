@@ -20,7 +20,9 @@
                 #:find-contact-by)
   (:import-from #:weblocks/hooks
                 #:call-fact-removed-hook
-                #:call-fact-created-hook))
+                #:call-fact-created-hook)
+  (:export
+   #:get-name))
 (in-package hacrm-tags/models)
 
 ;; (deffact new-tag

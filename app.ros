@@ -1,0 +1,22 @@
+#!/bin/sh
+#|-*- mode:lisp -*-|#
+#|
+exec ros -Q -- $0 "$@"
+|#
+(progn ;;init forms
+  (ros:ensure-asdf)
+  ;; (asdf:load-system :HACRM)
+  (ql:quickload :HACRM))
+
+
+(defpackage :ros.hacrm
+  (:use :cl)
+  (:import-from #:hacrm/desktop
+                #:main))
+(in-package :ros.hacrm)
+
+
+;; (defun main (&rest argv)
+;;   (declare (ignorable argv))
+;;   (hacrm/desktop::main))
+;;; vim: set ft=lisp lisp:

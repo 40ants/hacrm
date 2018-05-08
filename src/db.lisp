@@ -2,10 +2,11 @@
   (:use #:cl)
   (:import-from #:log)
   (:import-from #:cl-prevalence
-                #:snapshot
                 #:get-transaction-hook
                 #:get-guard
-                #:guarded-prevalence-system))
+                #:guarded-prevalence-system)
+  (:export
+   #:make-snapshot))
 (in-package hacrm/db)
 
 ;;; Multiple stores may be defined. The last defined store will be the
@@ -72,9 +73,14 @@
     store))
 
 
+(defun make-snapshot ()
+  (when *store*
+    (cl-prevalence:snapshot *store*)))
+
+
 (defun close-store ()
   (when *store*
-    (snapshot *store*)
+    (make-snapshot)
     (setf *store* nil)))
 
 

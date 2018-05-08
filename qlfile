@@ -4,11 +4,14 @@ github log4cl 40ants/log4cl
 github log4cl-json 40ants/log4cl-json
 github cl-prevalence 40ants/cl-prevalence
 
-github weblocks 40ants/weblocks :ref v0.25.0
-github weblocks-ui 40ants/weblocks-ui :ref v0.6.0
-github weblocks-lass 40ants/weblocks-lass :ref v0.2.0
-github weblocks-stores 40ants/weblocks-stores :ref v0.6.0
-github weblocks-parenscript 40ants/weblocks-parenscript :ref v0.3.0
+github weblocks 40ants/weblocks :tag v0.28.0
+github weblocks-ui 40ants/weblocks-ui :tag v0.6.0
+github weblocks-lass 40ants/weblocks-lass :tag v0.2.0
+# github weblocks-stores 40ants/weblocks-stores :tag v0.6.0
+github weblocks-parenscript 40ants/weblocks-parenscript :tag v0.3.0
 
 github websocket-driver fukamachi/websocket-driver :ref a3046b11dfb9803ac3bff7734dd017390c2b54bb
-github weblocks-websocket 40ants/weblocks-websocket :ref v0.1.1
+github weblocks-websocket 40ants/weblocks-websocket :tag v0.1.1
+
+# здесь влит мой пулл из ветки import-symbol-at-point
+github slynk joaotavora/sly

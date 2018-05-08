@@ -1,7 +1,7 @@
 ("quicklisp" .
  (:class qlot.source.ql:source-ql-all
   :initargs (:project-name "quicklisp" :%version :latest)
-  :version "2018-01-31"))
+  :version "2018-04-30"))
 ("log4cl" .
  (:class qlot.source.github:source-github
   :initargs (:project-name "log4cl" :repos "40ants/log4cl" :ref nil :branch nil :tag nil)
@@ -25,32 +25,32 @@
   :ref "c163c227ed85d430b82cb1e3502f72d4f88e3cfa"))
 ("weblocks" .
  (:class qlot.source.github:source-github
-  :initargs (:project-name "weblocks" :repos "40ants/weblocks" :ref "v0.25.0" :branch nil :tag nil)
-  :version "github-v0.25.0"
+  :initargs (:project-name "weblocks" :repos "40ants/weblocks" :ref nil :branch nil :tag "v0.28.0")
+  :version "github-282483f97d6ca351265ebfebb017867c295d01ad"
   :repos "40ants/weblocks"
-  :url "https://github.com/40ants/weblocks/archive/v0.25.0.tar.gz"
-  :ref "v0.25.0"))
+  :url "https://github.com/40ants/weblocks/archive/282483f97d6ca351265ebfebb017867c295d01ad.tar.gz"
+  :ref "282483f97d6ca351265ebfebb017867c295d01ad"))
 ("weblocks-ui" .
  (:class qlot.source.github:source-github
-  :initargs (:project-name "weblocks-ui" :repos "40ants/weblocks-ui" :ref "v0.6.0" :branch nil :tag nil)
-  :version "github-v0.6.0"
+  :initargs (:project-name "weblocks-ui" :repos "40ants/weblocks-ui" :ref nil :branch nil :tag "v0.6.0")
+  :version "github-5afdf238534d70edc2447d0bc8bc63da8e35999f"
   :repos "40ants/weblocks-ui"
-  :url "https://github.com/40ants/weblocks-ui/archive/v0.6.0.tar.gz"
-  :ref "v0.6.0"))
+  :url "https://github.com/40ants/weblocks-ui/archive/5afdf238534d70edc2447d0bc8bc63da8e35999f.tar.gz"
+  :ref "5afdf238534d70edc2447d0bc8bc63da8e35999f"))
 ("weblocks-lass" .
  (:class qlot.source.github:source-github
-  :initargs (:project-name "weblocks-lass" :repos "40ants/weblocks-lass" :ref nil :branch nil :tag nil)
-  :version "github-bba1f2941e6dcfc96ee84657bafa386f9d1c3975"
+  :initargs (:project-name "weblocks-lass" :repos "40ants/weblocks-lass" :ref nil :branch nil :tag "v0.2.0")
+  :version "github-1b043afbf2f3e84e495dfeae5e63fe67a435019f"
   :repos "40ants/weblocks-lass"
-  :url "https://github.com/40ants/weblocks-lass/archive/bba1f2941e6dcfc96ee84657bafa386f9d1c3975.tar.gz"
-  :ref "bba1f2941e6dcfc96ee84657bafa386f9d1c3975"))
+  :url "https://github.com/40ants/weblocks-lass/archive/1b043afbf2f3e84e495dfeae5e63fe67a435019f.tar.gz"
+  :ref "1b043afbf2f3e84e495dfeae5e63fe67a435019f"))
 ("weblocks-parenscript" .
  (:class qlot.source.github:source-github
-  :initargs (:project-name "weblocks-parenscript" :repos "40ants/weblocks-parenscript" :ref nil :branch nil :tag nil)
-  :version "github-7a095cd7a1ca3063c04a2e7028471a6ef31e1a91"
+  :initargs (:project-name "weblocks-parenscript" :repos "40ants/weblocks-parenscript" :ref nil :branch nil :tag "v0.3.0")
+  :version "github-8ef4ca2f837403a05c4e9b92dcf1c41771d16f17"
   :repos "40ants/weblocks-parenscript"
-  :url "https://github.com/40ants/weblocks-parenscript/archive/7a095cd7a1ca3063c04a2e7028471a6ef31e1a91.tar.gz"
-  :ref "7a095cd7a1ca3063c04a2e7028471a6ef31e1a91"))
+  :url "https://github.com/40ants/weblocks-parenscript/archive/8ef4ca2f837403a05c4e9b92dcf1c41771d16f17.tar.gz"
+  :ref "8ef4ca2f837403a05c4e9b92dcf1c41771d16f17"))
 ("websocket-driver" .
  (:class qlot.source.github:source-github
   :initargs (:project-name "websocket-driver" :repos "fukamachi/websocket-driver" :ref "a3046b11dfb9803ac3bff7734dd017390c2b54bb" :branch nil :tag nil)
@@ -60,8 +60,15 @@
   :ref "a3046b11dfb9803ac3bff7734dd017390c2b54bb"))
 ("weblocks-websocket" .
  (:class qlot.source.github:source-github
-  :initargs (:project-name "weblocks-websocket" :repos "40ants/weblocks-websocket" :ref "v0.1.1" :branch nil :tag nil)
-  :version "github-v0.1.1"
+  :initargs (:project-name "weblocks-websocket" :repos "40ants/weblocks-websocket" :ref nil :branch nil :tag "v0.1.1")
+  :version "github-b098db7f179dce3bfb045afd4e35e7cc868893f0"
   :repos "40ants/weblocks-websocket"
-  :url "https://github.com/40ants/weblocks-websocket/archive/v0.1.1.tar.gz"
-  :ref "v0.1.1"))
+  :url "https://github.com/40ants/weblocks-websocket/archive/b098db7f179dce3bfb045afd4e35e7cc868893f0.tar.gz"
+  :ref "b098db7f179dce3bfb045afd4e35e7cc868893f0"))
+("slynk" .
+ (:class qlot.source.github:source-github
+  :initargs (:project-name "slynk" :repos "joaotavora/sly" :ref nil :branch nil :tag nil)
+  :version "github-7d12c47bc573c5497487cfba60ccb30bd66514d7"
+  :repos "joaotavora/sly"
+  :url "https://github.com/joaotavora/sly/archive/7d12c47bc573c5497487cfba60ccb30bd66514d7.tar.gz"
+  :ref "7d12c47bc573c5497487cfba60ccb30bd66514d7"))

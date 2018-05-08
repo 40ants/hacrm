@@ -90,8 +90,8 @@ arguments."
         #P"/tmp/weblocks-cache/hacrm/")
   (apply #'weblocks/server:start args)
 
-  (setf hacrm-app
-        (weblocks/app:start 'hacrm))
+  ;; (setf hacrm-app
+  ;;       (weblocks/app:start 'hacrm))
   
   (open-store)
   (list hacrm-app))

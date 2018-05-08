@@ -16,7 +16,9 @@
   (:import-from #:hacrm/widgets/help
                 #:make-help-widget)
   (:import-from #:hacrm/search
-                #:search-contacts))
+                #:search-contacts)
+  (:import-from #:hacrm/widgets/version
+                #:make-version-widget))
 (in-package hacrm/toplevel-commands)
 
 
@@ -70,6 +72,19 @@
   (change-widget
    widget
    (make-help-widget widget)))
+
+
+(defmethod command ((widget base)
+                    (token (eql :version))
+                    query)
+  "Shows a version of the program."
+  (declare (ignorable query))
+
+  (log:debug "Opening version widget")
+  
+  (change-widget
+   widget
+   (make-version-widget)))
 
 
 (defmethod command ((widget base)

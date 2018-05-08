@@ -18,7 +18,9 @@
                 #:find-contacts-by)
   (:import-from #:weblocks/hooks
                 #:call-fact-removed-hook
-                #:call-fact-created-hook))
+                #:call-fact-created-hook)
+  (:export
+   #:get-address))
 (in-package hacrm-email/models)
 
 (deffact email

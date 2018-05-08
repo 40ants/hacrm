@@ -40,7 +40,7 @@
          (formatted-date (format-rfc1123-timestring
                           nil
                           (universal-to-timestamp created-at)))
-         (rendered-text (render-markup (hacrm-notes/models::text note))))
+         (rendered-text (render-markup (hacrm-notes/models:get-text note))))
     (with-html
       (:p :class "note__metadata"
           (:span formatted-date))

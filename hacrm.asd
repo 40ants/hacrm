@@ -14,12 +14,15 @@
                ;; :local-time
                ;; :split-sequence
                ;; :cl-markdown
+               :slynk
+               :lack-middleware-session
                (:version :asdf "3.3.1")
                (:version :weblocks "0.26.0")
                "hacrm/hooks"
                "hacrm/init-session"
                "hacrm/toplevel-commands"
                "hacrm/search"
+               "hacrm/desktop"
                :hacrm-birthdays
                :hacrm-tags
                :hacrm-email

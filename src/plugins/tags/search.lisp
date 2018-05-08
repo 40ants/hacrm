@@ -4,7 +4,7 @@
   (:import-from #:hacrm/search
                 #:index-facts)
   (:import-from #:hacrm-tags/models
-                #:name
+                #:get-name
                 #:get-contact-tags))
 (in-package hacrm-tags/search)
 
@@ -18,6 +18,6 @@
        search-document
        (montezuma:make-field
         "tag"
-        (name tag))))
+        (get-name tag))))
 
     (values)))
