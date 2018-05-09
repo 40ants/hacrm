@@ -1,3 +1,5 @@
 /assets/
 /quicklisp/
 /db.json
+/app
+/libssl.dylib
