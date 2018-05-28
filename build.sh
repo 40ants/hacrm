@@ -9,4 +9,4 @@
 #                #+sb-core-compression :compression #+sb-core-compression t)"
 
 
-CL_SOURCE_REGISTRY=~/common-lisp// qlot exec ros build app.ros
+CL_SOURCE_REGISTRY=~/common-lisp// qlot exec ros -L sbcl-bin build app.ros
