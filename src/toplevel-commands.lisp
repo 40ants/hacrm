@@ -115,3 +115,10 @@
           (make-contacts-list
            contacts
            :on-contact-click #'on-contact-selection)))))))
+
+
+(defmethod command ((widget base)
+                    (command (eql :quit))
+                    query)
+  "Quit from the program."
+  (ceramic:quit))
