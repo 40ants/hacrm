@@ -2,6 +2,13 @@
  (:class qlot.source.ql:source-ql-all
   :initargs (:project-name "quicklisp" :%version :latest)
   :version "2018-04-30"))
+("ceramic" .
+ (:class qlot.source.github:source-github
+  :initargs (:project-name "ceramic" :repos "40ants/ceramic" :ref nil :branch nil :tag nil)
+  :version "github-e0d905187946f8f2358f7b05e1ce87b302e34312"
+  :repos "40ants/ceramic"
+  :url "https://github.com/40ants/ceramic/archive/e0d905187946f8f2358f7b05e1ce87b302e34312.tar.gz"
+  :ref "e0d905187946f8f2358f7b05e1ce87b302e34312"))
 ("log4cl" .
  (:class qlot.source.github:source-github
   :initargs (:project-name "log4cl" :repos "40ants/log4cl" :ref nil :branch nil :tag nil)
@@ -68,7 +75,7 @@
 ("slynk" .
  (:class qlot.source.github:source-github
   :initargs (:project-name "slynk" :repos "joaotavora/sly" :ref nil :branch nil :tag nil)
-  :version "github-7d12c47bc573c5497487cfba60ccb30bd66514d7"
+  :version "github-3314cf8c3021cb758e0e30fe3ece54accf1dcf3d"
   :repos "joaotavora/sly"
-  :url "https://github.com/joaotavora/sly/archive/7d12c47bc573c5497487cfba60ccb30bd66514d7.tar.gz"
-  :ref "7d12c47bc573c5497487cfba60ccb30bd66514d7"))
+  :url "https://github.com/joaotavora/sly/archive/3314cf8c3021cb758e0e30fe3ece54accf1dcf3d.tar.gz"
+  :ref "3314cf8c3021cb758e0e30fe3ece54accf1dcf3d"))

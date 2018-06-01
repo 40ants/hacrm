@@ -1,5 +1,6 @@
 ql :all :latest
 
+github ceramic 40ants/ceramic
 github log4cl 40ants/log4cl
 github log4cl-json 40ants/log4cl-json
 github cl-prevalence 40ants/cl-prevalence
