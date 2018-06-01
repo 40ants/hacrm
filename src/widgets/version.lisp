@@ -41,4 +41,4 @@
     HTTP port: ~A
     Slynk port: ~A"
                       hacrm/desktop::*port*
-                      hacrm/desktop::*slynk-port*))))))
+                      hacrm/debug::*slynk-port*))))))

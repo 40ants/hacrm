@@ -8,6 +8,7 @@
                 #:get-all-contacts
                 #:make-contact)
   (:import-from #:hacrm/widgets/main
+                #:reset-user-input
                 #:change-widget)
   (:import-from #:hacrm/widgets/contact-details
                 #:make-contact-details-widget)
@@ -18,7 +19,11 @@
   (:import-from #:hacrm/search
                 #:search-contacts)
   (:import-from #:hacrm/widgets/version
-                #:make-version-widget))
+                #:make-version-widget)
+  (:import-from #:hacrm/debug
+                #:start-slynk)
+  (:import-from #:hacrm/desktop
+                #:*window*))
 (in-package hacrm/toplevel-commands)
 
 
@@ -122,3 +127,24 @@
                     query)
   "Quit from the program."
   (ceramic:quit))
+
+
+(defmethod command ((widget base)
+                    (command (eql :start-slynk))
+                    query)
+  "Starts slynk on a random port."
+  (start-slynk)
+  
+  ;; After Slynk was started we'll show version information
+  ;; so that user will know the port on which slynk is listening.
+  (change-widget
+   widget
+   (make-version-widget)))
+
+
+(defmethod command ((widget base)
+                    (command (eql :open-devtools))
+                    query)
+  "Starts slynk on a random port."
+  (ceramic:open-dev-tools *window*)
+  (reset-user-input widget))

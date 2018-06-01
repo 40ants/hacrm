@@ -7,6 +7,9 @@
   (:import-from #:hacrm/app
                 #:stop-hacrm
                 #:start-hacrm)
+  (:import-from #:hacrm/debug
+                #:start-slynk
+                #:stop-slynk)
   (:export
    #:start-dev-app
    #:stop-dev-app))
@@ -14,7 +17,6 @@
 
 (defvar *window* nil)
 (defvar *port* nil)
-(defvar *slynk-port* nil)
 
 
 (defun run (&key debug)
@@ -58,38 +60,20 @@ directory where executable file resides."
     (log:config :sane2 :debug)
     (weblocks/debug:on))
   
-  (let ((ceramic::*releasep* (not debug))
-        (slynk-port (find-port:find-port :min 4005))
-        (slynk-started nil)
-        (slynk-package (find-package :slynk)))
+  (let ((ceramic::*releasep* (not debug)))
          
-    (when (and debug
-               slynk-package)
-      (setf *slynk-port*
-            slynk-port)
-      
+    (when debug
       ;; We'll start swank only of application was started not
       ;; from the slime's repl.
-      (unless (ignore-errors
-               (uiop:symbol-call :slynk :connection-info))
-             
-        (log:info "Starting Slynk server on port"
-                  slynk-port)
-             
-        (uiop:symbol-call :slynk
-                          :create-server
-                          :dont-close t
-                          :port slynk-port)
-        (setf slynk-started t)))
+      (start-slynk))
 
     ;; Start Ceramic and Electron
     (ceramic:start)
     (handler-bind ((t (lambda (condition)
                         (log:info "Exception caught" condition)
                         (uiop:print-condition-backtrace condition)
-                        (when slynk-started
-                          (uiop:symbol-call :slynk :stop-server slynk-port))
 
+                        (stop-slynk)
                         (log:info "Quitting")
                         (ceramic:quit))))
       (run)
