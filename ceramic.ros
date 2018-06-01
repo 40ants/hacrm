@@ -1,0 +1,73 @@
+#!/bin/sh
+#|-*- mode:lisp -*-|#
+#|
+exec ros -Q -- $0 "$@"
+|#
+(progn ;;init forms
+  (ros:ensure-asdf)
+  #+quicklisp
+  (ql:quickload '(defmain
+                  osicat
+                  log4cl
+                  ceramic)
+                :silent t))
+
+(defpackage :ros.script.ceramic
+  (:use :cl
+        :defmain))
+(in-package :ros.script.ceramic)
+
+
+(defmain main ((verbose "Show more information and print tracebacks on errors."
+                        :flag t)
+               &rest app.ros)
+  "Give this command is a roswell script as an argument, and it will build an Electron application from it."
+  
+  (unless (and app.ros
+               (= (length app.ros)
+                  1))
+    (print-help)
+    (uiop:quit 1))
+
+  (if verbose
+      (log:config :sane2 :info)
+      (log:config :sane2 :error))
+  
+  (handler-bind ((t (lambda (condition)
+                      (format *error-output*
+                              "Unandled exception: ~A~%" condition)
+                      (when verbose
+                        (uiop:print-condition-backtrace condition
+                                                        :stream *error-output*
+                                                        :count 10))
+                      (uiop:quit 1))))
+
+    (flet ((run (command &rest args)
+             (setf command
+                   (apply #'format nil command args))
+             (log:info command)
+             (uiop:run-program command
+                               :output *standard-output*
+                               :error-output *error-output*)))
+      (let* ((script-name (first app.ros))
+             (js-app-directory (osicat:absolute-pathname "js-app/"))
+             (binary-name (pathname-name script-name)))
+
+        (log:info "Writing JS code" js-app-directory)
+        (ceramic.setup::prepare-release :app-directory js-app-directory)
+
+        (log:info "Building a binary application ~A from ~A"
+                  binary-name
+                  script-name)
+        (run "ros -L sbcl-bin build ~A" script-name)
+
+        (run "electron-packager ~A --overwrite --platform darwin --electron-version 1.2.7 --executable-name app --icon icon.icns hacrm"
+             js-app-directory)
+        
+        (run "mv hacrm-darwin-x64/hacrm.app/Contents/MacOS/app hacrm-darwin-x64/hacrm.app/Contents/MacOS/Electron")
+        
+        (run "cp app hacrm-darwin-x64/hacrm.app/Contents/MacOS/")
+        
+        ;; For some reason, electron-packager does not copies node_modules' content
+        (run "cp -r js-app/node_modules/ws hacrm-darwin-x64/hacrm.app/Contents/Resources/app/node_modules/")))))
+
