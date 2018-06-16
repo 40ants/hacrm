@@ -30,7 +30,7 @@
 
 
 (defwidget contact-details (base)
-  ((contact :type 'contact
+  ((contact :type 'hacrm/models/contact::contact
             :initarg :contact
             :reader get-contact)
    (feed :initform nil

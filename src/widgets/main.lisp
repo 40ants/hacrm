@@ -13,7 +13,7 @@
 
 
 (weblocks/widget:defwidget main-window ()
-  ((input-box :type (or input-box
+  ((input-box :type (or hacrm/widgets/input-box::input-box
                         null)
               :initarg :input-box
               :reader input-box)

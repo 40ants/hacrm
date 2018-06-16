@@ -32,7 +32,7 @@
 (defmethod print-object ((note note) stream)
   (format stream "#<NOTE created=~A text=~S>"
           (format-time (get-created-at note))
-          (first-line (text note))))
+          (first-line (get-text note))))
 
 
 ;; TODO: remove
@@ -63,9 +63,11 @@
                        text))
 
 
-(defun remove-note (note)
+(defun remove-note (contact note)
+  (check-type contact hacrm/models/contact:contact)
   (check-type note note)
-  (execute-tx-remove-note (get-object-id note)))
+  (execute-tx-remove-note (get-object-id contact)
+                          (get-object-id note)))
 
 
 ;; TODO: rename get-notes into get-contact-notes
