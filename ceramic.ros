@@ -59,7 +59,7 @@ exec ros -Q -- $0 "$@"
         (log:info "Building a binary application ~A from ~A"
                   binary-name
                   script-name)
-        (run "ros -L sbcl-bin build ~A" script-name)
+        (run "ros -L sbcl build ~A" script-name)
 
         (run "electron-packager ~A --overwrite --platform darwin --electron-version 1.2.7 --executable-name app --icon icon.icns hacrm"
              js-app-directory)
