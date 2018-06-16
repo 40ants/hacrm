@@ -29,6 +29,10 @@
     (log:debug "Creating window")
     (setf *window*
           (make-window :url (format nil "http://localhost:~D/" port)))
+
+    (setf (ceramic.window:title *window*)
+          "HACRM")
+    
     (show *window*)))
 
 
