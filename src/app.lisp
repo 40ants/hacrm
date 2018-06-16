@@ -7,6 +7,7 @@
   ;;       	#:set-cookie #:set-cookie* #:cookie-in
   ;;       	#:user-agent #:referer)
   (:import-from #:weblocks-lass)
+  (:import-from #:weblocks-parenscript)
   (:import-from #:weblocks/server)
   (:import-from #:weblocks/app)
   (:import-from #:hacrm/db
@@ -20,6 +21,10 @@
   (:import-from #:weblocks/dependencies
                 #:*cache-remote-dependencies-in*
                 #:get-dependencies)
+  (:import-from #:parenscript
+                #:create
+                #:chain
+                #:getprop)
   (:documentation
    "A Hackers's CRM, Weblocks application.")
   (:export
@@ -49,31 +54,58 @@
 
 
 (defmethod get-dependencies ((app hacrm))
-  (append (list (weblocks-lass:make-dependency
-                 '(body
-                   :position absolute
-                   :height 100%
-                   :min-height 100%
-                   :width 100%
-                   :margin 0
-                   :padding 0
+  (let ((js-dep (weblocks-parenscript:make-dependency
+                  (let* ((remote (getprop (require "electron")
+                                          :remote))
+                         (menu (getprop remote "Menu"))
+                         (roles (list "undo"
+                                      "redo"
+                                      "separator"
+                                      "cut"
+                                      "copy"
+                                      "paste"
+                                      "selectall"))
+                         (template (list
+                                    (create :label "HACRM"
+                                            :submenu (list (create :role "about"
+                                                                   :label "About")
+                                                           (create :role "quit"
+                                                                   :label "Quit")))
+                                    (create :label "Edit"
+                                            :submenu (loop for role in roles
+                                                           collect (create :role role)))))
+                         (app-menu (chain menu
+                                          (build-from-template
+                                           template))))
+                    (chain menu
+                           (set-application-menu app-menu)))))
+        (css-dep (weblocks-lass:make-dependency
+                   '(body
+                     :position absolute
+                     :height 100%
+                     :min-height 100%
+                     :width 100%
+                     :margin 0
+                     :padding 0
 
-                   ;; Common "reset" rules
-                   (*
-                    :box-sizing "border-box"
-                    :margin 0
-                    :padding 0
-                    :border 0
-                    ;; to make element's height calculation easier, will use
-                    ;; 20px as a default font-size
-                    :font-size 20px
-                    :line-height 30px
-                    :font-family helvetica
-                    )
-                   (a
-                    ;; special color for links
-                    :color "#0071d8"))))
-          (call-next-method)))
+                     ;; Common "reset" rules
+                     (*
+                      :box-sizing "border-box"
+                      :margin 0
+                      :padding 0
+                      :border 0
+                      ;; to make element's height calculation easier, will use
+                      ;; 20px as a default font-size
+                      :font-size 20px
+                      :line-height 30px
+                      :font-family helvetica
+                      )
+                     (a
+                      ;; special color for links
+                      :color "#0071d8")))))
+    (append (call-next-method)
+            (list js-dep)
+            (list css-dep))))
 
 
 ;; Top level start & stop scripts
