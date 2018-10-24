@@ -1,7 +1,7 @@
 (defpackage #:hacrm/widgets/contacts-list
   (:use #:cl
-        #:hacrm/models/contact
         #:f-underscore)
+  (:import-from #:hacrm/models/contact)
   (:import-from #:weblocks-parenscript)
   (:import-from #:weblocks-lass)
   (:import-from #:parenscript
@@ -30,7 +30,7 @@
 
 
 (defwidget contact-card (base)
-  ((contact :type 'contact
+  ((contact :type hacrm/models/contact:contact
             :initarg :contact
             :reader contact)
    (fact-groups :initarg :fact-groups
@@ -110,7 +110,7 @@ in contact list mode, redefine this method.")
                         (get-number widget))
             (:h1 (render-link (f_% (funcall on-click-callback
                                             contact))
-                              (get-name contact))
+                              (hacrm/models/contact:get-name contact))
                  (:span :class "contact-list__contact-number"
                         (princ-to-string (get-number widget))))
 
