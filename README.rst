@@ -6,7 +6,8 @@ Build it
 
 ::
 
-  brew install node
+  brew install roswell node
+  ros install fukamachi/qlot
   ./build.sh
 
 It should end with something like that::
