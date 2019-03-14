@@ -18,6 +18,7 @@
                :lack-middleware-session
                (:version :asdf "3.3.1")
                (:version :weblocks "0.26.0")
+               "weblocks-ui"
                "hacrm/hooks"
                "hacrm/init-session"
                "hacrm/toplevel-commands"
@@ -31,7 +32,6 @@
                ;; :weblocks-lass
                ;; :weblocks-stores
                ;; :weblocks-prevalence
-               ;; :weblocks-ui
                ;; :cl-prevalence
                ;; :ceramic
                ;; :find-port

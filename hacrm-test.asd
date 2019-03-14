@@ -24,4 +24,4 @@
   ;;                                          (:file phones)
   ;;                                          (:file email))))))
   :perform (test-op :after (op c)
-                    (call-symbol :rove :run c)))
+                    (symbol-call :rove :run c)))
