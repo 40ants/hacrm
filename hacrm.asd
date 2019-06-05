@@ -14,10 +14,11 @@
                ;; :local-time
                ;; :split-sequence
                ;; :cl-markdown
-               :slynk
-               :lack-middleware-session
-               (:version :asdf "3.3.1")
-               (:version :weblocks "0.26.0")
+               "bordeaux-threads"
+               "slynk"
+               "lack-middleware-session"
+               (:version "asdf" "3.3.1")
+               (:version "weblocks" "0.26.0")
                "weblocks-ui"
                "hacrm/hooks"
                "hacrm/init-session"

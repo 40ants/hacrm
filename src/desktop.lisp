@@ -41,6 +41,7 @@
   (ceramic:start)
   (run))
 
+
 (defun stop-dev-app ()
   (stop-hacrm)
   (ceramic:stop))
@@ -53,7 +54,10 @@
 ;;     (run)))
 
 
-(defmain main ((debug "Start slynk, turn on verbose logging, etc." :flag t))
+(defmain main ((debug "Start slynk, turn on verbose logging, etc." :flag t)
+               (slynk "Start slynk, but run in production mode." :flag
+                      t)
+               (no-ceramic "Don't start Electron application" :flag t))
   "Starts Ceramic application.
 
 Set 'releasep' argument to nil if you start it from the REPL.
@@ -63,23 +67,27 @@ directory where executable file resides."
   (when debug
     (log:config :sane2 :debug)
     (weblocks/debug:on))
+
+  (setf ceramic::*releasep* (not debug))
   
-  (let ((ceramic::*releasep* (not debug)))
-         
-    (when debug
-      ;; We'll start swank only of application was started not
-      ;; from the slime's repl.
-      (start-slynk))
+  (when (or debug slynk)
+    ;; We'll start swank only of application was started not
+    ;; from the slime's repl.
+    (start-slynk))
 
-    ;; Start Ceramic and Electron
-    (ceramic:start)
-    (handler-bind ((t (lambda (condition)
-                        (log:info "Exception caught" condition)
-                        (uiop:print-condition-backtrace condition)
+  ;; Start Ceramic and Electron
+  (cond
+    (no-ceramic (format t "Waiting for SLY.~%")
+                (loop do (sleep 5)))
+    (t 
+     (ceramic:start)
+     (handler-bind ((t (lambda (condition)
+                         (log:info "Exception caught" condition)
+                         (uiop:print-condition-backtrace condition)
 
-                        (stop-slynk)
-                        (log:info "Quitting")
-                        (ceramic:quit))))
-      (run)
-      (loop while (ceramic.driver:driver-running ceramic::*driver*)
-            do (sleep 1)))))
+                         (stop-slynk)
+                         (log:info "Quitting")
+                         (ceramic:quit))))
+       (run)
+       (loop while (ceramic.driver:driver-running ceramic::*driver*)
+             do (sleep 1))))))
