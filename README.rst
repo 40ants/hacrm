@@ -8,6 +8,7 @@ Build it
 
   brew install roswell node
   ros install fukamachi/qlot
+  npm install electron-packager -g
   ./build.sh
 
 It should end with something like that::

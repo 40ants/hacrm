@@ -48,6 +48,7 @@
   (ceramic:start)
   (run))
 
+
 (defun stop-dev-app ()
   (stop-hacrm)
   (ceramic:stop))
@@ -61,7 +62,9 @@
 
 
 (defmain main ((debug "Start slynk, turn on verbose logging, etc." :flag t)
-               (break "Break into debugger right after the start." :flag t))
+               (break "Break into debugger right after the start." :flag t)
+               (slynk "Start slynk, but run in production mode." :flag t)
+               (no-ceramic "Don't start Electron application" :flag t))
   "Starts Ceramic application.
 
 Set 'releasep' argument to nil if you start it from the REPL.
@@ -84,32 +87,38 @@ directory where executable file resides."
   
   (when debug
     (weblocks/debug:on))
+
+  ;; Always use release mode because otherwise
+  ;; Ceramic will not find app in the directory,
+  ;; created by ./build.sh
+  (setf ceramic::*releasep* t)
   
-  (let ((ceramic::*releasep* t ;; Always use 
-                             ;; (not debug)
-                             ))
-         
-    (when debug
-      ;; We'll start swank only of application was started not
-      ;; from the slime's repl.
-      (start-slynk))
+  (when (or debug slynk)
+    ;; We'll start swank only of application was started not
+    ;; from the slime's repl.
+    (start-slynk))
 
-    ;; Start Ceramic and Electron
-    ;; Without setting of the interface, find-port searches a port
-    ;; for websocket on 127.0.0.1, however it is opened on 0.0.0.0
-    ;; and this prevents opening of the second application.
-    ;; 
-    ;; TODO: fix this and open app on 127.0.0.1 
-    (let ((find-port:*default-interface* "0.0.0.0"))
-      (ceramic:start))
-    
-    (handler-bind ((t (lambda (condition)
-                        (log:info "Exception caught" condition)
-                        (uiop:print-condition-backtrace condition)
+  ;; Start Ceramic and Electron
+  (cond
+    (no-ceramic (format t "Waiting for SLY.~%")
+                (loop do (sleep 5)))
+    (t 
+     ;; Start Ceramic and Electron
+     ;; Without setting of the interface, find-port searches a port
+     ;; for websocket on 127.0.0.1, however it is opened on 0.0.0.0
+     ;; and this prevents opening of the second application.
+     ;; 
+     ;; TODO: fix this and open app on 127.0.0.1 
+     (let ((find-port:*default-interface* "0.0.0.0"))
+       (ceramic:start))
 
-                        (stop-slynk)
-                        (log:info "Quitting")
-                        (ceramic:quit))))
-      (run :debug debug)
-      (loop while (ceramic.driver:driver-running ceramic::*driver*)
-            do (sleep 1)))))
+     (handler-bind ((t (lambda (condition)
+                         (log:info "Exception caught" condition)
+                         (uiop:print-condition-backtrace condition)
+
+                         (stop-slynk)
+                         (log:info "Quitting")
+                         (ceramic:quit))))
+       (run)
+       (loop while (ceramic.driver:driver-running ceramic::*driver*)
+             do (sleep 1))))))

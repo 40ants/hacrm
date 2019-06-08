@@ -15,10 +15,10 @@
                ;; :split-sequence
                ;; :cl-markdown
                "prevalence-multimaster"
-               :slynk
-               :lack-middleware-session
-               (:version :asdf "3.3.1")
-               (:version :weblocks "0.26.0")
+               "slynk"
+               "lack-middleware-session"
+               (:version "asdf" "3.3.1")
+               (:version "weblocks" "0.26.0")
                "weblocks-ui"
                "hacrm/hooks"
                "hacrm/init-session"
