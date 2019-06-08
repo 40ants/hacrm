@@ -119,6 +119,6 @@ directory where executable file resides."
                          (stop-slynk)
                          (log:info "Quitting")
                          (ceramic:quit))))
-       (run)
+       (run :debug debug)
        (loop while (ceramic.driver:driver-running ceramic::*driver*)
              do (sleep 1))))))
