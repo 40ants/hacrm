@@ -5,8 +5,6 @@
   (:import-from #:weblocks/widget
                 #:render
                 #:defwidget)
-  (:import-from #:hacrm/models/core
-                #:get-root-object)
   (:import-from #:hacrm/models/feed
                 #:get-feed-items
                 #:created-at)

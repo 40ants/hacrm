@@ -1,10 +1,10 @@
 (defpackage #:hacrm/models/facts/core
   (:use #:cl
         #:f-underscore)
+  ;; (:nicknames #:HACRM.MODELS.FACTS.CORE)
   (:import-from #:hacrm/models/core
                 #:base
                 ;; #:find-object
-                ;; #:get-root-object
                 )
   (:import-from #:alexandria
                 #:with-gensyms)
@@ -69,68 +69,25 @@
 (defmacro add-facts ((contact-id) &rest facts)
   "Adds given facts to the contact."
   (with-gensyms (contact)
-    `(let* ((,contact (find-contact-by :id ,contact-id))
-            (new-facts (list ,@facts)))
+    `(let* ((,contact (find-contact-by :id ,contact-id)))
 
-       (unless ,contact
-         (error "Contact with id ~A not found" ,contact-id))
-       
-       (dolist (fact new-facts)
-         (push fact
-               (slot-value ,contact
-                           'facts)))
-
-       (values new-facts))))
+       (cond
+         (,contact (let ((new-facts (list ,@facts)))
+                     (dolist (fact new-facts)
+                       (push fact
+                             (slot-value ,contact
+                                         'facts)))
+                     (values new-facts)))
+         (t (log:error "Contact not found" ,contact-id))))))
 
 
-(defmacro remove-facts ((contact-id &key type) &body rules)
+(defmacro remove-facts ((item-name contact-id &key type) &body rules)
   `(remove-list-items
        facts
+       ,item-name
        (,contact-id :type ,type)
      ,@rules))
 
-
-(defmacro remove-facts-old ((contact-id &key type) &body rules)
-  "Removes a fact or facts bound to a contact with given id.
-
-A rules is an expression, evaluated to check if the fact should be removed.
-For example:
-
-\(remove-facts \(contact-id :type 'tag\)
-     \(string-equal \(number fact\)
-                     phone-number\)\)
-
-Will remove all phone numbers where number is equal to given.
-
-Variables 'contact' and 'fact' are bound to a contact identified by contact-id,
-and to checked fact during rules evaluation.
-
-Returns a list of removed facts.
-"
-  (with-gensyms (contact all-facts filtered-facts removed-facts)
-    `(let* ((,contact (find-contact-by :id ,contact-id))
-            ;; Tags are the facts which stored in a facts collection
-            (,all-facts (get-facts ,contact))
-            ;; Now we need to filter-out facts, related to the contact and
-            ;; having the given name
-            ,filtered-facts
-            ,removed-facts)
-       
-       (dolist (fact ,all-facts)
-         ;; TODO: it is possible to move
-         ;; this rules construction to the macro level
-         ;; to optimize performance
-         (if (and (or (null ,type)
-                      (typep fact ,type))
-                  ,@rules)
-             (push fact ,removed-facts)
-             (push fact ,filtered-facts)))
-       ;; Now, filtered facts should be saved back to the collection
-       (setf (slot-value ,contact 'facts)
-             (nreverse ,filtered-facts))
-
-       ;; Return removed facts
-       (nreverse ,removed-facts))))
 
 ;;(weblocks.hooks:call-hook :fact-removed contact tag-object)
 

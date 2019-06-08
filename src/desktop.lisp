@@ -1,5 +1,6 @@
 (defpackage #:hacrm/desktop
   (:use #:cl #:defmain)
+  (:import-from #:log4cl-json)
   (:import-from #:ceramic
                 #:show
                 #:make-window
@@ -7,6 +8,8 @@
   (:import-from #:hacrm/app
                 #:stop-hacrm
                 #:start-hacrm)
+  (:import-from #:hacrm/utils
+                #:get-machine-name)
   (:import-from #:hacrm/debug
                 #:start-slynk
                 #:stop-slynk)
@@ -20,18 +23,22 @@
 
 
 (defun run (&key debug)
-  (let ((port (find-port:find-port :min 9000)))
+  (let* ((interface "127.0.0.1")
+         (port (find-port:find-port :min 9000 :interface interface)))
     (log:info "Starting HACRM on port"
               port)
     (setf *port* port)
-    (start-hacrm :port port)
+    (start-hacrm :port port :interface interface :debug debug)
 
     (log:debug "Creating window")
     (setf *window*
           (make-window :url (format nil "http://localhost:~D/" port)))
 
     (setf (ceramic.window:title *window*)
-          "HACRM")
+          (if debug
+              (format nil "HACRM (~A)"
+                      (get-machine-name))
+              "HACRM"))
     
     (show *window*)))
 
@@ -53,18 +60,34 @@
 ;;     (run)))
 
 
-(defmain main ((debug "Start slynk, turn on verbose logging, etc." :flag t))
+(defmain main ((debug "Start slynk, turn on verbose logging, etc." :flag t)
+               (break "Break into debugger right after the start." :flag t))
   "Starts Ceramic application.
 
 Set 'releasep' argument to nil if you start it from the REPL.
 Otherwise, Ceramic will search Electron binary in the same
 directory where executable file resides."
 
+  ;; It is important to reinitialize a state each time,
+  ;; to make different uuid4s.
+  (setf *random-state*
+        (make-random-state t))
+  
+  (when break
+    (sb-ext:enable-debugger)
+    (break))
+
+  (log4cl-json:setup :plain t
+    :level (if debug
+               :debug
+               :warn))
+  
   (when debug
-    (log:config :sane2 :debug)
     (weblocks/debug:on))
   
-  (let ((ceramic::*releasep* (not debug)))
+  (let ((ceramic::*releasep* t ;; Always use 
+                             ;; (not debug)
+                             ))
          
     (when debug
       ;; We'll start swank only of application was started not
@@ -72,7 +95,14 @@ directory where executable file resides."
       (start-slynk))
 
     ;; Start Ceramic and Electron
-    (ceramic:start)
+    ;; Without setting of the interface, find-port searches a port
+    ;; for websocket on 127.0.0.1, however it is opened on 0.0.0.0
+    ;; and this prevents opening of the second application.
+    ;; 
+    ;; TODO: fix this and open app on 127.0.0.1 
+    (let ((find-port:*default-interface* "0.0.0.0"))
+      (ceramic:start))
+    
     (handler-bind ((t (lambda (condition)
                         (log:info "Exception caught" condition)
                         (uiop:print-condition-backtrace condition)
@@ -80,6 +110,6 @@ directory where executable file resides."
                         (stop-slynk)
                         (log:info "Quitting")
                         (ceramic:quit))))
-      (run)
+      (run :debug debug)
       (loop while (ceramic.driver:driver-running ceramic::*driver*)
             do (sleep 1)))))

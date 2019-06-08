@@ -2,6 +2,9 @@
 (setq lispy-colon-no-space-regex
       '((lisp-mode . ".*")))
 
+;; C-c C-c should recompile with debug policy by default
+(setf sly-compilation-policy '((cl:debug . 3)))
+
 
 ;; (require 'slime)
 

@@ -2,6 +2,16 @@ dist ultralisp http://dist.ultralisp.org
 ql :all :latest
 ultralisp :all :latest
 
+github find-port eudoxia0/find-port
+# Patch to bind server locally
+github clack svetlyak40wt/clack :ref patch-1
+
+# Here is a patch to stop remote-js
+github remote-js svetlyak40wt/remote-js :ref fix-stop-when-not-connected
+
+# And this is patch to fix electron app's name when it is started in production mode
+github electron-tools svetlyak40wt/electron-tools :ref fix-path-to-app-on-osx
+
 # github ceramic 40ants/ceramic
 # github log4cl 40ants/log4cl
 # github log4cl-json 40ants/log4cl-json

@@ -1,8 +1,36 @@
 ("quicklisp" .
  (:class qlot.source.ql:source-ql-all
   :initargs (:distribution "http://beta.quicklisp.org/dist/quicklisp.txt" :%version :latest)
-  :version "2019-03-07"))
+  :version "2019-05-21"))
 ("ultralisp" .
  (:class qlot.source.ql:source-ql-all
   :initargs (:distribution "http://dist.ultralisp.org" :%version :latest)
-  :version "20190313211840"))
+  :version "20190608060504"))
+("find-port" .
+ (:class qlot.source.github:source-github
+  :initargs (:project-name "find-port" :repos "eudoxia0/find-port" :ref nil :branch nil :tag nil)
+  :version "github-811727f88d7f000623bf92fdb0e64678a7112a28"
+  :repos "eudoxia0/find-port"
+  :url "https://github.com/eudoxia0/find-port/archive/811727f88d7f000623bf92fdb0e64678a7112a28.tar.gz"
+  :ref "811727f88d7f000623bf92fdb0e64678a7112a28"))
+("clack" .
+ (:class qlot.source.github:source-github
+  :initargs (:project-name "clack" :repos "svetlyak40wt/clack" :ref "patch-1" :branch nil :tag nil)
+  :version "github-patch-1"
+  :repos "svetlyak40wt/clack"
+  :url "https://github.com/svetlyak40wt/clack/archive/patch-1.tar.gz"
+  :ref "patch-1"))
+("remote-js" .
+ (:class qlot.source.github:source-github
+  :initargs (:project-name "remote-js" :repos "svetlyak40wt/remote-js" :ref "fix-stop-when-not-connected" :branch nil :tag nil)
+  :version "github-fix-stop-when-not-connected"
+  :repos "svetlyak40wt/remote-js"
+  :url "https://github.com/svetlyak40wt/remote-js/archive/fix-stop-when-not-connected.tar.gz"
+  :ref "fix-stop-when-not-connected"))
+("electron-tools" .
+ (:class qlot.source.github:source-github
+  :initargs (:project-name "electron-tools" :repos "svetlyak40wt/electron-tools" :ref "fix-path-to-app-on-osx" :branch nil :tag nil)
+  :version "github-fix-path-to-app-on-osx"
+  :repos "svetlyak40wt/electron-tools"
+  :url "https://github.com/svetlyak40wt/electron-tools/archive/fix-path-to-app-on-osx.tar.gz"
+  :ref "fix-path-to-app-on-osx"))

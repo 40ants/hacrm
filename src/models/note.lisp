@@ -1,5 +1,7 @@
 (defpackage #:hacrm/models/note
   (:use #:cl #:weblocks #:f-underscore)
+  (:import-from #:prevalence-multimaster/system
+                #:get-root-object)
   (:export #:note
            #:make-note
            #:save-note
@@ -67,8 +69,8 @@
 (defun migrate-old-notes ()
   "Временная функция чтобы трансформировать данные перенеся данные на плагин"
   
-  (let* ((old-notes (hacrm/models/core:get-root-object :notes))
-         (contacts (hacrm/models/core:get-root-object :contacts))
+  (let* ((old-notes (get-root-object :notes))
+         (contacts (get-root-object :contacts))
          (contacts-by-name (make-hash-table :test 'equal)))
 
     ;; Заполним словарик с контактами

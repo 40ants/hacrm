@@ -1,6 +1,7 @@
 (defpackage #:hacrm-birthdays/models
   (:use #:cl
         #:f-underscore)
+  ;; (:nicknames #:HACRM.PLUGINS.BIRTHDAYS)
   (:import-from #:hacrm/models/facts/core
                 #:add-facts
                 #:get-facts-of-type
@@ -8,9 +9,8 @@
                 #:contact
                 #:deffact)
   (:import-from #:hacrm/models/core
-                #:get-root-object
+                #:get-next-id
                 #:get-object-id
-                #:make-object
                 #:find-object)
   (:import-from #:weblocks/hooks
                 #:call-fact-updated-hook
@@ -67,7 +67,7 @@ Should be applied to the user input before storing it into the database."
     'birthday)))
 
 
-(hacrm/models/core:define-transaction tx-set-birthday (contact-id date)
+(prevalence-multimaster/transaction:define-transaction !set-birthday (contact-id new-fact-id date)
   "If a new fact was created, second returned value is \"true\"."
   (let* ((date (clean-date date))
          (contact (find-contact-by :id contact-id))
@@ -80,8 +80,9 @@ Should be applied to the user input before storing it into the database."
        (setf (slot-value birthday 'date)
              date))
       ;; New fact should be created
-      (t (setf birthday (make-object 'birthday
-                                     :date date)
+      (t (setf birthday (make-instance 'birthday
+                                       :id new-fact-id
+                                       :date date)
                created t)
          (add-facts (contact-id)
                     birthday)))
@@ -96,7 +97,9 @@ Returns a new `birthday' fact."
 
   (let* ((contact-id (get-object-id contact)))
     (multiple-value-bind (fact created)
-        (execute-tx-set-birthday contact-id date)
+        (!set-birthday contact-id
+                       (get-next-id)
+                       date)
 
       (if created
           (call-fact-created-hook contact fact)

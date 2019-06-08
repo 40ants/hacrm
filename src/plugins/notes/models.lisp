@@ -1,16 +1,15 @@
 (defpackage #:hacrm-notes/models
   (:use #:cl
         #:f-underscore)
+  ;; (:nicknames #:HACRM.PLUGINS.NOTES)
   (:import-from #:hacrm/models/feed
                 #:get-feed-items
                 #:add-feed-items
                 #:remove-feed-items
                 #:def-feed-item)
   (:import-from #:hacrm/models/core
-                #:get-root-object
-                #:make-object
-                #:get-object-id
-                #:define-transaction)
+                #:get-next-id
+                #:get-object-id)
   (:import-from #:hacrm/utils
                 #:first-line
                 #:format-time)
@@ -18,6 +17,8 @@
                 #:find-contact-by)
   (:import-from #:hacrm/models/feed
                 #:get-created-at)
+  (:import-from #:prevalence-multimaster/system
+                #:get-root-object)
   (:export
    #:get-text))
 (in-package hacrm-notes/models)
@@ -41,33 +42,35 @@
   (make-instance 'note :text text))
 
 
-(define-transaction tx-add-note (contact-id text)
-  (let* ((new-note (make-object 'note
-                                :text text)))
+(prevalence-multimaster/transaction:define-transaction !add-note (contact-id new-fact-id text)
+  (let* ((new-note (make-instance 'note
+                                  :id new-fact-id
+                                  :text text)))
     (add-feed-items (contact-id)
       new-note)
     
     new-note))
 
 
-(define-transaction tx-remove-note (contact-id note-id)
+(prevalence-multimaster/transaction:define-transaction !remove-note (contact-id note-id)
   (let* ((contact (find-contact-by :id contact-id)))
-    (remove-feed-items (contact)
-      (f_ (equal (get-object-id _)
-                 note-id)))))
+    (remove-feed-items (note contact-id :type 'note)
+      (equal (get-object-id note)
+             note-id))))
 
 
 (defun add-note (contact text)
   (check-type contact hacrm/models/contact:contact)
-  (execute-tx-add-note (get-object-id contact)
-                       text))
+  (!add-note (get-object-id contact)
+             (get-next-id)
+             text))
 
 
 (defun remove-note (contact note)
   (check-type contact hacrm/models/contact:contact)
   (check-type note note)
-  (execute-tx-remove-note (get-object-id contact)
-                          (get-object-id note)))
+  (!remove-note (get-object-id contact)
+                (get-object-id note)))
 
 
 ;; TODO: rename get-notes into get-contact-notes

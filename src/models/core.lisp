@@ -1,20 +1,26 @@
 (defpackage #:hacrm/models/core
   (:use #:cl
         #:f-underscore)
+  ;; (:nicknames #:HACRM.MODELS.CORE)
   (:import-from #:hacrm/db
                 #:*store*)
   (:import-from #:cl-prevalence
                 #:execute-transaction)
   (:import-from #:alexandria
                 #:symbolicate)
+  (:import-from #:uuid
+                #:make-v4-uuid)
+  (:import-from #:prevalence-multimaster/system
+                #:get-root-object)
   (:export
    #:get-object-id
    #:base
-;;   #:get-next-id
+   #:get-next-id
    #:define-transaction
-   #:get-root-object
-   #:make-object
-   #:remove-object-by-id))
+   ;; #:make-object
+   #:remove-object-by-id
+   #:compare-ids
+   #:ids=))
 (in-package hacrm/models/core)
 
 
@@ -26,30 +32,40 @@
 ;;           (+ (or previous 0)
 ;;              1))))
 
-(defun get-root-object (name)
-  (unless (member name (list :contacts
-                             :max-id))
-    (error "Root object with name \"~A\" aren't supported"
-           name))
+;; (defun get-root-object (name)
+;;   (unless (member name (list :contacts
+;;                              :max-id))
+;;     (error "Root object with name \"~A\" aren't supported"
+;;            name))
   
-  (cl-prevalence:get-root-object *store*
-                                 name))
+;;   (cl-prevalence:get-root-object *store*
+;;                                  name))
 
 
-(defun (setf get-root-object) (value name)
-  (setf (cl-prevalence:get-root-object *store* name)
-        value))
+;; (defun (setf get-root-object) (value name)
+;;   (setf (cl-prevalence:get-root-object *store* name)
+;;         value))
 
 (defun get-next-id ()
   "Each object should have a unique id.
    This function updates an id counter in the database and return a new value."
   (unless *store*
     (error "Please, setup hacrm/db::*store* first."))
-  
-  (let ((previous (get-root-object :max-id)))
-    (setf (get-root-object :max-id)
-          (+ (or previous 0)
-             1))))
+
+  ;; (make-v4-uuid)
+  (uuid:format-as-urn nil (make-v4-uuid))
+  ;; (let ((previous (get-root-object :max-id)))
+  ;;   (setf (get-root-object :max-id)
+  ;;         (+ (or previous 0)
+  ;;            1)))
+  )
+
+(defun ids= (left right)
+  (cond
+    ((and (typep left 'uuid:uuid)
+          (typep right 'uuid:uuid))
+     (uuid:uuid= left right))
+    (t (equal left right))))
 
 
 (defclass base ()
@@ -58,15 +74,19 @@
        :reader get-object-id)))
 
 
-(defun make-object (class &rest args)
-  "Use this function instead of make-instance, to created instances
-of classes inherited from 'base. This helper also sets an unique
-id for the object."
-  
-  (apply #'make-instance
-         class
-         :id (get-next-id)
-         args))
+;; (prevalence-multimaster/transaction:define-transaction !make-object (class id args)
+;;   (apply #'make-instance
+;;          class
+;;          :id id
+;;          args))
+
+
+;; (defun make-object (class &rest args)
+;;   "Use this function instead of make-instance, to created instances
+;; of classes inherited from 'base. This helper also sets an unique
+;; id for the object."
+
+;;   (!make-object class (get-next-id) args))
 
 
 (defmacro define-transaction (name (&rest args) &body body)
@@ -94,7 +114,7 @@ Also, a helper defined to call the transaction on hacrm/db::*store*."
 
 
 (defun find-object (root-object-name &key filter)
-  (let ((objects (hacrm/models/core:get-root-object root-object-name)))
+  (let ((objects (get-root-object root-object-name)))
     (if filter
         (remove-if-not filter objects)
         objects)))

@@ -7,7 +7,7 @@
   (:import-from #:alexandria
                 #:make-keyword
                 #:with-gensyms)
-  (:import-from #:hacrm/models/core
+  (:import-from #:prevalence-multimaster/system
                 #:get-root-object))
 (in-package playground)
 
@@ -134,14 +134,17 @@
 
 (defun import-contact (item)
   "Создаёт новый контакт из данных в JSON"
-  (with-json-fields (name created facts notes) item
-    (unless (find-contacts-by :name name)
-      (hacrm/models/core:make-object
-       'hacrm/models/contact::contact
-       :name name
-       :created-at created
-       :facts (mapcar #'import-fact facts)
-       :feed-items (mapcar #'import-note notes)))))
+  (error "Make-object is not available anymore")
+  
+  ;; (with-json-fields (name created facts notes) item
+  ;;   (unless (find-contacts-by :name name)
+  ;;     (hacrm/models/core:make-object
+  ;;      'hacrm/models/contact::contact
+  ;;      :name name
+  ;;      :created-at created
+  ;;      :facts (mapcar #'import-fact facts)
+  ;;      :feed-items (mapcar #'import-note notes))))
+  )
 
 
 (defun import-from-file (filename)

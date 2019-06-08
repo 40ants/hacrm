@@ -10,6 +10,8 @@
                 #:make-cl-info)
   (:import-from #:weblocks/html
                 #:with-html)
+  (:import-from #:hacrm/utils
+                #:get-machine-name)
   (:export
    #:make-version-widget))
 (in-package hacrm/widgets/version)
@@ -33,6 +35,7 @@
       (:h1 "Version info")
       (:pre (with-output-to-string (s)
               (format s "HACRM: ~A~%" version)
+              (format s "Machine: ~A~%" (get-machine-name))
               (princ system-info s))))
 
     (when debug-mode

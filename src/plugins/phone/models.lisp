@@ -1,6 +1,7 @@
 (defpackage #:hacrm-phone/models
   (:use #:cl
         #:f-underscore)
+  ;; (:nicknames #:HACRM.PLUGINS.PHONE)
   (:import-from #:hacrm/models/facts/core
                 #:add-facts
                 #:get-facts-of-type
@@ -11,7 +12,6 @@
                 #:deffact)
   (:import-from #:hacrm/models/core
                 #:get-object-id
-                #:get-root-object
                 #:define-transaction
                 #:find-object))
 (in-package hacrm-phone/models)
@@ -60,8 +60,8 @@
   (check-type contact-id integer)
   (check-type number string)
 
-  (remove-facts (contact-id :type 'phone)
-    (string-equal (get-number fact)
+  (remove-facts (phone contact-id :type 'phone)
+    (string-equal (get-number phone)
                   number)))
 
 
