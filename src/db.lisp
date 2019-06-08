@@ -59,7 +59,7 @@
 
 (defvar *sync-thread* nil)
 
-(defparameter *sleep-between-syncs* 5
+(defparameter *sleep-between-syncs* 15
   "A number of seconds before doing snapshots for syncronization.")
 
 
