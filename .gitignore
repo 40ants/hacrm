@@ -6,3 +6,4 @@
 /js-app/
 /hacrm-darwin-x64/
 /bin/
+*.log
