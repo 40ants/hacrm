@@ -50,7 +50,7 @@
   (let ((items (items widget)))
     
     (with-html
-      (:h1 "Активность")
+      (:h1 "Activity")
       (dolist (item items)
         (render item)))))
 
