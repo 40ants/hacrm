@@ -93,7 +93,10 @@ and then generic function hacrm/command:command is called."
       (closer-mop:method-specializers method)
     (declare (ignorable command text))
 
-    (typep widget command-widget-class)))
+    (or (and (null widget)
+             (subtypep 'hacrm/widgets/base:base
+                       command-widget-class))
+        (typep widget command-widget-class))))
 
 
 (defun help (widget)
