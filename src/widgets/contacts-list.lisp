@@ -134,11 +134,13 @@ in contact list mode, redefine this method.")
         (with-html
           (cond (query
                  (:p ("No contacts were found by \"~A\" query." query))
-                 (:p "May be there is no such contact?")
-                 (:p "You can add it with a command like that:"))
+                 (:p "May be there is no such a contact?")
+                 (:p "You can add it with a command like that:")
+                 (:p (:code ("add ~A" query))))
                 (t
-                 (:p "No contacts add some with a command like that:")))
-          (:p (:code "add John Doe"))))))
+                 (:p "No contacts add some with a command like that:")
+                 (:p (:code "add John Doe"))))
+          ))))
 
 
 (defmethod get-dependencies  ((widget contacts-list))
