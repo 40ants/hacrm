@@ -17,6 +17,7 @@
   (:import-from #:hacrm/widgets/help
                 #:make-help-widget)
   (:import-from #:hacrm/search
+                #:index-contacts
                 #:search-contacts)
   (:import-from #:hacrm/widgets/version
                 #:make-version-widget)
@@ -36,7 +37,7 @@
 
   (log:debug "Adding new contact" name)
   (let ((contact (make-contact name)))
-    
+    (index-contacts)
     (change-widget
         widget
         (make-contact-details-widget contact))))
