@@ -63,19 +63,13 @@ and then generic function hacrm/command:command is called."
                           :keyword)))
     (log:debug "Processing query" text)
     
-    (flet ((focus-on-input-box ()
-             (weblocks/response:send-script
-              "jQuery(\".input-box input[name='query']\").focus()")))
-      (handler-case (progn
-                      (command widget keyword rest-text)
-                      (focus-on-input-box))
-        (no-command-error ()
-          (log:warn "No command" keyword)
-          
-          (command widget
-                   (default-command widget)
-                   text)
-          (focus-on-input-box))))))
+    (handler-case (command widget keyword rest-text)
+      (no-command-error ()
+        (log:warn "No command" keyword)
+        
+        (command widget
+                 (default-command widget)
+                 text)))))
 
 
 
