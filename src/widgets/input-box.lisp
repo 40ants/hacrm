@@ -37,7 +37,7 @@
               :name "query"
               :autofocus t
               :onblur "this.focus()"
-              :placeholder "Enter a command or query here."
+              :placeholder "Enter a command or a search query here."
               :value ""))))
 
 

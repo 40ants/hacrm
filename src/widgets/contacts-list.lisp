@@ -23,9 +23,10 @@
   (:export
    #:make-contacts-list
    #:contacts-list
-   #:contacts
+   #:get-contacts
    #:render-facts
-   #:show-fact-group-in-contact-list-p))
+   #:show-fact-group-in-contact-list-p
+   #:get-search-query))
 (in-package hacrm/widgets/contacts-list)
 
 
@@ -39,13 +40,17 @@
              :initarg :on-click
              :reader on-click)
    (number :type integer
-    :initarg :number
-    :reader get-number)))
+           :initarg :number
+           :reader get-number)))
 
 
 (defwidget contacts-list (base)
   ((contacts :initarg :contacts
-             :reader contacts)))
+             :reader get-contacts)
+   (search-query :type (or string null)
+                 :initform nil
+                 :initarg :search-query
+                 :reader get-search-query)))
 
 
 (defgeneric show-fact-group-in-contact-list-p (fact-group)
@@ -80,7 +85,7 @@ in contact list mode, redefine this method.")
                    :fact-groups fact-group-widgets)))
 
 
-(defun make-contacts-list (contacts &key on-contact-click)
+(defun make-contacts-list (contacts &key on-contact-click search-query)
   (flet ((default-click-processor (contact)
            (log:info "No action was passed to process selection of the"
                      contact)))
@@ -93,7 +98,8 @@ in contact list mode, redefine this method.")
                               contact
                               (or on-contact-click
                                   #'default-click-processor)
-                              number)))))
+                              number))
+     :search-query search-query)))
 
 
 (defmethod render ((widget contact-card))
@@ -118,14 +124,21 @@ in contact list mode, redefine this method.")
 
 
 (defmethod render ((widget contacts-list))
-  (let ((contacts (contacts widget)))
+  (let ((contacts (get-contacts widget))
+        (query (get-search-query widget)))
 
     (if contacts
         (mapcar #'render
                 contacts)
         ;; No contacts
         (with-html
-          (:p "No contacts")))))
+          (cond (query
+                 (:p ("No contacts were found by \"~A\" query." query))
+                 (:p "May be there is no such contact?")
+                 (:p "You can add it with a command like that:"))
+                (t
+                 (:p "No contacts add some with a command like that:")))
+          (:p (:code "add John Doe"))))))
 
 
 (defmethod get-dependencies  ((widget contacts-list))

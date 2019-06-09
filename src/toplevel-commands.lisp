@@ -58,7 +58,6 @@
             (make-contact-details-widget
              contact))))
 
-    ;; TODO: разобраться, почему не срабатывает смена основного виджета
     (change-widget
      widget
      (make-contacts-list
@@ -120,7 +119,8 @@
           widget
           (make-contacts-list
            contacts
-           :on-contact-click #'on-contact-selection)))))))
+           :on-contact-click #'on-contact-selection
+           :search-query query)))))))
 
 
 (defmethod command ((widget base)
