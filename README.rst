@@ -1,3 +1,12 @@
+======================
+ HACRM - Hacker's CRM
+======================
+
+.. image:: docs/hacrm-screenshot.png
+
+.. warning:: This is a prototype and most probably it will not work
+             for you. But you can try.
+
 How to test desktop app
 =======================
 
