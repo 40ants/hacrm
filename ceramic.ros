@@ -49,25 +49,34 @@ exec ros -Q -- $0 "$@"
              (uiop:run-program command
                                :output *standard-output*
                                :error-output *error-output*)))
-      (let* ((script-name (first app.ros))
+      (let* (;; (script-name (first app.ros))
              (js-app-directory (osicat:absolute-pathname "js-app/"))
-             (binary-name (pathname-name script-name)))
+             ;; (binary-name (pathname-name script-name))
+             )
 
         (log:info "Writing JS code" js-app-directory)
         (ceramic.setup::prepare-release :app-directory js-app-directory)
 
-        (log:info "Building a binary application ~A from ~A"
-                  binary-name
-                  script-name)
-        (run "ros -L sbcl build ~A" script-name)
+        ;; (log:info "Building a binary application ~A from ~A"
+        ;;           binary-name
+        ;;           script-name)
 
-        (run "electron-packager ~A --overwrite --platform darwin --electron-version 1.2.7 --executable-name app --icon icon.icns hacrm"
+        ;; Previosly we used Roswell to build a binary,
+        ;; but it does not fixes paths to the shared libraries.
+        ;; "Deploy" works much better!
+        ;; (run "ros -L sbcl build ~A" script-name)
+        (run "ros -L sbcl run --eval '(ql:quickload :deploy)' --eval '(ql:quickload :hacrm)' --eval '(asdf:make :hacrm/osx)'")
+
+        (run "electron-packager ~A --overwrite --platform darwin --electron-version 1.2.7 --executable-name app --icon icon.icns --extra-resource js-app/node_modules hacrm"
              js-app-directory)
-        
+
+        ;; Now we need to replace a js application with our Common Lisp server
+        ;; It will start ./Electron app as a subprocess.
         (run "mv hacrm-darwin-x64/hacrm.app/Contents/MacOS/app hacrm-darwin-x64/hacrm.app/Contents/MacOS/Electron")
-        
-        (run "cp app hacrm-darwin-x64/hacrm.app/Contents/MacOS/")
+
+        (run "cp bin/* hacrm-darwin-x64/hacrm.app/Contents/MacOS/")
         
         ;; For some reason, electron-packager does not copies node_modules' content
-        (run "cp -r js-app/node_modules/ws hacrm-darwin-x64/hacrm.app/Contents/Resources/app/node_modules/")))))
+        ;; (run "cp -r js-app/node_modules/ws hacrm-darwin-x64/hacrm.app/Contents/Resources/app/node_modules/")
+        ))))
 

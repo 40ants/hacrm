@@ -14,7 +14,7 @@
                ;; :local-time
                ;; :split-sequence
                ;; :cl-markdown
-               "bordeaux-threads"
+               "prevalence-multimaster"
                "slynk"
                "lack-middleware-session"
                (:version "asdf" "3.3.1")
@@ -119,6 +119,15 @@
   ;;               :depends-on (hacrm
   ;;                            conf)))
   :in-order-to ((test-op (test-op hacrm-test))))
+
+
+(defsystem hacrm/osx
+  :defsystem-depends-on (:deploy)
+  ;; :build-operation "osx-app-deploy-op"
+  :build-operation "deploy-op"
+  :build-pathname "app"
+  :entry-point "hacrm/desktop::main"
+  :depends-on ("hacrm"))
 
 
 (register-system-packages "3bmd" '(#:3bmd-ext))

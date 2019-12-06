@@ -44,20 +44,20 @@ contacts by some associated data."))
        (values new-items))))
 
 
-(defmacro remove-list-items (slot-name (contact-id &key type) &body rules)
+(defmacro remove-list-items (slot-name item-name (contact-id &key type) &body rules)
   "Removes a items from the list accoring to rules.
 
-A rules is an expression, evaluated to check if the fact should be removed.
+A rules is an expression, evaluated to check if the item should be removed.
 For example:
 
 \(remove-facts \(contact-id :type 'tag\)
-     \(string-equal \(number fact\)
+     \(string-equal \(get-number item\)
                      phone-number\)\)
 
 Will remove all phone numbers where number is equal to given.
 
-Variables 'contact' and 'fact' are bound to a contact identified by contact-id,
-and to checked fact during rules evaluation.
+Variables 'contact' and 'item' are bound to a contact identified by contact-id,
+and to checked item during rules evaluation.
 
 Returns a list of removed facts.
 "
@@ -71,15 +71,15 @@ Returns a list of removed facts.
             ,filtered-items
             ,removed-items)
        
-       (dolist (item ,all-items)
+       (dolist (,item-name ,all-items)
          ;; TODO: it is possible to move
          ;; this rules construction to the macro level
          ;; to optimize performance
          (if (and (or (null ,type)
-                      (typep item ,type))
+                      (typep ,item-name ,type))
                   ,@rules)
-             (push item ,removed-items)
-             (push item ,filtered-items)))
+             (push ,item-name ,removed-items)
+             (push ,item-name ,filtered-items)))
        ;; Now, filtered items should be saved back to the collection
        (setf (slot-value ,contact ',slot-name)
              (nreverse ,filtered-items))

@@ -1,6 +1,7 @@
 (defpackage #:hacrm-email/models
   (:use #:cl
         #:f-underscore)
+  ;; (:nicknames #:HACRM.PLUGINS.EMAIL)
   (:import-from #:hacrm/models/facts/core
                 #:get-facts-of-type
                 #:remove-facts
@@ -9,10 +10,8 @@
                 #:contact
                 #:deffact)
   (:import-from #:hacrm/models/core
-                #:define-transaction
+                #:get-next-id
                 #:get-object-id
-                #:get-root-object
-                #:make-object
                 #:find-object)
   (:import-from #:hacrm/models/contact
                 #:find-contacts-by)
@@ -51,12 +50,13 @@
   (get-facts-of-type contact 'email))
 
 
-(define-transaction tx-add-email (contact-id email-address)
+(prevalence-multimaster/transaction:define-transaction !add-email (contact-id next-fact-id email-address)
   (check-type email-address string)
   (check-type contact-id integer)
   
-  (let* ((email (make-object 'email
-                             :address email-address)))
+  (let* ((email (make-instance 'email
+                               :id next-fact-id
+                               :address email-address)))
     (add-facts (contact-id)
                email)
 
@@ -68,8 +68,9 @@
     (when exists
       (error 'already-exists))
 
-    (let ((fact (execute-tx-add-email
+    (let ((fact (!add-email
                  (get-object-id contact)
+                 (get-next-id)
                  email-address)))
 
       (call-fact-created-hook contact fact)
@@ -77,19 +78,19 @@
       fact)))
 
 
-(define-transaction tx-remove-email
+(prevalence-multimaster/transaction:define-transaction !remove-email
     (contact-id email-to-remove) (check-type contact-id integer)
     (check-type email-to-remove string)
     
-    (remove-facts (contact-id :type 'email)
-      (f_ (string-equal (get-address _)
-                        email-to-remove))))
+    (remove-facts (email contact-id :type 'email)
+      (string-equal (get-address email)
+                    email-to-remove)))
 
 
 (defun remove-email (contact email-to-remove)
   (let* ((contact-id (get-object-id contact))
-         (removed-emails (execute-tx-remove-email contact-id
-                                                  email-to-remove)))
+         (removed-emails (!remove-email contact-id
+                                        email-to-remove)))
     (dolist (removed-email removed-emails)
       (call-fact-removed-hook contact removed-email))
 

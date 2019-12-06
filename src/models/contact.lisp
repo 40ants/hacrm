@@ -1,13 +1,14 @@
 (defpackage  #:hacrm/models/contact
+  ;; (:nicknames #:HACRM.MODELS.CONTACT)
   (:use #:cl
         #:f-underscore)
   (:import-from #:hacrm/models/core
+                #:ids=
                 #:base
                 #:get-object-id
+                #:get-next-id
                 #:find-object
-                #:define-transaction
-                #:make-object
-                #:get-root-object)
+                #:define-transaction)
   (:import-from #:cl-strings
                 #:join
                 #:split)
@@ -17,6 +18,8 @@
                 #:find-contacts-by)
   (:import-from #:hacrm/models/feed
                 #:object-with-feed-mixin)
+  (:import-from #:prevalence-multimaster/system
+                #:get-root-object)
   (:export #:contact
            #:make-contact
            #:get-name-synonyms
@@ -40,33 +43,37 @@
                :reader get-created-at)))
 
 
-(define-transaction tx-make-contact (name)
-  (let ((contact (make-object 'contact
-                              :name name)))
+(prevalence-multimaster/transaction:define-transaction !make-contact (id name)
+  "Create a new contact."
+  (let ((contact (make-instance 'contact
+                                :id id
+                                :name name)))
     (push contact
           (get-root-object :contacts))
     contact))
 
 
-(define-transaction tx-delete-contact (name)
+(defun make-contact (name)
+  "Create a new contact."
+  (let ((result (!make-contact (get-next-id)
+                               name)))
+    result))
+
+
+(prevalence-multimaster/transaction:define-transaction !delete-contact (id)
   (setf (get-root-object :contacts)
         (remove-if
          (lambda (contact)
-           (string-equal (get-name contact)
-                         name))
+           (equal (get-object-id contact)
+                  id))
          (get-root-object :contacts)))
 
   (values))
 
 
-(defun make-contact (name)
-  "Create a new contact."
-  (execute-tx-make-contact name))
-
-
-(defun delete-contact (name)
+(defun delete-contact (id)
   "Delete a contact."
-  (execute-tx-delete-contact name))
+  (!delete-contact id))
 
 
 (defun get-all-contacts ()
@@ -151,7 +158,13 @@ Alexander, Sasha, Shura."
 (defmethod find-contacts-by ((keyword (eql :id)) value)
   (find-object :contacts
                :filter
-               (f_ (eql (get-object-id _)
-                        value))))
+               (f_ (ids= (get-object-id _)
+                         value))))
 
 
+(defun show-contacts-with-ids ()
+  (loop for c in (get-root-object :contacts)
+        do (format t "~A: ~A~%"
+                   (get-name c)
+                   (get-object-id c)))
+  (values))

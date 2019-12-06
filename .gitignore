@@ -5,3 +5,5 @@
 /libssl.dylib
 /js-app/
 /hacrm-darwin-x64/
+/bin/
+*.log

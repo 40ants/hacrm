@@ -1,6 +1,7 @@
 (defpackage #:hacrm/models/feed
   (:use #:cl
         #:f-underscore)
+  ;; (:nicknames #:HACRM.MODELS.FEED)
   (:import-from #:hacrm/models/contact-utils
                 #:add-list-items
                 #:remove-list-items)
@@ -63,7 +64,9 @@ of other types."
                    ,@items))
 
 
-(defmacro remove-feed-items ((contact-id &key type) &body rules)
-  `(remove-list-items feed-items
+(defmacro remove-feed-items ((item-name contact-id &key type) &body rules)
+  `(remove-list-items
+       feed-items
+       ,item-name
        (,contact-id :type ,type)
-     ,@rules))
+       ,@rules))

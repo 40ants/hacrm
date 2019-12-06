@@ -17,6 +17,7 @@
   (:import-from #:hacrm/widgets/help
                 #:make-help-widget)
   (:import-from #:hacrm/search
+                #:index-contacts
                 #:search-contacts)
   (:import-from #:hacrm/widgets/version
                 #:make-version-widget)
@@ -36,7 +37,7 @@
 
   (log:debug "Adding new contact" name)
   (let ((contact (make-contact name)))
-    
+    (index-contacts)
     (change-widget
         widget
         (make-contact-details-widget contact))))
@@ -57,7 +58,6 @@
             (make-contact-details-widget
              contact))))
 
-    ;; TODO: разобраться, почему не срабатывает смена основного виджета
     (change-widget
      widget
      (make-contacts-list
@@ -119,7 +119,8 @@
           widget
           (make-contacts-list
            contacts
-           :on-contact-click #'on-contact-selection)))))))
+           :on-contact-click #'on-contact-selection
+           :search-query query)))))))
 
 
 (defmethod command ((widget base)

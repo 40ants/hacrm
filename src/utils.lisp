@@ -19,6 +19,7 @@
    #:remove-object
    #:find-object
    #:render-markup
+   #:get-machine-name
    #:parse-time))
 (in-package hacrm/utils)
 
@@ -59,3 +60,10 @@
   (let ((*auto-links* t))
     (with-output-to-string (s)
       (3bmd:parse-string-and-print-to-stream text s))))
+
+
+(defun get-machine-name ()
+  (or (uiop:getenv "MACHINE_NAME")
+      (string-trim (list #\Newline)
+                   (with-output-to-string (s)
+                     (uiop:run-program "hostname" :output s)))))

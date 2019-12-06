@@ -14,10 +14,6 @@
 (in-package hacrm-test/utils)
 
 
-;; For unittests we don't want to clutter console with debug information
-(log:config :sane2 :warn)
-
-
 (defun random-string (length)
   (let ((chars "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"))
     (coerce (loop repeat length

@@ -1,6 +1,7 @@
 (defpackage #:hacrm-tags/models
   (:use #:cl
         #:f-underscore)
+  ;; (:nicknames #:HACRM.PLUGINS.TAGS)
   (:import-from #:hacrm/hooks)
   (:import-from #:hacrm/models/facts/core
                 #:get-facts-of-type
@@ -11,11 +12,9 @@
                 #:fact
                 #:deffact)
   (:import-from #:hacrm/models/core
+                #:get-next-id
                 #:find-object
-                #:get-root-object
-                #:make-object
-                #:get-object-id
-                #:define-transaction)
+                #:get-object-id)
   (:import-from #:hacrm/models/contact-utils
                 #:find-contact-by)
   (:import-from #:weblocks/hooks
@@ -44,9 +43,10 @@
 (defmethod fact-group ((fact tag))
   :tags)
 
-(define-transaction tx-tag-contact (contact-id tag-name)
-  (let ((tag (make-object 'tag
-                          :name tag-name)))
+(prevalence-multimaster/transaction:define-transaction !tag-contact (contact-id new-fact-id tag-name)
+  (let ((tag (make-instance 'tag
+                            :id new-fact-id
+                            :name tag-name)))
     (add-facts (contact-id)
                tag)
     
@@ -54,22 +54,23 @@
 
 
 (defun tag-contact (contact tag-name)
-  (let ((tag (execute-tx-tag-contact (get-object-id contact)
-                                     tag-name)))
+  (let ((tag (!tag-contact (get-object-id contact)
+                           (get-next-id)
+                           tag-name)))
     (call-fact-created-hook contact tag)
     
     tag))
 
 
-(define-transaction tx-untag-contact (contact-id tag-name)
-  (remove-facts (contact-id :type 'tag)
-    (string-equal (name fact)
+(prevalence-multimaster/transaction:define-transaction !untag-contact (contact-id tag-name)
+  (remove-facts (fact contact-id :type 'tag)
+    (string-equal (get-name fact)
                   tag-name)))
 
 
 (defun untag-contact (contact tag-name)
-  (let ((removed-tags (execute-tx-untag-contact (get-object-id contact)
-                                                tag-name)))
+  (let ((removed-tags (!untag-contact (get-object-id contact)
+                                      tag-name)))
 
     (dolist (tag removed-tags)
       (call-fact-removed-hook contact tag))))
